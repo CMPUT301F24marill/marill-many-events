@@ -99,7 +99,7 @@
 |----------------------------------------------------------------------------------------------------|---------------------------------|
 | - Collect and verify the location of users when they join the waiting list                          | Entrant                        |
 | - Display a map view of where entrants joined from                                                  | EventManager                         | 
-| - Track and store geolocation data for event analytics                                              | Database                         |
+| - Track and store geolocation data for event analytics                                              |                          |
 | - Warn entrants about events requiring geolocation                                   |            |
 | - Provide geolocation-based event recommendations                                    |       |
 
@@ -108,8 +108,8 @@
 ### Facility
 | **Responsibilities**                                                                               | **Collaborators**               |
 |----------------------------------------------------------------------------------------------------|---------------------------------|
-| - contains facility information with getters and setters                                         | organizer                          | 
-| - Contains facility name                                                                           | administrator                  |
+| - contains facility information with getters and setters                                         | Organizer                          | 
+| - Contains facility name                                                                           | Administrator                  |
 | - Associated to events in a list                                                                 | EventList                          |
 | - Provide facilities for event                                                                    |                           |
 | - Handle booking and availability of facilities                                                      |                    |
@@ -119,17 +119,17 @@
 ### Authentication
 | **Responsibilities**                                                                               | **Collaborators**               |
 |----------------------------------------------------------------------------------------------------|---------------------------------|
-| - Validate entrant credentials (Check device identification)                                                             | Entrant,                |
-| - Handle account creation (If username already exist)                                                                | Database               |
-| - Manage entrant sessions (session tokens, logout)                                      | Session    |
+| - Validate entrant credentials (Check device identification)                                                             | Entrant                |
+| - Handle account creation (If username already exist)                                                                |  Session                 |
+| - Manage entrant sessions (session tokens, logout)                                      | |
 
 ### UserProfile
 
 | **Responsibilities**                                                                 | **Collaborators**  |
 |--------------------------------------------------------------------------------------|-------------------|
 | - Manage entrant profile details (name, email, profile picture, etc.)                   | Entrant    |
-| - Upload or remove profile picture                                                   | Database        |
-| - Associated with profile picture image                | Image         |
+| - Upload or remove profile picture                                                   |Image          |
+| - Associated with profile picture image                | |
 | - Generated image deterministically based on username                |          |
 
 
@@ -138,8 +138,8 @@
 | **Responsibilities**                                                                 | **Collaborators**  |
 |--------------------------------------------------------------------------------------|-------------------|
 | - Manage app settings (e.g., notification preferences, themes)                       | Entrant |
-| - Store and retrieve settings from local storage or database                         | Database          |
-| - Manage opt-in/opt-out settings for notifications                                   | Notification             |
+| - Store and retrieve settings from local storage or database                         |Notification              |
+| - Manage opt-in/opt-out settings for notifications                                   | |
 
 
 
