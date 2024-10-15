@@ -14,23 +14,23 @@
 |-------------------------------------------------------------------------------------------------------|---------------------------------|
 | - Create and manage event details                                                                      |                                 |
 | - Add entrants to the waiting list                                                                     | Entrant                         |
-| - Randomly select entrants for event participation                                                      | Entrant                         |
-| - Handle cancellations and replacements                                                                | Entrant                         |
+| - Randomly select entrants for event participation                                                      |                      |
+| - Handle cancellations and replacements                                                                |                       |
 | - Generate QR code for event registration                                                              | QRCode                          |
 
 ### EventList
 | **Responsibilities**                                                                                      | **Collaborators**               |
 |-----------------------------------------------------------------------------------------------------------|---------------------------------|
 | - Add a new event to the list                                                                              | Event                           |
-| - Remove an event from the list                                                                            | Event                           |
-| - Retrieve an event by its ID                                                                              | Event                           |
-| - Get a list of all events                                                                                 | Event                           |
+| - Remove an event from the list                                                                            |                         |
+| - Retrieve an event by its ID                                                                              |                         |
+| - Get a list of all events                                                                                 |                        |
 
 ### QRCode
 | **Responsibilities**                                                                                  | **Collaborators**               |
 |-------------------------------------------------------------------------------------------------------|---------------------------------|
 | - Generate a unique code for each event                                                                | Event                           |
-| - Provide event details when scanned                                                                   | Event                           |
+| - Provide event details when scanned                                                                   |                          |
 
 ### Notification
 | **Responsibilities**                                                                               | **Collaborators**               |
@@ -44,3 +44,10 @@
 |----------------------------------------------------------------------------------------------------|---------------------------------|
 | - Collect and verify the location of users when they join the waiting list                          | Entrant                        |
 | - Display a map view of where entrants joined from                                                  |                                |
+
+### Facility
+| **Responsibilities**                                                                               | **Collaborators**               |
+|----------------------------------------------------------------------------------------------------|---------------------------------|
+| - contains facility information with getters and setters                                         | organizer                          | 
+| - Contains facility name                                                                           | administrator                  |
+| - linked to events                                                                                | Event                          |
