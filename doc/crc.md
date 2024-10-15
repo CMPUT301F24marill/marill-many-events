@@ -8,7 +8,7 @@
 | - Upload or remove profile picture                                                                     |                                 |
 | - Receive notifications about lottery results                                                          | Notification                    |
 | - Accept or decline an event invitation                                                                | Event                           |
-| - Have a facility if entrant is an organiser                                                           | Event                           |
+| - Have a facility if entrant is an organiser                                                           |                           |
 
 
 ### Event
