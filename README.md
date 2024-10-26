@@ -1,2 +1,2 @@
 # marill-events
-Project Part 1
+Team Marill CMPUT 301 Project
