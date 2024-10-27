@@ -1,3 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-    <string name="app_name">marill_many_events</string>
+    <string name="app_name">login</string>
+    <string name="loading">Loading…</string>
+    <string name="no_internet_connection">No internet connection!</string>
+    <string name="lbl_many_events">Many Events</string>
+    <string name="lbl_marill">Marill</string>
+    <string name="lbl_log_in">Log in</string>
+    <string name="lbl_welcome_to">Welcome to</string>
 </resources>

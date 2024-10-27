@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Button logInButton = findViewById(R.id.loginButton);
-        Button registerButton = findViewById(R.id.registerButton);
+        //Button registerButton = findViewById(R.id.registerButton);
 
         // Set up the login button to navigate to the actual login page
         logInButton.setOnClickListener(v -> {
@@ -27,10 +27,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Set up the register button to navigate to the registration page
-        registerButton.setOnClickListener(view -> {
-            Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
-            startActivity(intent);
-        });
+//        registerButton.setOnClickListener(view -> {
+//            Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
+//            startActivity(intent);
+//        });
 
     }
 }
