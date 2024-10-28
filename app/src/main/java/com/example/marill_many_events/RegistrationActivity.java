@@ -15,6 +15,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
@@ -76,16 +78,23 @@ public class RegistrationActivity extends AppCompatActivity {
 
     }
 
+
     private final ActivityResultLauncher<Intent> photoPickerLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (result.getResultCode() == RESULT_OK) {
-                    Intent data = result.getData();
-                    if (data != null) {
-                        profilePictureUri = data.getData();
-                        profilePicture.setImageURI(profilePictureUri); // Display the selected image
-                    }
-                }
-            });
+                        if (result.getResultCode() == RESULT_OK) {
+                            Intent data = result.getData();
+                            if (data != null) {
+                                profilePictureUri = data.getData();
+                                // Display the selected image in a circular shape using Glide
+                                if (profilePictureUri != null) {
+                                    Glide.with(this)
+                                            .load(profilePictureUri)
+                                            .transform(new CircleCrop()) // Apply circular cropping
+                                            .into(profilePicture); // Display in ImageView
+                                }
+                            }
+                        }
+                    });
 
 
         // Validate user inputs
