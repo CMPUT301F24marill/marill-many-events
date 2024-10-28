@@ -60,12 +60,11 @@ public class MainActivity extends AppCompatActivity {
                         String mobile = result.getData().getStringExtra("mobile");
 
                         // Create a new user map to add to Firestore
-                        User newUser = new User(name, email, mobile);
 
                         // Add the user to Firestore under their device ID
-                        usersRef.document(deviceId).set(newUser)
-                                .addOnSuccessListener(aVoid -> Log.d(TAG, "User added successfully"))
-                                .addOnFailureListener(e -> Log.e(TAG, "Error adding user", e));
+//                        usersRef.document(deviceId).set(newUser)
+//                                .addOnSuccessListener(aVoid -> Log.d(TAG, "User added successfully"))
+//                                .addOnFailureListener(e -> Log.e(TAG, "Error adding user", e));
                     }
                 });
 

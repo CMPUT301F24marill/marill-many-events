@@ -1,11 +1,17 @@
 package com.example.marill_many_events;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,6 +20,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +33,9 @@ public class RegistrationActivity extends AppCompatActivity {
     private Button buttonRegister;
     private FirebaseFirestore firestore; // Firestore instance
     private String deviceId; // Variable to hold the device ID
+    private ImageView profilePicture;
+    private Uri profilePictureUri;
+    private StorageReference storageReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +43,7 @@ public class RegistrationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register); // Ensure this matches your layout XML file name
         deviceId = getIntent().getStringExtra("deviceId"); // Ensure you pass this from MainActivity
         firestore = FirebaseFirestore.getInstance();
+        storageReference = FirebaseStorage.getInstance().getReference("profile_pictures");
 
 
         // Initialize UI elements
@@ -41,7 +53,11 @@ public class RegistrationActivity extends AppCompatActivity {
         editTextName = findViewById(R.id.editTextName);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextMobile = findViewById(R.id.editTextMobile);
+        profilePicture = findViewById(R.id.profile_picture);
         buttonRegister = findViewById(R.id.buttonRegister); // Ensure you add this button in your layout XML
+
+
+        profilePicture.setOnClickListener(v -> openPhotoPicker());
 
         // Set click listener for the register button
         buttonRegister.setOnClickListener(new View.OnClickListener() {
@@ -54,7 +70,25 @@ public class RegistrationActivity extends AppCompatActivity {
         });
     }
 
-    // Validate user inputs
+    private void openPhotoPicker() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        photoPickerLauncher.launch(intent);
+
+    }
+
+    private final ActivityResultLauncher<Intent> photoPickerLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    Intent data = result.getData();
+                    if (data != null) {
+                        profilePictureUri = data.getData();
+                        profilePicture.setImageURI(profilePictureUri); // Display the selected image
+                    }
+                }
+            });
+
+
+        // Validate user inputs
     private boolean validateInputs() {
         String name = editTextName.getText().toString().trim();
         String email = editTextEmail.getText().toString().trim();
@@ -74,7 +108,7 @@ public class RegistrationActivity extends AppCompatActivity {
             textInputLayoutEmail.setError(null); // Clear error
         }
 
-        if (mobile.isEmpty() || mobile.length() < 10) {
+        if (!mobile.isEmpty() && mobile.length() < 10) {
             textInputLayoutMobile.setError("Valid mobile number is required");
             return false;
         } else {
@@ -84,34 +118,32 @@ public class RegistrationActivity extends AppCompatActivity {
         return true;
     }
 
+
     private void registerUser() {
         String name = editTextName.getText().toString().trim();
         String email = editTextEmail.getText().toString().trim();
         String mobile = editTextMobile.getText().toString().trim();
 
-        // Create a Map to hold the user data
-        Map<String, Object> user = new HashMap<>();
-        user.put("name", name);
-        user.put("email", email);
-        user.put("mobile", mobile);
+        // Upload the image to Firebase Storage
+        if (profilePictureUri != null) {
+            StorageReference fileReference = storageReference.child("profile_pictures/" + deviceId + ".jpg");
 
-        // Add a new document with the deviceId as the document name
-        firestore.collection("users")
-                .document(deviceId) // Use the deviceId as the document ID
-                .set(user)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(RegistrationActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();
-                            // Navigate to another activity after successful registration
-                            // Intent intent = new Intent(RegistrationActivity.this, HomeActivity.class);
-                            // startActivity(intent);
-                            finish(); // Close this activity
-                        } else {
-                            Toast.makeText(RegistrationActivity.this, "Registration failed. Please try again.", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+            fileReference.putFile(profilePictureUri)
+                    .addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
+                        // Create a user document in Firestore with the image URL and other fields
+                        User user = new User(name, email, mobile, uri.toString());
+                        firestore.collection("users").document(deviceId)
+                                .set(user)
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(RegistrationActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();
+                                    // Navigate to the next activity if needed
+                                })
+                                .addOnFailureListener(e -> Toast.makeText(RegistrationActivity.this, "Failed to register user.", Toast.LENGTH_SHORT).show());
+                    }))
+                    .addOnFailureListener(e -> Toast.makeText(RegistrationActivity.this, "Image upload failed.", Toast.LENGTH_SHORT).show());
+        } else {
+            // Handle case where no image was selected
+            Toast.makeText(this, "Please select a profile picture.", Toast.LENGTH_SHORT).show();
+        }
     }
 }
