@@ -1,76 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    android:background="@color/white">
+    android:padding="16dp">
 
-    <!-- Email Field -->
-    <EditText
-        android:id="@+id/emailEditText"
+    <!-- Profile Picture Placeholder -->
+    <ImageView
+        android:id="@+id/profile_picture"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="24dp"
+        android:src="@drawable/ic_marill"
+        />
+
+    <!-- Name Input Field -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayoutName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_constraintEnd_toEndOf="parent"
-        android:layout_constraintStart_toStartOf="parent"
-        android:layout_constraintTop_toTopOf="parent"
-        android:hint="Email"
-        android:inputType="textEmailAddress"
-        android:padding="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/phoneEditText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_below="@id/profile_picture"
+        android:layout_marginBottom="16dp"
+        app:hintEnabled="true"
+        app:hintAnimationEnabled="true">
 
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Name"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Phone Number Field -->
-    <EditText
-        android:id="@+id/phoneEditText"
+    <!-- Email Input Field -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayoutEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_constraintEnd_toEndOf="parent"
-        android:layout_constraintStart_toStartOf="parent"
-        android:layout_constraintTop_toTopOf="parent"
-        android:hint="Phone Number(Optional)"
-        android:inputType="textEmailAddress"
-        android:padding="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/passwordEditText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_below="@id/textInputLayoutName"
+        android:layout_marginBottom="16dp"
+        app:hintEnabled="true"
+        app:hintAnimationEnabled="true">
 
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Password Field -->
-    <EditText
-        android:id="@+id/passwordEditText"
+    <!-- Mobile Number Input Field -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayoutMobile"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_constraintTop_toBottomOf="@id/emailEditText"
-        android:layout_constraintEnd_toEndOf="parent"
-        android:layout_constraintStart_toStartOf="parent"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:padding="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="170dp" />
+        android:layout_below="@id/textInputLayoutEmail"
+        android:layout_marginBottom="16dp"
+        app:hintEnabled="true"
+        app:hintAnimationEnabled="true">
 
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextMobile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mobile Number"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Submit Button -->
     <Button
-        android:id="@+id/submitButton"
-        android:layout_width="0dp"
+        android:id="@+id/buttonRegister"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_constraintTop_toBottomOf="@id/passwordEditText"
-        android:layout_constraintEnd_toEndOf="parent"
-        android:layout_constraintStart_toStartOf="parent"
-        android:backgroundTint="@color/black"
-        android:text="Submit"
-        android:textColor="@android:color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="352dp" />
+        android:text="Register"
+        android:layout_below="@id/textInputLayoutMobile"
+        android:layout_marginTop="24dp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
-
+</RelativeLayout>
