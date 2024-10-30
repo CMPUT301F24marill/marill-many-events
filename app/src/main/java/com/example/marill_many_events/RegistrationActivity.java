@@ -140,19 +140,24 @@ public class RegistrationActivity extends AppCompatActivity {
             fileReference.putFile(profilePictureUri)
                     .addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
                         // Create a user document in Firestore with the image URL and other fields
-                        User user = new User(name, email, mobile, uri.toString());
+                        String profilePictureUrl = uri.toString();
+                        User user = new User(name, email, mobile, profilePictureUrl);
                         firestore.collection("users").document(deviceId)
                                 .set(user)
                                 .addOnSuccessListener(aVoid -> {
                                     Toast.makeText(RegistrationActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();
-                                    // Navigate to the next activity if needed
+
+                                    Intent intent = new Intent(RegistrationActivity.this, HomePageActivity.class);
+                                    intent.putExtra("deviceId", deviceId);
+                                    startActivity(intent); // Use the launcher to start RegistrationActivity
+
+
                                 })
                                 .addOnFailureListener(e -> Toast.makeText(RegistrationActivity.this, "Failed to register user.", Toast.LENGTH_SHORT).show());
                     }))
                     .addOnFailureListener(e -> Toast.makeText(RegistrationActivity.this, "Image upload failed.", Toast.LENGTH_SHORT).show());
         } else {
             // Handle case where no image was selected
-            Toast.makeText(this, "Please select a profile picture.", Toast.LENGTH_SHORT).show();
         }
     }
 }

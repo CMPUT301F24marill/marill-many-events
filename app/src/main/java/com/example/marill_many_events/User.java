@@ -4,7 +4,7 @@ public class User {
     public String name;
     public String email;
     public String phone;
-    private String profilePictureUrl;
+    public String profilePictureUrl;
 
     public User() {
         // Default constructor

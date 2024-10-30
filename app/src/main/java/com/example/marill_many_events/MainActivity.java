@@ -24,6 +24,8 @@ import android.os.Bundle;
 import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         Button logInButton = findViewById(R.id.loginButton);
+
 
         firestore = FirebaseFirestore.getInstance();
         usersRef = firestore.collection("users");
@@ -84,13 +87,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
     private void checkDeviceId(String deviceId) {
         usersRef.document(deviceId).get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-
+                            Intent intent = new Intent(MainActivity.this, HomePageActivity.class);
+                            intent.putExtra("deviceId", deviceId);
+                            startActivity(intent);; // Use the launcher to start RegistrationActivity
                         } else {
                             // Device ID does not exist, navigate to register activity
                             Log.d(TAG, "Device ID not found. Redirecting to RegistrationActivity.");
