@@ -5,10 +5,6 @@ public class User {
     public String email;
     public String phone;
 
-    public User() {
-        // Default constructor
-    }
-
     public User(String name, String email, String phone) {
         // Initialize user profile
         this.name = name;
