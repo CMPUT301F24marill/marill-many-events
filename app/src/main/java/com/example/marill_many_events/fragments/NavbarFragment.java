@@ -58,10 +58,19 @@ public class NavbarFragment extends Fragment {
 
             if (itemId == R.id.nav_home) {
                 // Handle home navigation
-                bottomNavigation.getMenu().findItem(R.id.nav_home).setIcon(R.drawable.home_focused);
+                if (navbarListener != null) {
+                    // Pass the deviceId when opening the registration fragment
+                    bottomNavigation.getMenu().findItem(R.id.nav_home).setIcon(R.drawable.home_focused);
+                    navbarListener.onHomeSelected();
+                }
+
                 return true;
             } else if (itemId == R.id.nav_menu) {
-                // Handle dashboard navigation
+                if (navbarListener != null) {
+                    // Pass the deviceId when opening the registration fragment
+                    bottomNavigation.getMenu().findItem(R.id.nav_menu).setIcon(R.drawable.menu);
+                    navbarListener.onMenuSelected();
+                }
                 return true;
             } else if (itemId == R.id.nav_profile) {
                 // Open registration fragment when profile is clicked

@@ -5,6 +5,8 @@ import static com.google.firebase.appcheck.internal.util.Logger.TAG;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.example.marill_many_events.fragments.HomeFragment;
+import com.example.marill_many_events.fragments.MenuFragment;
 import com.example.marill_many_events.fragments.NavbarFragment;
 import com.example.marill_many_events.NavbarListener;
 import com.example.marill_many_events.R;
@@ -13,6 +15,7 @@ import com.example.marill_many_events.fragments.RegistrationFragment;
 import android.widget.FrameLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -48,11 +51,41 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
 
     }
 
+
+    /**
+     * Handles the event when the home option is selected from the navigation bar.
+     * It opens a placeholder.
+     */
+    public void onHomeSelected(){
+        HomeFragment homeFragment = new HomeFragment();
+
+        Log.d(TAG, "onHomeSelected called");
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, homeFragment)
+                .commit();
+    }
+
+    /**
+     * Handles the event when the menu option is selected from the navigation bar.
+     * It opens a placeholder.
+     */
+    public void onMenuSelected(){
+        MenuFragment menuFragment = new MenuFragment();
+
+        Log.d(TAG, "onMenuSelected called");
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, menuFragment)
+                .commit();
+    }
+
     /**
      * Handles the event when the profile option is selected from the navigation bar.
      * It opens the RegistrationFragment and passes the deviceId as an argument.
      */
-
     @Override
     public void onProfileSelected() {
         // Open the RegistrationFragment when profile is selected
