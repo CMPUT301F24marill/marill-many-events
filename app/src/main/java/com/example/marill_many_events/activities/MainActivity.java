@@ -19,6 +19,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.CollectionReference;
 
+/**
+ *  Checks for an existing user registration based on the device ID and navigates to the appropriate screen.
+ */
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
@@ -47,19 +50,8 @@ public class MainActivity extends AppCompatActivity {
         registrationActivityLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                        // Get user info from the RegistrationActivity result
-
-                        String name = result.getData().getStringExtra("name");
-                        String email = result.getData().getStringExtra("email");
-                        String mobile = result.getData().getStringExtra("mobile");
-
-                        // Create a new user map to add to Firestore
-
-                        // Add the user to Firestore under their device ID
-//                        usersRef.document(deviceId).set(newUser)
-//                                .addOnSuccessListener(aVoid -> Log.d(TAG, "User added successfully"))
-//                                .addOnFailureListener(e -> Log.e(TAG, "Error adding user", e));
+                    if (result.getResultCode() == RESULT_OK) {
+                            checkDeviceId(deviceId); // attempt login after registration is successful
                     }
                 });
 
@@ -70,15 +62,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        // Set up the register button to navigate to the registration page
-//        registerButton.setOnClickListener(view -> {
-//            Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
-//            startActivity(intent);
-//        });
-
     }
 
-
+    /**
+     * Checks if a user with the provided device ID exists in the Firestore database.
+     * If the user exists, navigates to the HomePageActivity; otherwise, it starts the RegistrationActivity.
+     *
+     * @param deviceId The unique device ID used to identify the user in the database.
+     */
 
     private void checkDeviceId(String deviceId) {
         args.putString("deviceId", deviceId); // Pass the device ID

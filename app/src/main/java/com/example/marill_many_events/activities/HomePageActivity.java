@@ -17,10 +17,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+
+/**
+ * HomePageActivity serves as the main activity for the application, managing the
+ * display of the navigation bar and handling user profile interactions.
+ * It implements the NavbarListener interface to respond to navigation events.
+ */
 public class HomePageActivity extends AppCompatActivity implements NavbarListener {
 
-    private FirebaseFirestore firestore;
-    private CollectionReference usersRef;
+    private FirebaseFirestore firestore; // Firestore instance
     private String deviceId; // Store deviceId here
 
     @Override
@@ -30,7 +35,6 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
         deviceId = getIntent().getStringExtra("deviceId"); // Retrieve deviceId
 
         firestore = FirebaseFirestore.getInstance();
-        usersRef = firestore.collection("users");
 
         Log.d("HomePageActivity", "Fragment Container Visibility: " + findViewById(R.id.fragment_container).getVisibility());
 
@@ -43,6 +47,11 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
 
 
     }
+
+    /**
+     * Handles the event when the profile option is selected from the navigation bar.
+     * It opens the RegistrationFragment and passes the deviceId as an argument.
+     */
 
     @Override
     public void onProfileSelected() {
@@ -58,8 +67,8 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
         registrationFragment.setArguments(args);
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, registrationFragment)
-                .addToBackStack(null) // Optional: add to back stack
+                .replace(R.id.fragment_container, registrationFragment) // replace the fragment already in fragment_container
+                .addToBackStack(null) // add to back stack
                 .commit();
 
 

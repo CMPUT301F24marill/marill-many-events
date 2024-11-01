@@ -6,6 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.fragments.RegistrationFragment;
 
+/**
+ * RegistrationActivity handles user registration.
+ * It loads the RegistrationFragment and passes the device ID to it.
+ */
+
+
 public class RegistrationActivity extends AppCompatActivity {
 
     @Override
@@ -25,6 +31,7 @@ public class RegistrationActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, myFragment)
                     .commit();
+
         }
     }
 }

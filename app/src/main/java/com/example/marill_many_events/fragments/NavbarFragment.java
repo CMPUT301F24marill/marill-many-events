@@ -13,10 +13,27 @@ import com.example.marill_many_events.NavbarListener;
 import com.example.marill_many_events.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+
+
+/**
+ * NavbarFragment represents a fragment that contains a BottomNavigationView
+ * for navigating between different sections of the app.
+ */
 public class NavbarFragment extends Fragment {
 
     private BottomNavigationView bottomNavigation;
     private NavbarListener navbarListener; // Changed to NavbarListener
+
+    /**
+     * Inflates the layout for this fragment.
+     *
+     * @param inflater           The LayoutInflater used to inflate the view.
+     * @param container          The parent view that this fragment's UI should be attached to.
+     * @param savedInstanceState A Bundle containing the activity's previously saved state.
+     * @return The view for this fragment.
+     */
+
+
 
     @Nullable
     @Override
@@ -60,6 +77,12 @@ public class NavbarFragment extends Fragment {
         });
     }
 
+    /**
+     * Clears the focus from unselected menu icons in the Navbar.
+     *
+     * @param bottomNavigation The BottomNavigationView instance.
+     * @param selectedItemId  The ID of the currently selected menu item.
+     */
     private void clearFocus(BottomNavigationView bottomNavigation, int selectedItemId) {
         // Iterate through all menu items
         for (int i = 0; i < bottomNavigation.getMenu().size(); i++) {

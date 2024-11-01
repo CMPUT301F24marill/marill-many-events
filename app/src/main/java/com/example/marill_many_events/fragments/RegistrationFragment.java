@@ -1,5 +1,7 @@
 package com.example.marill_many_events.fragments;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,6 +34,12 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.util.HashMap;
 import java.util.Map;
 
+
+/**
+ * RegistrationFragment is responsible for user registration and profile update functionalities.
+ * It provides a form for users to input their details, upload a profile picture,
+ * and store the information in Firebase Firestore and Firebase Storage.
+ */
 public class RegistrationFragment extends Fragment {
 
     private TextInputLayout textInputLayoutName, textInputLayoutEmail, textInputLayoutMobile;
@@ -56,12 +64,28 @@ public class RegistrationFragment extends Fragment {
         storageReference = FirebaseStorage.getInstance().getReference("profile_pictures");
     }
 
+    /**
+     * Inflates the layout for this fragment.
+     *
+     * @param inflater           The LayoutInflater used to inflate the view.
+     * @param container          The parent view that this fragment's UI should be attached to.
+     * @param savedInstanceState A Bundle containing the activity's previously saved state.
+     * @return The view for this fragment.
+     */
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_register, container, false); // Ensure this matches your layout XML file name
     }
+
+    /**
+     * Initializes UI elements and sets up click listeners.
+     *
+     * @param view              The view returned by onCreateView.
+     * @param savedInstanceState A Bundle containing the activity's previously saved state.
+     */
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -94,6 +118,10 @@ public class RegistrationFragment extends Fragment {
         });
     }
 
+    /**
+     * Loads user details from Firestore if in edit mode.
+     */
+
     private void loadUserDetails() {
         // Retrieve user details from Firestore
         firestore.collection("users").document(deviceId)
@@ -124,6 +152,10 @@ public class RegistrationFragment extends Fragment {
                 });
     }
 
+    /**
+     * Opens the photo picker to select a profile picture.
+     */
+
     private void openPhotoPicker() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         photoPickerLauncher.launch(intent);
@@ -146,6 +178,12 @@ public class RegistrationFragment extends Fragment {
                 }
             });
 
+
+    /**
+     * Validates user inputs for registration.
+     *
+     * @return True if all inputs are valid, otherwise false.
+     */
     // Validate user inputs
     private boolean validateInputs() {
         String name = editTextName.getText().toString().trim();
@@ -176,6 +214,10 @@ public class RegistrationFragment extends Fragment {
         return true;
     }
 
+    /**
+     * Registers a new user and uploads the profile picture to Firebase Storage if one does not exist.
+     */
+
     private void registerUser() {
         String name = editTextName.getText().toString().trim();
         String email = editTextEmail.getText().toString().trim();
@@ -196,7 +238,10 @@ public class RegistrationFragment extends Fragment {
                                     Toast.makeText(getActivity(), "Registration successful!", Toast.LENGTH_SHORT).show();
 
                                     // Optionally, navigate to another fragment or activity
-                                    getActivity().finish(); // Close the current activity
+                                    Intent resultIntent = new Intent();
+                                    resultIntent.putExtra("deviceId", deviceId); // Include deviceId if needed
+                                    getActivity().setResult(RESULT_OK, resultIntent);
+                                    getActivity().finish(); // Finish the activity
                                 })
                                 .addOnFailureListener(e -> Toast.makeText(getActivity(), "Failed to register user.", Toast.LENGTH_SHORT).show());
                     }))
@@ -213,6 +258,10 @@ public class RegistrationFragment extends Fragment {
                     .addOnFailureListener(e -> Toast.makeText(getActivity(), "Failed to register user.", Toast.LENGTH_SHORT).show());
         }
     }
+
+    /**
+     * Updates existing user details in Firestore for pre-existing users.
+     */
 
     private void updateUser() {
         String name = editTextName.getText().toString().trim();
@@ -238,6 +287,12 @@ public class RegistrationFragment extends Fragment {
             updateUserInFirestore(userUpdates);
         }
     }
+
+    /**
+     * Updates user details in Firestore with the provided updates map.
+     *
+     * @param userUpdates A map containing the updated user details.
+     */
 
     void updateUserInFirestore(Map<String, Object> userUpdates) {
         firestore.collection("users").document(deviceId)
