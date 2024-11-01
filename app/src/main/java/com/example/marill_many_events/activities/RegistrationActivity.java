@@ -1,7 +1,10 @@
-package com.example.marill_many_events;
+package com.example.marill_many_events.activities;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.marill_many_events.R;
+import com.example.marill_many_events.fragments.RegistrationFragment;
 
 public class RegistrationActivity extends AppCompatActivity {
 

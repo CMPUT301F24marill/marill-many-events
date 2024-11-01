@@ -1,4 +1,4 @@
-package com.example.marill_many_events;
+package com.example.marill_many_events.fragments;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -20,6 +20,8 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.example.marill_many_events.R;
+import com.example.marill_many_events.models.User;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -67,10 +69,12 @@ public class RegistrationFragment extends Fragment {
         textInputLayoutName = view.findViewById(R.id.textInputLayoutName);
         textInputLayoutEmail = view.findViewById(R.id.textInputLayoutEmail);
         textInputLayoutMobile = view.findViewById(R.id.textInputLayoutMobile);
+
         editTextName = view.findViewById(R.id.editTextName);
         editTextEmail = view.findViewById(R.id.editTextEmail);
         editTextMobile = view.findViewById(R.id.editTextMobile);
         profilePicture = view.findViewById(R.id.profile_picture);
+
         buttonRegister = view.findViewById(R.id.buttonRegister); // Ensure you add this button in your layout XML
 
         profilePicture.setOnClickListener(v -> openPhotoPicker());
@@ -99,6 +103,7 @@ public class RegistrationFragment extends Fragment {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
                             isEditMode = true; // Set edit mode to true
+                            buttonRegister.setText("Save");
                             User user = document.toObject(User.class);
                             if (user != null) {
                                 editTextName.setText(user.getName());
@@ -239,7 +244,6 @@ public class RegistrationFragment extends Fragment {
                 .update(userUpdates)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(getActivity(), "User details updated successfully!", Toast.LENGTH_SHORT).show();
-                    getActivity().finish(); // Close the current activity
                 })
                 .addOnFailureListener(e -> Toast.makeText(getActivity(), "Failed to update user details.", Toast.LENGTH_SHORT).show());
     }

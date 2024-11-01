@@ -1,4 +1,4 @@
-package com.example.marill_many_events;
+package com.example.marill_many_events.models;
 
 public class User {
     public String name;

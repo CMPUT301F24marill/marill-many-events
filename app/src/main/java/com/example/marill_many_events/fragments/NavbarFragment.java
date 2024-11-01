@@ -1,4 +1,4 @@
-package com.example.marill_many_events;
+package com.example.marill_many_events.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,9 +8,12 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.example.marill_many_events.NavbarListener;
+import com.example.marill_many_events.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class Navbar extends Fragment {
+public class NavbarFragment extends Fragment {
 
     private BottomNavigationView bottomNavigation;
     private NavbarListener navbarListener; // Changed to NavbarListener
@@ -25,6 +28,7 @@ public class Navbar extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         bottomNavigation = view.findViewById(R.id.bottom_navigation);
+
 
         // Set the listener here
         if (getActivity() instanceof NavbarListener) {
@@ -46,8 +50,8 @@ public class Navbar extends Fragment {
                 // Open registration fragment when profile is clicked
                 if (navbarListener != null) {
                     // Pass the deviceId when opening the registration fragment
-                    String deviceId = getActivity().getIntent().getStringExtra("deviceId");
-                    navbarListener.onProfileSelected(deviceId);
+                    bottomNavigation.getMenu().findItem(R.id.nav_profile).setIcon(R.drawable.default_profile_focus);
+                    navbarListener.onProfileSelected();
                 }
                 return true;
             } else {
