@@ -40,6 +40,17 @@ dependencies {
     implementation ("androidx.navigation:navigation-fragment:2.3.5")
     implementation ("androidx.navigation:navigation-ui:2.3.5")
     implementation ("com.google.android.material:material")
+    implementation(libs.fragment.testing)
+    testImplementation(libs.ext.junit)
+
+    androidTestImplementation ("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation ("androidx.test:runner:1.5.2")
+    androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.2")
+    androidTestImplementation ("androidx.test:core")
+
+    testImplementation ("org.mockito:mockito-core:5.0.0")
+    androidTestImplementation ("org.mockito:mockito-android:5.0.0")
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -49,6 +60,7 @@ dependencies {
     implementation("com.github.bumptech.glide:okhttp3-integration:4.15.0") // For OkHttp integration if needed
     implementation("com.github.bumptech.glide:annotations:4.15.0")
     testImplementation(libs.junit)
+    testImplementation(libs.core)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 }

@@ -22,7 +22,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class NavbarFragment extends Fragment {
 
     private BottomNavigationView bottomNavigation;
-    private NavbarListener navbarListener; // Changed to NavbarListener
+    public NavbarListener navbarListener; // Changed to NavbarListener
 
     /**
      * Inflates the layout for this fragment.
