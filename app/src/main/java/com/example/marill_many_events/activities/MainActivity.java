@@ -1,41 +1,38 @@
-package com.example.marill_many_events;
+package com.example.marill_many_events.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.provider.Settings;
 
-import androidx.activity.EdgeToEdge;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.activity.result.ActivityResultLauncher;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import com.google.firebase.firestore.DocumentReference;
+
+import androidx.fragment.app.Fragment;
+
+import com.example.marill_many_events.R;
+import com.example.marill_many_events.fragments.RegistrationFragment;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.CollectionReference;
 
+/**
+ *  Checks for an existing user registration based on the device ID and navigates to the appropriate screen.
+ */
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private static final int REQUEST_CODE_REGISTER = 1;
     private FirebaseFirestore firestore;
     private CollectionReference usersRef;
+
+
+    Fragment registrationFragment = new RegistrationFragment();
+    Bundle args = new Bundle();
+
 
     private ActivityResultLauncher<Intent> registrationActivityLauncher;
     @Override
@@ -46,26 +43,15 @@ public class MainActivity extends AppCompatActivity {
         String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         Button logInButton = findViewById(R.id.loginButton);
 
+
         firestore = FirebaseFirestore.getInstance();
         usersRef = firestore.collection("users");
 
         registrationActivityLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                        // Get user info from the RegistrationActivity result
-
-                        String name = result.getData().getStringExtra("name");
-                        String email = result.getData().getStringExtra("email");
-                        String mobile = result.getData().getStringExtra("mobile");
-
-                        // Create a new user map to add to Firestore
-                        User newUser = new User(name, email, mobile);
-
-                        // Add the user to Firestore under their device ID
-                        usersRef.document(deviceId).set(newUser)
-                                .addOnSuccessListener(aVoid -> Log.d(TAG, "User added successfully"))
-                                .addOnFailureListener(e -> Log.e(TAG, "Error adding user", e));
+                    if (result.getResultCode() == RESULT_OK) {
+                            checkDeviceId(deviceId); // attempt login after registration is successful
                     }
                 });
 
@@ -76,23 +62,29 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        // Set up the register button to navigate to the registration page
-//        registerButton.setOnClickListener(view -> {
-//            Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
-//            startActivity(intent);
-//        });
-
     }
 
+    /**
+     * Checks if a user with the provided device ID exists in the Firestore database.
+     * If the user exists, navigates to the HomePageActivity; otherwise, it starts the RegistrationActivity.
+     *
+     * @param deviceId The unique device ID used to identify the user in the database.
+     */
 
     private void checkDeviceId(String deviceId) {
+        args.putString("deviceId", deviceId); // Pass the device ID
+        registrationFragment.setArguments(args);
+
         usersRef.document(deviceId).get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-
+                            Intent intent = new Intent(MainActivity.this, HomePageActivity.class);
+                            intent.putExtra("deviceId", deviceId);
+                            startActivity(intent);; // Use the launcher to start RegistrationActivity
                         } else {
+
                             // Device ID does not exist, navigate to register activity
                             Log.d(TAG, "Device ID not found. Redirecting to RegistrationActivity.");
                             Intent intent = new Intent(MainActivity.this, RegistrationActivity.class);
