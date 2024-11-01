@@ -13,6 +13,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class Navbar extends Fragment {
 
     private BottomNavigationView bottomNavigation;
+    private NavbarListener navbarListener; // Changed to NavbarListener
 
     @Nullable
     @Override
@@ -23,25 +24,31 @@ public class Navbar extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         bottomNavigation = view.findViewById(R.id.bottom_navigation);
+
+        // Set the listener here
+        if (getActivity() instanceof NavbarListener) {
+            navbarListener = (NavbarListener) getActivity();
+        }
 
         bottomNavigation.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
-            clearfocus(bottomNavigation, itemId);
+            clearFocus(bottomNavigation, itemId);
 
             if (itemId == R.id.nav_home) {
                 // Handle home navigation
                 bottomNavigation.getMenu().findItem(R.id.nav_home).setIcon(R.drawable.home_focused);
-                clearfocus(bottomNavigation, itemId);
                 return true;
             } else if (itemId == R.id.nav_menu) {
                 // Handle dashboard navigation
                 return true;
             } else if (itemId == R.id.nav_profile) {
-                // Handle notifications navigation
-                bottomNavigation.getMenu().findItem(R.id.nav_profile).setIcon(R.drawable.default_profile_focus);
-                clearfocus(bottomNavigation, itemId);
+                // Open registration fragment when profile is clicked
+                if (navbarListener != null) {
+                    // Pass the deviceId when opening the registration fragment
+                    String deviceId = getActivity().getIntent().getStringExtra("deviceId");
+                    navbarListener.onProfileSelected(deviceId);
+                }
                 return true;
             } else {
                 return false;
@@ -49,9 +56,7 @@ public class Navbar extends Fragment {
         });
     }
 
-
-
-    private void clearfocus(BottomNavigationView bottomNavigation, int selectedItemId) {
+    private void clearFocus(BottomNavigationView bottomNavigation, int selectedItemId) {
         // Iterate through all menu items
         for (int i = 0; i < bottomNavigation.getMenu().size(); i++) {
             MenuItem menuItem = bottomNavigation.getMenu().getItem(i);
@@ -68,10 +73,6 @@ public class Navbar extends Fragment {
             } else if (menuItem.getItemId() == R.id.nav_profile) {
                 menuItem.setIcon(R.drawable.default_profile); // Reset to unselected icon
             }
-            // Add more if statements for additional items as needed
         }
     }
-
-
-
 }

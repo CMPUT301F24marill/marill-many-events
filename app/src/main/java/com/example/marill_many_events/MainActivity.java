@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentReference;
@@ -38,6 +39,11 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_REGISTER = 1;
     private FirebaseFirestore firestore;
     private CollectionReference usersRef;
+
+
+    Fragment registrationFragment = new RegistrationFragment();
+    Bundle args = new Bundle();
+
 
     private ActivityResultLauncher<Intent> registrationActivityLauncher;
     @Override
@@ -89,6 +95,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void checkDeviceId(String deviceId) {
+        args.putString("deviceId", deviceId); // Pass the device ID
+        registrationFragment.setArguments(args);
+
         usersRef.document(deviceId).get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -98,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
                             intent.putExtra("deviceId", deviceId);
                             startActivity(intent);; // Use the launcher to start RegistrationActivity
                         } else {
+
                             // Device ID does not exist, navigate to register activity
                             Log.d(TAG, "Device ID not found. Redirecting to RegistrationActivity.");
                             Intent intent = new Intent(MainActivity.this, RegistrationActivity.class);
