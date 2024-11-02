@@ -3,6 +3,7 @@ package com.example.marill_many_events.fragments;
 import static android.app.Activity.RESULT_OK;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -23,6 +24,7 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.example.marill_many_events.R;
+import com.example.marill_many_events.models.ProfilePictureGenerator;
 import com.example.marill_many_events.models.User;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -53,6 +55,8 @@ public class RegistrationFragment extends Fragment {
     private String profilePictureUrl;
     private StorageReference storageReference;
     private boolean isEditMode = false;
+    private Bitmap defaultprofile;
+    String name;
 
     public RegistrationFragment() {}
 
@@ -91,15 +95,19 @@ public class RegistrationFragment extends Fragment {
         textInputLayoutName = view.findViewById(R.id.textInputLayoutName);
         textInputLayoutEmail = view.findViewById(R.id.textInputLayoutEmail);
         textInputLayoutMobile = view.findViewById(R.id.textInputLayoutMobile);
+
         editTextName = view.findViewById(R.id.editTextName);
         editTextEmail = view.findViewById(R.id.editTextEmail);
         editTextMobile = view.findViewById(R.id.editTextMobile);
+
+
         profilePicture = view.findViewById(R.id.profile_picture);
         buttonRegister = view.findViewById(R.id.buttonRegister);
 
 
         profilePicture.setOnClickListener(v -> showPhotoOptions());
         loadUserDetails();
+
 
         buttonRegister.setOnClickListener(v -> {
             if (validateInputs()) {
@@ -117,6 +125,37 @@ public class RegistrationFragment extends Fragment {
      * Loads user details from Firestore if in edit mode.
      */
 
+    private Bitmap generateprofile() {
+        if (name != null) {
+            return defaultprofile = ProfilePictureGenerator.generateAvatar(name, 200);
+        }
+        return null;
+    }
+
+    private void loadProfilewithGlide(Uri profilePictureUri, String profilePictureUrl) {
+        if (profilePictureUri != null) {
+            // Load from URI if it exists
+            Glide.with(this)
+                    .load(profilePictureUri) // Load from Uri
+                    .transform(new CircleCrop()) // Apply transformations if needed
+                    .into(profilePicture); // Set the ImageView
+        } else if (profilePictureUrl != null) {
+            // Load from URL if it exists
+            Glide.with(this)
+                    .load(profilePictureUrl) // Load from URL
+                    .transform(new CircleCrop()) // Apply transformations if needed
+                    .into(profilePicture); // Set the ImageView
+        } else {
+            // Load the generated Bitmap if both URL and URI are null
+            Glide.with(this)
+                    .asBitmap() // Specify that you are loading a Bitmap
+                    .load(generateprofile()) // Load the Bitmap
+                    .transform(new CircleCrop()) // Apply transformations if needed
+                    .into(profilePicture); // Set the ImageView
+        }
+    }
+
+
     private void loadUserDetails() {
         firestore.collection("users").document(deviceId)
                 .get()
@@ -131,14 +170,10 @@ public class RegistrationFragment extends Fragment {
                                 editTextName.setText(user.getName());
                                 editTextEmail.setText(user.getEmail());
                                 editTextMobile.setText(user.getPhone());
+                                name = user.getName();
 
                                 profilePictureUrl = user.getProfilePictureUrl();
-                                if(profilePictureUrl != null) {
-                                    Glide.with(this)
-                                            .load(profilePictureUrl)
-                                            .transform(new CircleCrop())
-                                            .into(profilePicture);
-                                }
+                                loadProfilewithGlide(null, profilePictureUrl);
                             }
                         } else {
                             Toast.makeText(getActivity(), "User not found. You can register.", Toast.LENGTH_SHORT).show();
@@ -164,12 +199,7 @@ public class RegistrationFragment extends Fragment {
                     Intent data = result.getData();
                     if (data != null) {
                         profilePictureUri = data.getData();
-                        if (profilePictureUri != null) {
-                            Glide.with(this)
-                                    .load(profilePictureUri)
-                                    .transform(new CircleCrop())
-                                    .into(profilePicture);
-                        }
+                        loadProfilewithGlide(profilePictureUri, null    );
                     }
                 }
             });
@@ -241,9 +271,11 @@ public class RegistrationFragment extends Fragment {
                     .addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
                         updateProfilePictureUrl(uri.toString());
                         profilePictureUrl = uri.toString();
+                        loadUserDetails();
                     }))
                     .addOnFailureListener(e -> Toast.makeText(getActivity(), "Image upload failed.", Toast.LENGTH_SHORT).show());
         }
+        loadUserDetails(); // Reload the newly saved user
     }
 
     /**
@@ -296,9 +328,9 @@ public class RegistrationFragment extends Fragment {
                                 .update("profilePictureUrl", null)  // Set URL to null
                                 .addOnSuccessListener(aVoid2 -> {
                                     Toast.makeText(getActivity(), "Profile picture reference removed from Firestore.", Toast.LENGTH_SHORT).show();
-                                    profilePicture.setImageResource(R.drawable.default_profile); // Reset to default
                                     profilePictureUri = null;
                                     profilePictureUrl = null;
+                                    loadProfilewithGlide(null,null);
                                 })
                                 .addOnFailureListener(e -> Toast.makeText(getActivity(), "Failed to remove picture reference from Firestore.", Toast.LENGTH_SHORT).show());
                     })
