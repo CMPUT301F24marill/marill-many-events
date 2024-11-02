@@ -35,6 +35,12 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * RegistrationFragment is responsible for user registration and profile update functionalities.
+ * It provides a form for users to input their details, upload a profile picture,
+ * and store the information in Firebase Firestore and Firebase Storage.
+ */
+
 public class RegistrationFragment extends Fragment {
 
     private TextInputLayout textInputLayoutName, textInputLayoutEmail, textInputLayoutMobile;
@@ -58,11 +64,27 @@ public class RegistrationFragment extends Fragment {
         storageReference = FirebaseStorage.getInstance().getReference("profile_pictures");
     }
 
+    /**
+     * Inflates the layout for this fragment.
+     *
+     * @param inflater           The LayoutInflater used to inflate the view.
+     * @param container          The parent view that this fragment's UI should be attached to.
+     * @param savedInstanceState A Bundle containing the activity's previously saved state.
+     * @return The view for this fragment.
+     */
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_register, container, false);
     }
+
+    /**
+     * Initializes UI elements and sets up click listeners.
+     *
+     * @param view              The view returned by onCreateView.
+     * @param savedInstanceState A Bundle containing the activity's previously saved state.
+     */
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -90,6 +112,10 @@ public class RegistrationFragment extends Fragment {
         });
 
     }
+
+    /**
+     * Loads user details from Firestore if in edit mode.
+     */
 
     private void loadUserDetails() {
         firestore.collection("users").document(deviceId)
@@ -123,6 +149,10 @@ public class RegistrationFragment extends Fragment {
                 });
     }
 
+    /**
+     * Opens the photo picker to select a profile picture.
+     */
+
     private void openPhotoPicker() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         photoPickerLauncher.launch(intent);
@@ -143,6 +173,13 @@ public class RegistrationFragment extends Fragment {
                     }
                 }
             });
+
+    /**
+     * Validates user inputs for registration.
+     *
+     * @return True if all inputs are valid, otherwise false.
+     */
+    // Validate user inputs
 
     private boolean validateInputs() {
         String name = editTextName.getText().toString().trim();
@@ -173,6 +210,10 @@ public class RegistrationFragment extends Fragment {
         return true;
     }
 
+    /**
+     * Registers a new user and uploads the profile picture to Firebase Storage if provided.
+     */
+
     private void registerUser() {
         String name = editTextName.getText().toString().trim();
         String email = editTextEmail.getText().toString().trim();
@@ -189,6 +230,10 @@ public class RegistrationFragment extends Fragment {
                 .addOnFailureListener(e -> Toast.makeText(getActivity(), "Failed to register user.", Toast.LENGTH_SHORT).show());
     }
 
+    /**
+     * Upload profile picture to firebase storage and get the download url.
+     */
+
     private void uploadProfilePicture() {
         if (profilePictureUri != null) {
             StorageReference fileReference = storageReference.child("profile_pictures/" + deviceId + ".jpg");
@@ -198,11 +243,12 @@ public class RegistrationFragment extends Fragment {
                         profilePictureUrl = uri.toString();
                     }))
                     .addOnFailureListener(e -> Toast.makeText(getActivity(), "Image upload failed.", Toast.LENGTH_SHORT).show());
-        } else {
-            Toast.makeText(getActivity(), "No profile picture selected.", Toast.LENGTH_SHORT).show();
         }
     }
 
+    /**
+     * Upload profile picture URL to firestore under a user's profilepictureurl field.
+     */
     private void updateProfilePictureUrl(String profilePictureUrl) {
         firestore.collection("users").document(deviceId)
                 .update("profilePictureUrl", profilePictureUrl)
@@ -210,6 +256,9 @@ public class RegistrationFragment extends Fragment {
                 .addOnFailureListener(e -> Toast.makeText(getActivity(), "Failed to update profile picture.", Toast.LENGTH_SHORT).show());
     }
 
+    /**
+     * Open a menu to select between deleting and uploading a profile picture.
+     */
     private void showPhotoOptions() {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
         View sheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_profilepicture, null);
@@ -256,7 +305,9 @@ public class RegistrationFragment extends Fragment {
                     .addOnFailureListener(e -> Toast.makeText(getActivity(), "Failed to delete profile picture.", Toast.LENGTH_SHORT).show());
     }
 
-
+    /**
+     * Update an existing user's details.
+     */
     private void updateUser() {
         String name = editTextName.getText().toString().trim();
         String email = editTextEmail.getText().toString().trim();
