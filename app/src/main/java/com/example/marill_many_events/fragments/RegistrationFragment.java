@@ -236,6 +236,7 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
     }
 
     public void onRegistered(){
+        assert getActivity() != null;
         getActivity().finish(); // new user activity only starts when user isn't found on login
     }
 

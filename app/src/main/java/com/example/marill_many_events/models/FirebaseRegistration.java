@@ -129,7 +129,6 @@ public class FirebaseRegistration {
                     .addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
                         updateProfilePictureUrl(uri.toString());
                         profilePictureUrl = uri.toString();
-                        loadUserDetails();
                     }));
                     //.addOnFailureListener(e -> Toast.makeText(getActivity(), "Image upload failed.", Toast.LENGTH_SHORT).show());
         }
