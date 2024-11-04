@@ -24,12 +24,12 @@
 ### Event
 | **Responsibilities**                                                                                  | **Collaborators**               |
 |-------------------------------------------------------------------------------------------------------|---------------------------------|
-| - Create and manage event details(name, date, location, etc)                                          | Facility                        |
+| - Create and manage event details(name, date, location, etc)                                          | com.example.marill_many_events.Facility                        |
 | - Manage the waiting list(add/remove entrants)                                                        | Entrant                         |
 | - Randomly select entrants for event participation(lottery system)                                    | Entrant                         |
 | - Handle cancellations and replacements                                                               | Entrant, Notification           |
 | - Allow organizers to publish event details and QR codes                                                | QRCode, Organizer                          |
-| - Track event statistics (capacity, attendees, cancellations, etc.)                                   | QRCode, Facility                |
+| - Track event statistics (capacity, attendees, cancellations, etc.)                                   | QRCode, com.example.marill_many_events.Facility                |
 | - Manage post-event follow-up (feedback, notifications)                                               | Notification.                   |
 | - Display event information to entrants (details, updates)                                            | Entrant                         |
                               
@@ -81,7 +81,7 @@
 
        
 
-### Facility
+### com.example.marill_many_events.Facility
 | **Responsibilities**                                                                               | **Collaborators**               |
 |----------------------------------------------------------------------------------------------------|---------------------------------|
 | - contains facility information with getters and setters                                         | organizer                          | 
@@ -134,14 +134,14 @@
 | **Responsibilities**                                                                 | **Collaborators**  |
 |--------------------------------------------------------------------------------------|-------------------|
 | - Assist with managing multiple events                                               | Event      |
-| - Manage facility booking and logistics                                              | Facility   |
+| - Manage facility booking and logistics                                              | com.example.marill_many_events.Facility   |
 | - Track event-related budgets and expenses                                           | Event    |
 | - Ensure compliance with event guidelines                                            | Event      |
 | - Remove events that violate policies                                                | Event      |
 | - Remove profiles that violate policies                                              | UserProfile |
 | - Remove hashed QR code data                                                         | QRCode    |
 | - Browse events, profiles, and images                                                | Event, UserProfile |
-| - Remove facilities that violate app policy                                          | Facility  |
+| - Remove facilities that violate app policy                                          | com.example.marill_many_events.Facility  |
 
 
 
