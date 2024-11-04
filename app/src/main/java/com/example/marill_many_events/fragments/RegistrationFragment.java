@@ -245,7 +245,7 @@ public class RegistrationFragment extends Fragment {
                                 })
                                 .addOnFailureListener(e -> Toast.makeText(getActivity(), "Failed to register user.", Toast.LENGTH_SHORT).show());
                     }))
-                    .addOnFailureListener(e -> Toast.makeText(getActivity(), "Image upload failed.", Toast.LENGTH_SHORT).show());
+                    .addOnFailureListener(e -> Toast.makeText(getActivity(), "com.example.marill_many_events.Image upload failed.", Toast.LENGTH_SHORT).show());
         } else {
             // Handle case where no image was selected
             User user = new User(name, email, mobile, null); // No image URL
@@ -282,7 +282,7 @@ public class RegistrationFragment extends Fragment {
                         userUpdates.put("profilePictureUrl", uri.toString());
                         updateUserInFirestore(userUpdates);
                     }))
-                    .addOnFailureListener(e -> Toast.makeText(getActivity(), "Image upload failed.", Toast.LENGTH_SHORT).show());
+                    .addOnFailureListener(e -> Toast.makeText(getActivity(), "com.example.marill_many_events.Image upload failed.", Toast.LENGTH_SHORT).show());
         } else {
             updateUserInFirestore(userUpdates);
         }

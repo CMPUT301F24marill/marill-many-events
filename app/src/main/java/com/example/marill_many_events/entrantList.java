@@ -9,13 +9,22 @@ public class entrantList {
     public entrantList(){
     }
 
-    //Add entrant as waitlisted
-    public void addEntrant(User user){
-        Entrant entrant = new Entrant("Waitlist", user);
+    /**
+     * Add entrant to list. They are added as waitlisted.
+     *
+     * @param entrant           User to add
+     * @return The list of entrants in this event under that status
+     */
+    public void addEntrant(Entrant entrant){
         this.entrants.add(entrant);
     }
 
-    //set user status to user in list
+    /**
+     * Set the status of an entrant in the list
+     *
+     * @param user              The user to apply the status to
+     * @param Status           The status to apply for: Waitlist, Cancelled, Enrolled, Invited
+     */
     public void setEntrantStatus(User user, String Status){
         for (Entrant entrant: this.entrants) {
             User currentuser = entrant.getUser();
@@ -26,9 +35,14 @@ public class entrantList {
         }
     }
 
-    //get list of users under status
+    /**
+     * Gets a list of entrants under specified status
+     *
+     * @param Status           The status to search for: Waitlist, Cancelled, Enrolled, Invited
+     * @return The list of entrants in this event under that status
+     */
     public List<Entrant> getStatusEntrantsList(String Status){
-        List<Entrant> entrantsOfStatus = new List<Entrant>;
+        List<Entrant> entrantsOfStatus = new ArrayList<Entrant>();
         for (Entrant entrant: this.entrants) {
             if(entrant.getStatus().equals(Status)){
                 entrantsOfStatus.add(entrant);
@@ -37,7 +51,11 @@ public class entrantList {
         return entrantsOfStatus;
     }
 
-    //Remove a user from the list
+    /**
+     * Remove a User from the list.
+     *
+     * @param user  The user to remove
+     */
     public void removeEntrant(User user){
         for (Entrant entrant: this.entrants) {
             User currentuser = entrant.getUser();
