@@ -129,6 +129,7 @@ public class FirebaseRegistration {
                     .addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
                         updateProfilePictureUrl(uri.toString());
                         profilePictureUrl = uri.toString();
+                        loadUserDetails();
                     }));
                     //.addOnFailureListener(e -> Toast.makeText(getActivity(), "Image upload failed.", Toast.LENGTH_SHORT).show());
         }
@@ -143,6 +144,10 @@ public class FirebaseRegistration {
                 .update("profilePictureUrl", profilePictureUrl);
         //.addOnSuccessListener(aVoid -> Toast.makeText(getActivity(), "Profile picture updated!", Toast.LENGTH_SHORT).show())
         //.addOnFailureListener(e -> Toast.makeText(getActivity(), "Failed to update profile picture.", Toast.LENGTH_SHORT).show());
+    }
+
+    public void deleteUser(){
+        firestore.collection("users").document(deviceId).delete();
     }
 
 }
