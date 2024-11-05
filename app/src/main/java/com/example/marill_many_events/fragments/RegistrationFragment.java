@@ -23,7 +23,14 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.example.marill_many_events.R;
+
+import com.example.marill_many_events.UserCallback;
+import com.example.marill_many_events.models.PhotoPicker;
+import com.example.marill_many_events.models.ProfilePictureGenerator;
 import com.example.marill_many_events.models.User;
+import com.example.marill_many_events.models.FirebaseRegistration;
+
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -40,21 +47,29 @@ import java.util.Map;
  * It provides a form for users to input their details, upload a profile picture,
  * and store the information in Firebase Firestore and Firebase Storage.
  */
-public class RegistrationFragment extends Fragment {
+
+public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhotoSelectedListener, UserCallback {
 
     private TextInputLayout textInputLayoutName, textInputLayoutEmail, textInputLayoutMobile;
     private TextInputEditText editTextName, editTextEmail, editTextMobile;
-    private Button buttonRegister;
-    private FirebaseFirestore firestore; // Firestore instance
-    private String deviceId; // Variable to hold the device ID
+    private FirebaseFirestore firestore;
+    private String deviceId;
     private ImageView profilePicture;
-    private Uri profilePictureUri;
-    private StorageReference storageReference;
-    private boolean isEditMode = false; // Flag to indicate edit mode
 
-    public RegistrationFragment() {
-        // Required empty public constructor
-    }
+    private String profilePictureUrl;
+    private StorageReference storageReference;
+    private boolean isEditMode = false;
+
+    private Button buttonRegister;
+    private Uri profilePictureUri;
+    private PhotoPicker.OnPhotoSelectedListener listener;
+    private PhotoPicker photoPicker;
+    private User user;
+    String name;
+
+    FirebaseRegistration firebaseRegistration;
+
+    public RegistrationFragment() {}
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,6 +77,8 @@ public class RegistrationFragment extends Fragment {
         deviceId = getArguments() != null ? getArguments().getString("deviceId") : null; // Get device ID from arguments
         firestore = FirebaseFirestore.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference("profile_pictures");
+        firebaseRegistration = new FirebaseRegistration(firestore, storageReference, deviceId, this);
+        photoPicker = new PhotoPicker(this, this);
     }
 
     /**
@@ -90,18 +107,20 @@ public class RegistrationFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // Initialize UI elements
+        //Initialization for error prompts within the textinput boxes
         textInputLayoutName = view.findViewById(R.id.textInputLayoutName);
         textInputLayoutEmail = view.findViewById(R.id.textInputLayoutEmail);
         textInputLayoutMobile = view.findViewById(R.id.textInputLayoutMobile);
+
 
         editTextName = view.findViewById(R.id.editTextName);
         editTextEmail = view.findViewById(R.id.editTextEmail);
         editTextMobile = view.findViewById(R.id.editTextMobile);
         profilePicture = view.findViewById(R.id.profile_picture);
 
-        buttonRegister = view.findViewById(R.id.buttonRegister); // Ensure you add this button in your layout XML
+        firebaseRegistration.loadUserDetails(); // Try getting an existing user
 
-        profilePicture.setOnClickListener(v -> openPhotoPicker());
+        profilePicture.setOnClickListener(v -> photoPicker.showPhotoOptions(profilePictureUrl));
 
         // Load existing user details if in edit mode
         loadUserDetails();
@@ -110,81 +129,57 @@ public class RegistrationFragment extends Fragment {
         buttonRegister.setOnClickListener(v -> {
             if (validateInputs()) {
                 if (isEditMode) {
-                    updateUser();
+                    firebaseRegistration.updateUser(
+                            editTextName.getText().toString().trim(),
+                            editTextEmail.getText().toString().trim(),
+                            editTextMobile.getText().toString().trim(),
+                            profilePictureUri);
                 } else {
-                    registerUser();
+                    firebaseRegistration.registerUser(
+                            editTextName.getText().toString().trim(),
+                            editTextEmail.getText().toString().trim(),
+                            editTextMobile.getText().toString().trim(),
+                            profilePictureUri);
                 }
             }
         });
     }
 
-    /**
-     * Loads user details from Firestore if in edit mode.
-     */
-
-    private void loadUserDetails() {
-        // Retrieve user details from Firestore
-        firestore.collection("users").document(deviceId)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            isEditMode = true; // Set edit mode to true
-                            buttonRegister.setText("Save");
-                            User user = document.toObject(User.class);
-                            if (user != null) {
-                                editTextName.setText(user.getName());
-                                editTextEmail.setText(user.getEmail());
-                                editTextMobile.setText(user.getPhone());
-                                // Load profile picture if exists
-                                Glide.with(this)
-                                        .load(user.getProfilePictureUrl())
-                                        .transform(new CircleCrop())
-                                        .into(profilePicture);
-                            }
-                        } else {
-                            Toast.makeText(getActivity(), "User not found. You can register.", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Toast.makeText(getActivity(), "Failed to load user details.", Toast.LENGTH_SHORT).show();
-                    }
-                });
+    private Bitmap generateprofile() {
+        if (name != null) {
+            return ProfilePictureGenerator.generateAvatar(name, 200);
+        }
+        return null;
     }
 
-    /**
-     * Opens the photo picker to select a profile picture.
-     */
-
-    private void openPhotoPicker() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        photoPickerLauncher.launch(intent);
+    private void loadProfilewithGlide(Uri profilePictureUri, String profilePictureUrl) {
+        if (profilePictureUri != null) {
+            // Load from URI if it exists
+            Glide.with(this)
+                    .load(profilePictureUri) // Load from Uri
+                    .transform(new CircleCrop()) // Apply transformations if needed
+                    .into(profilePicture); // Set the ImageView
+        } else if (profilePictureUrl != null) {
+            // Load from URL if it exists
+            Glide.with(this)
+                    .load(profilePictureUrl) // Load from URL
+                    .transform(new CircleCrop()) // Apply transformations if needed
+                    .into(profilePicture); // Set the ImageView
+        } else {
+            // Load the generated Bitmap if both URL and URI are null
+            Glide.with(this)
+                    .asBitmap() // Specify that you are loading a Bitmap
+                    .load(generateprofile()) // Load the Bitmap
+                    .transform(new CircleCrop()) // Apply transformations if needed
+                    .into(profilePicture); // Set the ImageView
+        }
     }
-
-    private final ActivityResultLauncher<Intent> photoPickerLauncher =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (result.getResultCode() == getActivity().RESULT_OK) {
-                    Intent data = result.getData();
-                    if (data != null) {
-                        profilePictureUri = data.getData();
-                        // Display the selected image in a circular shape using Glide
-                        if (profilePictureUri != null) {
-                            Glide.with(this)
-                                    .load(profilePictureUri)
-                                    .transform(new CircleCrop()) // Apply circular cropping
-                                    .into(profilePicture); // Display in ImageView
-                        }
-                    }
-                }
-            });
-
 
     /**
      * Validates user inputs for registration.
      *
      * @return True if all inputs are valid, otherwise false.
      */
-    // Validate user inputs
     private boolean validateInputs() {
         String name = editTextName.getText().toString().trim();
         String email = editTextEmail.getText().toString().trim();
@@ -214,92 +209,44 @@ public class RegistrationFragment extends Fragment {
         return true;
     }
 
-    /**
-     * Registers a new user and uploads the profile picture to Firebase Storage if one does not exist.
-     */
+    public void onUserloaded(User returnedUser){
+        if (returnedUser != null) {
+            user = returnedUser;
+            isEditMode = true;
 
-    private void registerUser() {
-        String name = editTextName.getText().toString().trim();
-        String email = editTextEmail.getText().toString().trim();
-        String mobile = editTextMobile.getText().toString().trim();
+            editTextName.setText(user.getName());
+            editTextEmail.setText(user.getEmail());
+            editTextMobile.setText(user.getPhone());
+            buttonRegister.setText("Save");
 
-        // Upload the image to Firebase Storage
-        if (profilePictureUri != null) {
-            StorageReference fileReference = storageReference.child("profile_pictures/" + deviceId + ".jpg");
+            name = user.getName();
+            profilePictureUrl = user.getProfilePictureUrl();
 
-            fileReference.putFile(profilePictureUri)
-                    .addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
-                        // Create a user document in Firestore with the image URL and other fields
-                        String profilePictureUrl = uri.toString();
-                        User user = new User(name, email, mobile, profilePictureUrl);
-                        firestore.collection("users").document(deviceId)
-                                .set(user)
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(getActivity(), "Registration successful!", Toast.LENGTH_SHORT).show();
+            loadProfilewithGlide(null, profilePictureUrl);
+        }
 
-                                    // Optionally, navigate to another fragment or activity
-                                    Intent resultIntent = new Intent();
-                                    resultIntent.putExtra("deviceId", deviceId); // Include deviceId if needed
-                                    getActivity().setResult(RESULT_OK, resultIntent);
-                                    getActivity().finish(); // Finish the activity
-                                })
-                                .addOnFailureListener(e -> Toast.makeText(getActivity(), "Failed to register user.", Toast.LENGTH_SHORT).show());
-                    }))
-                    .addOnFailureListener(e -> Toast.makeText(getActivity(), "Image upload failed.", Toast.LENGTH_SHORT).show());
-        } else {
-            // Handle case where no image was selected
-            User user = new User(name, email, mobile, null); // No image URL
-            firestore.collection("users").document(deviceId)
-                    .set(user)
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(getActivity(), "Registration successful!", Toast.LENGTH_SHORT).show();
-                        getActivity().finish(); // Close the current activity
-                    })
-                    .addOnFailureListener(e -> Toast.makeText(getActivity(), "Failed to register user.", Toast.LENGTH_SHORT).show());
+        else{
+            Toast.makeText(getActivity(), "User not found. You can register.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    /**
-     * Updates existing user details in Firestore for pre-existing users.
-     */
-
-    private void updateUser() {
-        String name = editTextName.getText().toString().trim();
-        String email = editTextEmail.getText().toString().trim();
-        String mobile = editTextMobile.getText().toString().trim();
-
-        // Update the user document in Firestore
-        Map<String, Object> userUpdates = new HashMap<>();
-        userUpdates.put("name", name);
-        userUpdates.put("email", email);
-        userUpdates.put("phone", mobile);
-
-        // If a new profile picture is selected, upload it
-        if (profilePictureUri != null) {
-            StorageReference fileReference = storageReference.child("profile_pictures/" + deviceId + ".jpg");
-            fileReference.putFile(profilePictureUri)
-                    .addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
-                        userUpdates.put("profilePictureUrl", uri.toString());
-                        updateUserInFirestore(userUpdates);
-                    }))
-                    .addOnFailureListener(e -> Toast.makeText(getActivity(), "Image upload failed.", Toast.LENGTH_SHORT).show());
-        } else {
-            updateUserInFirestore(userUpdates);
-        }
+    public void onUserUpdated() {
+        firebaseRegistration.loadUserDetails();
     }
 
-    /**
-     * Updates user details in Firestore with the provided updates map.
-     *
-     * @param userUpdates A map containing the updated user details.
-     */
-
-    void updateUserInFirestore(Map<String, Object> userUpdates) {
-        firestore.collection("users").document(deviceId)
-                .update(userUpdates)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getActivity(), "User details updated successfully!", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> Toast.makeText(getActivity(), "Failed to update user details.", Toast.LENGTH_SHORT).show());
+    public void onRegistered(){
+        assert getActivity() != null;
+        getActivity().finish(); // new user activity only starts when user isn't found on login
     }
+
+    public void onPhotoSelected(Uri uri){ // when the upload photo button is pressed and a photo is uploaded
+        profilePictureUri = uri;
+        loadProfilewithGlide(profilePictureUri, null);
+    }
+
+    public void onPhotoDeleted(){ // when the delete photo button in the bottom sheet is pressed
+        profilePictureUri = null;
+        firebaseRegistration.deleteProfilePicture();
+    }
+
 }

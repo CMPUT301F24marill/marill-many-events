@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_REGISTER = 1;
     private FirebaseFirestore firestore;
     private CollectionReference usersRef;
-
+    public String deviceId;
 
     Fragment registrationFragment = new RegistrationFragment();
     Bundle args = new Bundle();
@@ -40,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
         Button logInButton = findViewById(R.id.loginButton);
 
 
