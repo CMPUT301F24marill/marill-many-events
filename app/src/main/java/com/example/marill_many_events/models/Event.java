@@ -1,6 +1,6 @@
 package com.example.marill_many_events.models;
 
-import com.example.marill_many_events.User;
+import com.example.marill_many_events.models.User;
 
 import java.text.DateFormat;
 import java.util.List;
@@ -55,7 +55,7 @@ public class Event {
      * @param x_cord        User x coordinate
      * @param y_cord        User y coordinate
      */
-    public void addEntrant(com.example.marill_many_events.User user, float x_cord, float y_cord){
+    public void addEntrant(User user, float x_cord, float y_cord){
         Entrant entrant = new Entrant("Waitlist", user);
         if(this.checkGeo){
             //entrant location is set if event checks for geo, else the coordinates within the entrant will remain null

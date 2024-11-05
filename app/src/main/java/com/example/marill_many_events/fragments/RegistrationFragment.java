@@ -3,6 +3,7 @@ package com.example.marill_many_events.fragments;
 import static android.app.Activity.RESULT_OK;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -112,7 +113,7 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
         textInputLayoutEmail = view.findViewById(R.id.textInputLayoutEmail);
         textInputLayoutMobile = view.findViewById(R.id.textInputLayoutMobile);
 
-
+        buttonRegister = view.findViewById(R.id.buttonRegister);
         editTextName = view.findViewById(R.id.editTextName);
         editTextEmail = view.findViewById(R.id.editTextEmail);
         editTextMobile = view.findViewById(R.id.editTextMobile);
@@ -122,8 +123,7 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
 
         profilePicture.setOnClickListener(v -> photoPicker.showPhotoOptions(profilePictureUrl));
 
-        // Load existing user details if in edit mode
-        loadUserDetails();
+        firebaseRegistration.loadUserDetails();
 
         // Set click listener for the register button
         buttonRegister.setOnClickListener(v -> {

@@ -8,7 +8,7 @@ import android.util.Log;
 import com.example.marill_many_events.fragments.EventFragment;
 import com.example.marill_many_events.fragments.MenuFragment;
 import com.example.marill_many_events.fragments.NavbarFragment;
-import com.example.marill_many_events.models.NavbarListener;
+import com.example.marill_many_events.NavbarListener;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.fragments.RegistrationFragment;
 

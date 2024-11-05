@@ -6,7 +6,6 @@ import org.junit.runner.RunWith;
 
 
 import com.example.marill_many_events.fragments.NavbarFragment;
-import com.example.marill_many_events.models.NavbarListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.junit.Before;
