@@ -10,6 +10,8 @@ constraintlayout = "2.1.4"
 firebaseDatabase = "21.0.0"
 core = "1.6.1"
 fragmentTesting = "1.8.5"
+monitor = "1.6.1"
+androidxJunit = "1.1.5"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -22,6 +24,8 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 core = { group = "androidx.test", name = "core", version.ref = "core" }
 fragment-testing = { group = "androidx.fragment", name = "fragment-testing", version.ref = "fragmentTesting" }
+monitor = { group = "androidx.test", name = "monitor", version.ref = "monitor" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxJunit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

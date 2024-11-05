@@ -1,4 +1,6 @@
-package com.example.marill_many_events;
+package com.example.marill_many_events.models;
+
+import com.example.marill_many_events.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +27,9 @@ public class entrantList {
      * @param user              The user to apply the status to
      * @param Status           The status to apply for: Waitlist, Cancelled, Enrolled, Invited
      */
-    public void setEntrantStatus(User user, String Status){
+    public void setEntrantStatus(com.example.marill_many_events.User user, String Status){
         for (Entrant entrant: this.entrants) {
-            User currentuser = entrant.getUser();
+            com.example.marill_many_events.User currentuser = entrant.getUser();
             if(currentuser == user){
                 entrant.setStatus(Status);
                 return;
@@ -56,7 +58,7 @@ public class entrantList {
      *
      * @param user  The user to remove
      */
-    public void removeEntrant(User user){
+    public void removeEntrant(com.example.marill_many_events.User user){
         for (Entrant entrant: this.entrants) {
             User currentuser = entrant.getUser();
             if(currentuser == user){
