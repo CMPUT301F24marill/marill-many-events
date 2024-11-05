@@ -42,6 +42,7 @@ dependencies {
     implementation("com.google.android.material:material")
 
     implementation(libs.fragment.testing)
+    implementation(libs.androidx.espresso.intents)
 
     // JUnit dependencies
     testImplementation("junit:junit:4.13.2")
