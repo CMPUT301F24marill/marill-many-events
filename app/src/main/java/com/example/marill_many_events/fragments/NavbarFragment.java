@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.marill_many_events.NavbarListener;
+import com.example.marill_many_events.models.NavbarListener;
 import com.example.marill_many_events.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -32,8 +32,6 @@ public class NavbarFragment extends Fragment {
      * @param savedInstanceState A Bundle containing the activity's previously saved state.
      * @return The view for this fragment.
      */
-
-
 
     @Nullable
     @Override

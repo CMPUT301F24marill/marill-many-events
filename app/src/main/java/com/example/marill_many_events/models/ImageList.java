@@ -1,4 +1,4 @@
-package com.example.marill_many_events;
+package com.example.marill_many_events.models;
 
 import java.util.ArrayList;
 import java.util.List;

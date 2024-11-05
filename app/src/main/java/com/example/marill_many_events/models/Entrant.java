@@ -1,4 +1,6 @@
-package com.example.marill_many_events;
+package com.example.marill_many_events.models;
+
+import com.example.marill_many_events.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,9 +10,9 @@ public class Entrant {
     Geolocation Geo;
 
     private List<Event> Events = new ArrayList<>();
-    User user;
+    com.example.marill_many_events.User user;
 
-    public Entrant(String status, User user) {
+    public Entrant(String status, com.example.marill_many_events.User user) {
         // Initialize user profile
         this.status = status;
         this.user = user;
@@ -36,7 +38,7 @@ public class Entrant {
         this.status = status;
     }
 
-    public User getUser() {
+    public com.example.marill_many_events.User getUser() {
         return user;
     }
 

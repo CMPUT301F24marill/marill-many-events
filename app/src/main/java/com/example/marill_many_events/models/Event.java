@@ -1,4 +1,6 @@
-package com.example.marill_many_events;
+package com.example.marill_many_events.models;
+
+import com.example.marill_many_events.User;
 
 import java.text.DateFormat;
 import java.util.List;
@@ -7,7 +9,7 @@ public class Event {
     entrantList entrants;
     String Name;
     String Location;
-    Image Image;
+    String ImageURL;
     QRcode eventQRcode;
     DateFormat startDate;
     DateFormat drawDate;
@@ -16,9 +18,9 @@ public class Event {
     Integer capacity;
     boolean checkGeo;
 
-    public void event(String imageURL, boolean imageGenerated, String name, String location, DateFormat startDate, DateFormat drawDate, boolean limitEntrants, Integer capacity, boolean checkGeo){
+    public void event(String imageURL, String name, String location, DateFormat startDate, DateFormat drawDate, boolean limitEntrants, Integer capacity, boolean checkGeo){
         this.entrants = new entrantList();
-        this.Image = new Image( imageURL, imageGenerated);
+        this.ImageURL = imageURL;
         this.eventQRcode = new QRcode();
 
         this.Name = name;
@@ -53,7 +55,7 @@ public class Event {
      * @param x_cord        User x coordinate
      * @param y_cord        User y coordinate
      */
-    public void addEntrant(User user, float x_cord, float y_cord){
+    public void addEntrant(com.example.marill_many_events.User user, float x_cord, float y_cord){
         Entrant entrant = new Entrant("Waitlist", user);
         if(this.checkGeo){
             //entrant location is set if event checks for geo, else the coordinates within the entrant will remain null
@@ -78,7 +80,7 @@ public class Event {
      * @return String for event poster
      */
     public String getImageURL(){
-        return this.Image.getImageURL();
+        return this.ImageURL;
     }
 
     /**
@@ -87,7 +89,7 @@ public class Event {
      * @param  url for event poster
      */
     public void setImageURL(String url){
-        this.Image.setImageURL(url);
+        this.ImageURL = url;
     }
 
     public Integer getCapacity() {
@@ -128,14 +130,6 @@ public class Event {
 
     public void setEventQRcode(QRcode eventQRcode) {
         this.eventQRcode = eventQRcode;
-    }
-
-    public com.example.marill_many_events.Image getImage() {
-        return Image;
-    }
-
-    public void setImage(com.example.marill_many_events.Image image) {
-        Image = image;
     }
 
     public String getLocation() {
