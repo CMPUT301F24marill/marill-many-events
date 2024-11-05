@@ -5,10 +5,10 @@ import static com.google.firebase.appcheck.internal.util.Logger.TAG;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.example.marill_many_events.fragments.HomeFragment;
+import com.example.marill_many_events.fragments.EventFragment;
 import com.example.marill_many_events.fragments.MenuFragment;
 import com.example.marill_many_events.fragments.NavbarFragment;
-import com.example.marill_many_events.NavbarListener;
+import com.example.marill_many_events.models.NavbarListener;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.fragments.RegistrationFragment;
 
@@ -17,7 +17,6 @@ import android.widget.FrameLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
@@ -41,30 +40,37 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
 
         Log.d("HomePageActivity", "Fragment Container Visibility: " + findViewById(R.id.fragment_container).getVisibility());
 
-
         // Set up NavbarFragment
         NavbarFragment navbarFragment = new NavbarFragment();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.navbar_container, navbarFragment)
                 .commit();
-
-
     }
 
 
     /**
      * Handles the event when the home option is selected from the navigation bar.
-     * It opens a placeholder.
+     * It opens the list of events
      */
     public void onHomeSelected(){
-        HomeFragment homeFragment = new HomeFragment();
+        // Open the eventfragment when profile is selected
+        EventFragment eventFragment = new EventFragment();
+        Log.d(TAG, "onHomeSelected called with deviceId: " + deviceId);
 
-        Log.d(TAG, "onHomeSelected called");
+        // Pass deviceId to the fragment
+        Bundle args = new Bundle();
+        args.putString("deviceId", deviceId);
+        eventFragment.setArguments(args);
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, homeFragment)
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, eventFragment) // replace the fragment already in fragment_container
+                .addToBackStack(null) // add to back stack
                 .commit();
+
+        FrameLayout fragmentContainer = findViewById(R.id.fragment_container);
+        FrameLayout navbarContainer = findViewById(R.id.navbar_container);
+        Log.d(TAG, "Fragment Container Visibility: " + fragmentContainer.getVisibility());
+        Log.d(TAG, "NavbarFragment Container Visibility: " + navbarContainer.getVisibility());
     }
 
     /**

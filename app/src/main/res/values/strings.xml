@@ -6,5 +6,21 @@
     <string name="lbl_many_events">Many Events</string>
     <string name="lbl_marill">Marill</string>
     <string name="lbl_log_in">Log in</string>
-    <string name="lbl_welcome_to">Welcome to</string>
+
+    <string name="Event_Name">Event Name</string>
+    <string name="Location">Location</string>
+    <string name="Start_Date">Start Date</string>
+    <string name="Draw_Date">Draw Date</string>
+    <string name="Capacity_Prompt">Capacity (Optional)</string>
+    <string name="Geolocation">Geolocation</string>
+    <string name="Create">Create</string>
+    <string name="Facility_Name">Facility Name</string>
+    <string name="lbl_my_events">My Events</string>
+    <string name="lbl_my_waiting_list">My Waiting List</string>
+    <string name="lbl_my_registered_events">Registered</string>
+    <string name="lbl_my_facility">My Facility</string>
+    <string name="leave_waitlist">Leave Waitlist</string>
+    <string name="waitlist_confirmation">You are now waitlisted in this event!</string>
+    <string name="registration_confirmation">You are now registered in this event!</string>
+    <string name="Return">Return</string>
 </resources>

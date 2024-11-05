@@ -5,4 +5,5 @@
     <color name="light_blue">#FFDEEBF0</color>
     <color name="navbarFragment">#FF025177</color>
     <color name="grey">#FF373737</color>
+    <color name="white">#FFFFFF</color>
 </resources>

@@ -26,18 +26,18 @@
 ### Event
 | **Responsibilities**                                                                                  | **Collaborators**               |
 |-------------------------------------------------------------------------------------------------------|---------------------------------|
-| - Create and manage event details(name, date, location, etc)                                          | Facility                        |
+| - Create and manage event details(name, date, location, etc)                                          | com.example.marill_many_events.models.Facility                        |
 | - Manage the waiting list(add/remove entrants)                                                        | EntrantList                        |
 | - Randomly select entrants for event participation(lottery system)                                    | QRCode                         |
 | - Handle cancellations and replacements                                                               | Messagefragment          |
 | - Allow organizers to publish event details and QR codes                                                | Organizer                          |
 | - Track event statistics (capacity, attendees, cancellations, etc.)                                   | Geolocation               |
-| - Manage post-event follow-up (feedback, notifications)                                               | Image                  |
+| - Manage post-event follow-up (feedback, notifications)                                               | com.example.marill_many_events.models.Image                  |
 | - Display event information to entrants (details, updates)                                            ||
 | - Generate a unique QR code for each event                                                         |                          |
 | - Optionally create and hold geolocation location a                                                    |                          |          
 | - Track available capacity and status (full, open)                                                    |                          |      
-| - Manage poster image                                                   |                          | 
+| - Manage poster imageURL                                                   |                          | 
 | - Allow organizer to send messages to entrants                                                  |                          |
 | - Hold Entrant List                                                  |                          |
                               
@@ -105,7 +105,7 @@
 
        
 
-### Facility
+### com.example.marill_many_events.models.Facility
 | **Responsibilities**                                                                               | **Collaborators**               |
 |----------------------------------------------------------------------------------------------------|---------------------------------|
 | - contains facility information with getters and setters                                         | Organizer                          | 
@@ -128,9 +128,9 @@
 | **Responsibilities**                                                                 | **Collaborators**  |
 |--------------------------------------------------------------------------------------|-------------------|
 | - Manage entrant profile details (name, email, profile picture, etc.)                   | Entrant    |
-| - Upload or remove profile picture                                                   |Image          |
-| - Associated with profile picture image                | |
-| - Generated image deterministically based on username                |          |
+| - Upload or remove profile picture                                                   |com.example.marill_many_events.models.Image          |
+| - Associated with profile picture imageURL                | |
+| - Generated imageURL deterministically based on username                |          |
 
 
 ### Settings
@@ -157,10 +157,10 @@
 | **Responsibilities**                                                                 | **Collaborators**  |
 |--------------------------------------------------------------------------------------|-------------------|
 | - Assist with managing multiple eventswithin a facility                               | Event      |
-| - Manage facility booking and logistics                                              | Facility   |
+| - Manage facility booking and logistics                                              | com.example.marill_many_events.models.Facility   |
 | - Track event-related budgets and expenses                                           | UserProfile    |
 | - Ensure compliance with event guidelines                                            | QRCode        |
-| - Remove events that violate policies                                                | ImageList        |
+| - Remove events that violate policies                                                | com.example.marill_many_events.models.ImageList        |
 | - Remove profiles that violate policies                                              |                 |
 | - Remove hashed QR code data                                                         |                 |
 | - Browse all events, profiles, and images                                                |                 |
@@ -176,7 +176,7 @@
 | - Set event capacity and waiting list limits                                         | Geolocation      |
 | - View waiting list details and entrant locations                                    | Entrant  |
 | - Optionally enable or disable geolocation verification                              |  |
-| - Draw replacements for cancelled entrants                                           | Facility           |
+| - Draw replacements for cancelled entrants                                           | com.example.marill_many_events.models.Facility           |
 | - Send notifications to selected and cancelled entrants                              | Eventlist         |
 | - View lists of all selected and cancelled entrants                                  |                 |
 | - Manage their facility                                                               |                 |
@@ -184,23 +184,23 @@
 | - Delete facility when deleted                                                       |                 |
 
 
-### Image
+### com.example.marill_many_events.models.Image
 
 | **Responsibilities**                                                                 | **Collaborators**  |
 |--------------------------------------------------------------------------------------|-------------------|
-| - Hold Image                                                                       | ImageList      |
+| - Hold com.example.marill_many_events.models.Image                                                                       | com.example.marill_many_events.models.ImageList      |
 | - Get entrants in event                                                                 | UserProfile    |
 | - Filter through entrants by invited, enrolled, cancelled, and waitlisted                  | Event    |
-| - Add self to overall image list when created                                              |       |
+| - Add self to overall imageURL list when created                                              |       |
 | - Track if uploaded or generated deterministically                                         |       |
 | - Track if a poster or a profile picture                                            |       |
 | - Have access to associated event or userprofile                                         |       |
 
-### ImageList
+### com.example.marill_many_events.models.ImageList
 
 | **Responsibilities**                                                                 | **Collaborators**  |
 |--------------------------------------------------------------------------------------|-------------------|
-| - Add and Remove Image                                                                 |Image      |
+| - Add and Remove com.example.marill_many_events.models.Image                                                                 |com.example.marill_many_events.models.Image      |
 | - Sort images by poster or profile picture                                                       |      |
 | - Replace deleted profile pictures with ones generated by profile username                        |      |
 

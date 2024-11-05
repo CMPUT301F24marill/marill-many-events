@@ -47,7 +47,7 @@
 | - Collect and verify the location of users when they join the waiting list                          | Entrant                        |
 | - Display a map view of where entrants joined from                                                  |                                |
 
-### Facility
+### com.example.marill_many_events.models.Facility
 | **Responsibilities**                                                                               | **Collaborators**               |
 |----------------------------------------------------------------------------------------------------|---------------------------------|
 | - contains facility information with getters and setters                                         | organizer                          | 

@@ -3,7 +3,6 @@ package com.example.marill_many_events.fragments;
 import static android.app.Activity.RESULT_OK;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -24,6 +23,7 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.example.marill_many_events.R;
+
 import com.example.marill_many_events.UserCallback;
 import com.example.marill_many_events.models.PhotoPicker;
 import com.example.marill_many_events.models.ProfilePictureGenerator;
@@ -40,6 +40,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.HashMap;
 import java.util.Map;
+
 
 /**
  * RegistrationFragment is responsible for user registration and profile update functionalities.
@@ -73,7 +74,7 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        deviceId = getArguments() != null ? getArguments().getString("deviceId") : null;
+        deviceId = getArguments() != null ? getArguments().getString("deviceId") : null; // Get device ID from arguments
         firestore = FirebaseFirestore.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference("profile_pictures");
         firebaseRegistration = new FirebaseRegistration(firestore, storageReference, deviceId, this);
@@ -92,7 +93,8 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_register, container, false);
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_register, container, false); // Ensure this matches your layout XML file name
     }
 
     /**
@@ -104,8 +106,7 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
-
+        // Initialize UI elements
         //Initialization for error prompts within the textinput boxes
         textInputLayoutName = view.findViewById(R.id.textInputLayoutName);
         textInputLayoutEmail = view.findViewById(R.id.textInputLayoutEmail);
@@ -115,17 +116,16 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
         editTextName = view.findViewById(R.id.editTextName);
         editTextEmail = view.findViewById(R.id.editTextEmail);
         editTextMobile = view.findViewById(R.id.editTextMobile);
-
-
         profilePicture = view.findViewById(R.id.profile_picture);
-        buttonRegister = view.findViewById(R.id.buttonRegister);
 
         firebaseRegistration.loadUserDetails(); // Try getting an existing user
 
         profilePicture.setOnClickListener(v -> photoPicker.showPhotoOptions(profilePictureUrl));
 
+        // Load existing user details if in edit mode
+        loadUserDetails();
 
-
+        // Set click listener for the register button
         buttonRegister.setOnClickListener(v -> {
             if (validateInputs()) {
                 if (isEditMode) {
@@ -143,7 +143,6 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
                 }
             }
         });
-
     }
 
     private Bitmap generateprofile() {
@@ -190,21 +189,21 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
             textInputLayoutName.setError("Name is required");
             return false;
         } else {
-            textInputLayoutName.setError(null);
+            textInputLayoutName.setError(null); // Clear error
         }
 
         if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             textInputLayoutEmail.setError("Valid email is required");
             return false;
         } else {
-            textInputLayoutEmail.setError(null);
+            textInputLayoutEmail.setError(null); // Clear error
         }
 
         if (!mobile.isEmpty() && mobile.length() < 10) {
             textInputLayoutMobile.setError("Valid mobile number is required");
             return false;
         } else {
-            textInputLayoutMobile.setError(null);
+            textInputLayoutMobile.setError(null); // Clear error
         }
 
         return true;
