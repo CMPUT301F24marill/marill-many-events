@@ -5,6 +5,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/posterView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.RoundedCorners"
+        app:cardBackgroundColor="@color/blue_end_translucent"
+        app:strokeWidth="0dp"> <!-- translucent background color -->
+
+        <ImageView
+            android:id="@+id/poster"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/default_profile"
+            android:background="@android:color/transparent"/>
+
+    </com.google.android.material.card.MaterialCardView>
+
+
     <ImageView
         android:id="@+id/imageView2"
         android:layout_width="38dp"
@@ -77,14 +96,7 @@
         app:layout_constraintTop_toTopOf="@+id/Capacityfield"
         app:srcCompat="@drawable/default_profile" />
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="220dp"
-        android:scaleType="fitStart"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
 
     <EditText
         android:id="@+id/NameField"
@@ -99,7 +111,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/posterView" />
 
     <EditText
         android:id="@+id/LocationField"
@@ -116,7 +128,7 @@
         android:background="@color/blue_start"
         android:padding="10dp"/>
 
-    <EditText
+    <TextView
         android:id="@+id/Startdatefield"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
@@ -131,7 +143,7 @@
         android:background="@color/blue_start"
         android:padding="10dp"/>
 
-    <EditText
+    <TextView
         android:id="@+id/DrawdateField"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
