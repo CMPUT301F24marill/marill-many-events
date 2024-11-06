@@ -220,5 +220,4 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         return event;
     }
 
-
 }

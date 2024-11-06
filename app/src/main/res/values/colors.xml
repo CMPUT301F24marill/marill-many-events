@@ -2,7 +2,7 @@
 <resources>
     <color name="blue_start">#FF006494</color>
     <color name="blue_end">#FF051923</color>
-    <color name="blue_end_translucent">#80051923</color>
+    <color name="blue_end_translucent">#80373737</color>
     <color name="light_blue">#FFDEEBF0</color>
     <color name="navbarFragment">#FF025177</color>
     <color name="grey">#FF373737</color>

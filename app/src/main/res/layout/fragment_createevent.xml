@@ -7,16 +7,19 @@
 
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/posterView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.RoundedCorners"
-        app:cardBackgroundColor="#80000000"> <!-- translucent background color -->
+        app:cardBackgroundColor="@color/blue_end_translucent"
+        app:strokeWidth="0dp"> <!-- translucent background color -->
 
         <ImageView
             android:id="@+id/poster"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/default_profile" />
+            android:src="@drawable/default_profile"
+            android:background="@android:color/transparent"/>
 
     </com.google.android.material.card.MaterialCardView>
 
@@ -93,14 +96,7 @@
         app:layout_constraintTop_toTopOf="@+id/Capacityfield"
         app:srcCompat="@drawable/default_profile" />
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="220dp"
-        android:scaleType="fitStart"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
 
     <EditText
         android:id="@+id/NameField"
@@ -115,7 +111,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/posterView" />
 
     <EditText
         android:id="@+id/LocationField"
