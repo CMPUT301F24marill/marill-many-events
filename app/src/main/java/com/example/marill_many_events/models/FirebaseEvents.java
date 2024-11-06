@@ -9,6 +9,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.UUID;
+
 public class FirebaseEvents {
     private FirebaseFirestore firestore;
     private StorageReference storageReference;
@@ -99,18 +101,19 @@ public class FirebaseEvents {
     /**
      * Upload profile picture to firebase storage and get the download url.
      */
-//    private void uploadPoster(Uri profilePictureUri, String documentID) {
-//        if (profilePictureUri != null) {
-//            StorageReference fileReference = storageReference.child("eventposters/" + documentID + ".jpg");
-//            fileReference.putFile(profilePictureUri)
-//                    .addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
-//                        updateProfilePictureUrl(uri.toString());
-//                        profilePictureUrl = uri.toString();
-//                        getEventDetails(documentID);
-//                    }));
-//            //.addOnFailureListener(e -> Toast.makeText(getActivity(), "Image upload failed.", Toast.LENGTH_SHORT).show());
-//        }
-//    }
+    public void uploadPoster(Uri profilePictureUri) {
+        String filename = generateRandomFilename();
+        if (profilePictureUri != null) {
+            StorageReference fileReference = storageReference.child("eventposters/" + filename + ".jpg");
+            fileReference.putFile(profilePictureUri)
+                    .addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
+                        //updateProfilePictureUrl(uri.toString());
+                        String posterurl = uri.toString();
+                        eventsCallback.onPosterUpload(posterurl);
+                    }));
+            //.addOnFailureListener(e -> Toast.makeText(getActivity(), "Image upload failed.", Toast.LENGTH_SHORT).show());
+        }
+    }
 
     /**
      * Upload profile picture URL to firestore under a user's profilepictureurl field.
@@ -126,4 +129,8 @@ public class FirebaseEvents {
         firestore.collection("users").document(deviceId).delete();
     }
 
+    public String generateRandomFilename() {    // https://stackoverflow.com/questions/5126559/android-create-unique-string-for-file-name
+        long timestamp = System.currentTimeMillis();
+        return "image_" + timestamp + "_" + UUID.randomUUID().toString() + ".jpg"; // Add your desired extension
+    }
 }

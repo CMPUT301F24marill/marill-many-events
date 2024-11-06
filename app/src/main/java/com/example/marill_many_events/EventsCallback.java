@@ -7,5 +7,6 @@ public interface EventsCallback {
     void onEventDelete();
     void joinEvent();
     void getEvent(Event event);
+    void onPosterUpload(String url);
 
 }

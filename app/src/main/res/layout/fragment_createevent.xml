@@ -5,6 +5,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.RoundedCorners"
+        app:cardBackgroundColor="#80000000"> <!-- translucent background color -->
+
+        <ImageView
+            android:id="@+id/poster"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/default_profile" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+
     <ImageView
         android:id="@+id/imageView2"
         android:layout_width="38dp"

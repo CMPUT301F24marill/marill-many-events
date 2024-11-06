@@ -1,23 +1,35 @@
 package com.example.marill_many_events.fragments;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.marill_many_events.EventsCallback;
 import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.models.Event;
 import com.example.marill_many_events.models.FirebaseEvents;
+import com.example.marill_many_events.models.PhotoPicker;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.StorageReference;
@@ -27,19 +39,27 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class CreateEventFragment extends Fragment implements EventsCallback {
+public class CreateEventFragment extends Fragment implements EventsCallback, PhotoPicker.OnPhotoSelectedListener {
 
     //Views
-    private TextView NameField, datePickerStart, datePickerEnd, capacityField;
+    private TextView NameField, datePickerStart, datePickerEnd, capacityField, locationField;
     private ListView waitlistList, registeredList;
     private ArrayList<Event> waitlistdataList;
     private ArrayList<Event> registereddataList;
     private EventyArrayAdapter waitlistAdapter, registeredAdapter;
+    private SwitchCompat switchCompat;
     private Button createButton;
+    private ImageView posterview;
 
     //Variables
-    Date startDate;
-    Date endDate;
+    private String eventName;
+    private Date startDate;
+    private Date endDate;
+    private int capacity;
+    private boolean geolocation;
+    private PhotoPicker photoPicker;
+    private Uri posterUri;
+    private String posterUrl, location;
 
     //Data Storage
     private FirebaseFirestore firestore;
@@ -72,6 +92,7 @@ public class CreateEventFragment extends Fragment implements EventsCallback {
         firestore = identity.getFirestore();
         storageReference = identity.getStorage().getReference("event_posters");
         firebaseEvents = new FirebaseEvents(firestore, storageReference, deviceId, this);
+        photoPicker = new PhotoPicker(this, this);
     }
 
     /**
@@ -101,29 +122,29 @@ public class CreateEventFragment extends Fragment implements EventsCallback {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         NameField = view.findViewById(R.id.NameField);
         createButton = view.findViewById(R.id.create);
-
+        posterview = view.findViewById(R.id.poster);
         datePickerStart = view.findViewById(R.id.Startdatefield);
         datePickerEnd = view.findViewById(R.id.DrawdateField);
         capacityField = view.findViewById(R.id.Capacityfield);
-
+        locationField = view.findViewById(R.id.LocationField);
+        switchCompat = view.findViewById(R.id.GeoSwitch);
 
         datePicker(datePickerStart, true);
         datePicker(datePickerEnd,false);
 
-        createButton.setOnClickListener(v-> {
-                int capacity = Integer.parseInt(capacityField.getText().toString().trim());
-                String eventname = NameField.getText().toString().trim();
-                Event event = new Event(null, eventname, null, startDate, endDate, capacity, false);
-                firebaseEvents.createEvent(event);
-                });
+        posterview.setOnClickListener(v-> {
+            photoPicker.showPhotoOptions(null);
+        });
 
-//        registereddataList = new ArrayList<Event>();
-//        registeredAdapter = new EventyArrayAdapter(getContext(), registereddataList);
-//        registeredList.setAdapter(registeredAdapter);
-//
-//        waitlistdataList = new ArrayList<Event>();
-//        waitlistAdapter = new EventyArrayAdapter(getContext(), waitlistdataList);
-//        waitlistList.setAdapter(waitlistAdapter);
+        createButton.setOnClickListener(v-> {
+                if(posterUri != null) firebaseEvents.uploadPoster(posterUri);
+                else firebaseEvents.createEvent(createEvent());
+        });
+
+        switchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            geolocation = isChecked;
+        });
+
     }
 
 
@@ -150,4 +171,54 @@ public class CreateEventFragment extends Fragment implements EventsCallback {
             });
         });
     }
+
+    public void onPhotoSelected(Uri uri){ // when the upload photo button is pressed and a photo is uploaded
+        posterUri = uri;
+        Glide.with(this).asBitmap().load(uri)
+                .into(new CustomTarget<Bitmap>() {
+                @Override
+                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition transition) {
+                    float imageAspectRatio = (float) resource.getWidth() / (float) resource.getHeight(); // Get the aspect ratio of the image
+
+                    int viewwidth = posterview.getWidth(); // Get the width of the ImageView
+
+
+                    int height;
+                    if (imageAspectRatio >= 1)  // Landscape or square image (16:9 or wider)
+                        height = (int) (viewwidth / imageAspectRatio);
+                    else // Portrait image (9:16 or taller), limit the height to 1/4 of the fragment height
+                        height = getView().getHeight()/4;
+
+
+                    // Set the height of the ImageView
+                    ViewGroup.LayoutParams params = posterview.getLayoutParams();
+                    params.height = height;
+                    posterview.setLayoutParams(params);
+
+                    posterview.setImageBitmap(resource); // Add the image in the view
+                }
+
+                public void onLoadCleared(Drawable draw){}
+        });
+    }
+
+    public void onPhotoDeleted(){ // when the upload photo button is pressed and a photo is uploaded
+            // reset the view height to the height of a default "add poster here" image
+    }
+
+    public void onPosterUpload(String url){
+        posterUrl = url;
+        Event event = createEvent();
+        firebaseEvents.createEvent(event);
+    }
+
+    public Event createEvent(){
+        capacity = Integer.parseInt(capacityField.getText().toString().trim());
+        eventName = NameField.getText().toString().trim();
+        location = locationField.getText().toString().trim();
+        Event event = new Event(posterUrl, eventName, location, startDate, endDate, capacity, geolocation);
+        return event;
+    }
+
+
 }
