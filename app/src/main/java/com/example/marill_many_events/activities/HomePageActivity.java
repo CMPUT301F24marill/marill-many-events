@@ -7,20 +7,17 @@ import android.util.Log;
 
 import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.fragments.EventFragment;
-import com.example.marill_many_events.fragments.MenuFragment;
+import com.example.marill_many_events.fragments.CreateEventFragment;
 import com.example.marill_many_events.fragments.NavbarFragment;
 import com.example.marill_many_events.NavbarListener;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.fragments.RegistrationFragment;
-
-import android.widget.FrameLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 
 /**
@@ -73,13 +70,13 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
      * It opens a placeholder.
      */
     public void onMenuSelected(){
-        MenuFragment menuFragment = new MenuFragment();
+        CreateEventFragment createEventFragment = new CreateEventFragment();
 
         Log.d(TAG, "onMenuSelected called");
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, menuFragment)
+                .replace(R.id.fragment_container, createEventFragment)
                 .commit();
     }
 

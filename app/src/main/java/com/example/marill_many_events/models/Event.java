@@ -5,6 +5,8 @@ import com.example.marill_many_events.models.User;
 import java.text.DateFormat;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 public class Event {
     entrantList entrants;
     String Name;
@@ -14,11 +16,10 @@ public class Event {
     DateFormat startDate;
     DateFormat drawDate;
 
-    boolean limitEntrants;
     Integer capacity;
     boolean checkGeo;
 
-    public void event(String imageURL, String name, String location, DateFormat startDate, DateFormat drawDate, boolean limitEntrants, Integer capacity, boolean checkGeo){
+    public Event(String imageURL, String name, String location, DateFormat startDate, DateFormat drawDate, Integer capacity, @Nullable boolean checkGeo){
         this.entrants = new entrantList();
         this.ImageURL = imageURL;
         this.eventQRcode = new QRcode();
@@ -27,13 +28,6 @@ public class Event {
         this.Location = location;
         this.startDate = startDate;
         this.drawDate = drawDate;
-        this.limitEntrants = limitEntrants;
-        if(limitEntrants){
-            this.capacity = capacity;
-        }
-        else{
-            this.capacity = 0;
-        }
         this.checkGeo = checkGeo;
     }
 
@@ -98,14 +92,6 @@ public class Event {
 
     public void setCapacity(Integer capacity) {
         this.capacity = capacity;
-    }
-
-    public boolean isLimitEntrants() {
-        return limitEntrants;
-    }
-
-    public void setLimitEntrants(boolean limitEntrants) {
-        this.limitEntrants = limitEntrants;
     }
 
     public DateFormat getDrawDate() {

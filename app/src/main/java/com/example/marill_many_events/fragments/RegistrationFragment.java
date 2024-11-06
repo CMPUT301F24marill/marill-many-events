@@ -22,14 +22,12 @@ import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
 
 import com.example.marill_many_events.UserCallback;
-import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.PhotoPicker;
 import com.example.marill_many_events.models.ProfilePictureGenerator;
 import com.example.marill_many_events.models.User;
 import com.example.marill_many_events.models.FirebaseUserRegistration;
 
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
