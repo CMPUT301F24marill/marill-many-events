@@ -32,10 +32,10 @@
 
         <activity android:name=".activities.RegistrationActivity" />
         <activity android:name=".activities.HomePageActivity" />
-        <uses-permission android:name="android.permission.INTERNET"
-            tools:ignore="WrongManifestParent" />
-        <uses-permission android:name="android.permission.WAKE_LOCK"
-            tools:ignore="WrongManifestParent" />
+<!--        <uses-permission android:name="android.permission.INTERNET"-->
+<!--            tools:ignore="WrongManifestParent" />-->
+<!--        <uses-permission android:name="android.permission.WAKE_LOCK"-->
+<!--            tools:ignore="WrongManifestParent" />-->
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
