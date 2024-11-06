@@ -22,8 +22,24 @@
             </intent-filter>
         </activity>
 
+        <service
+            android:name="notifications.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <activity android:name=".activities.RegistrationActivity" />
         <activity android:name=".activities.HomePageActivity" />
+        <uses-permission android:name="android.permission.INTERNET"
+            tools:ignore="WrongManifestParent" />
+        <uses-permission android:name="android.permission.WAKE_LOCK"
+            tools:ignore="WrongManifestParent" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/blue_start" />
     </application>
 
 </manifest>
