@@ -18,25 +18,36 @@ import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.models.Event;
 import com.example.marill_many_events.models.FirebaseEvents;
+import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.StorageReference;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class CreateEventFragment extends Fragment implements EventsCallback {
 
-    private TextView NameField, waitlistText;
+    //Views
+    private TextView NameField, datePickerStart, datePickerEnd, capacityField;
     private ListView waitlistList, registeredList;
     private ArrayList<Event> waitlistdataList;
     private ArrayList<Event> registereddataList;
     private EventyArrayAdapter waitlistAdapter, registeredAdapter;
     private Button createButton;
 
+    //Variables
+    Date startDate;
+    Date endDate;
+
+    //Data Storage
     private FirebaseFirestore firestore;
     private String deviceId;
     private StorageReference storageReference;
     private Identity identity;
     private FirebaseEvents firebaseEvents;
+
 
     public CreateEventFragment() {
         // Required empty public constructor
@@ -91,9 +102,18 @@ public class CreateEventFragment extends Fragment implements EventsCallback {
         NameField = view.findViewById(R.id.NameField);
         createButton = view.findViewById(R.id.create);
 
+        datePickerStart = view.findViewById(R.id.Startdatefield);
+        datePickerEnd = view.findViewById(R.id.DrawdateField);
+        capacityField = view.findViewById(R.id.Capacityfield);
+
+
+        datePicker(datePickerStart, true);
+        datePicker(datePickerEnd,false);
 
         createButton.setOnClickListener(v-> {
-                Event event = new Event(null, NameField.getText().toString().trim(), null, null, null, null, false);
+                int capacity = Integer.parseInt(capacityField.getText().toString().trim());
+                String eventname = NameField.getText().toString().trim();
+                Event event = new Event(null, eventname, null, startDate, endDate, capacity, false);
                 firebaseEvents.createEvent(event);
                 });
 
@@ -111,4 +131,23 @@ public class CreateEventFragment extends Fragment implements EventsCallback {
     public void onEventDelete(){}
     public void joinEvent(){}
     public void getEvent(Event event){}
+
+
+    public void datePicker(TextView view, boolean isStartDate) {
+
+        view.setOnClickListener(v -> {
+            MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker().build();
+
+            // Show the date picker dialog
+            datePicker.show(getParentFragmentManager(), "DATE_PICKER");
+
+            // Handle the date selection
+            datePicker.addOnPositiveButtonClickListener(selection -> {
+                Date selectedDate = new Date(selection);
+                view.setText(datePicker.getHeaderText()); // Update the TextView with the selected date
+                if(isStartDate) startDate = selectedDate; // Crude way to avoid more handlers, if boolean flag is true then this is a start date
+                else endDate = selectedDate;
+            });
+        });
+    }
 }

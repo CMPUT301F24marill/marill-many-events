@@ -158,7 +158,7 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
 
     private Bitmap generateprofile() {
         if (name != null) {
-            return ProfilePictureGenerator.generateAvatar(name, 200);
+            return ProfilePictureGenerator.generateProfilePicture(name, 200);
         }
         return null;
     }

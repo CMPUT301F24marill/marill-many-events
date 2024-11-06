@@ -3,6 +3,7 @@ package com.example.marill_many_events.models;
 import com.example.marill_many_events.models.User;
 
 import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -12,18 +13,18 @@ public class Event {
     String Name;
     String Location;
     String ImageURL;
-    QRcode eventQRcode;
-    DateFormat startDate;
-    DateFormat drawDate;
+    //QRcode eventQRcode;
+    Date startDate;
+    Date drawDate;
 
     Integer capacity;
     boolean checkGeo;
 
-    public Event(String imageURL, String name, String location, DateFormat startDate, DateFormat drawDate, Integer capacity, @Nullable boolean checkGeo){
+    public Event(String imageURL, String name, String location, Date startDate, Date drawDate, Integer capacity, @Nullable boolean checkGeo){
         this.entrants = new entrantList();
         this.ImageURL = imageURL;
-        this.eventQRcode = new QRcode();
-
+        //this.eventQRcode = new QRcode();
+        this.capacity = capacity;
         this.Name = name;
         this.Location = location;
         this.startDate = startDate;
@@ -94,29 +95,29 @@ public class Event {
         this.capacity = capacity;
     }
 
-    public DateFormat getDrawDate() {
+    public Date getDrawDate() {
         return drawDate;
     }
 
-    public void setDrawDate(DateFormat drawDate) {
+    public void setDrawDate(Date drawDate) {
         this.drawDate = drawDate;
     }
 
-    public DateFormat getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(DateFormat startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public QRcode getEventQRcode() {
-        return eventQRcode;
-    }
-
-    public void setEventQRcode(QRcode eventQRcode) {
-        this.eventQRcode = eventQRcode;
-    }
+//    public QRcode getEventQRcode() {
+//        return eventQRcode;
+//    }
+//
+//    public void setEventQRcode(QRcode eventQRcode) {
+//        this.eventQRcode = eventQRcode;
+//    }
 
     public String getLocation() {
         return Location;
