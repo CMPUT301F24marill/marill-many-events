@@ -68,4 +68,7 @@ dependencies {
     implementation("com.github.bumptech.glide:annotations:4.15.0")
 
     testImplementation(libs.core) // This is for core testing
+
+
+    implementation("androidx.cardview:cardview:1.0.0"); // card based layout
 }
