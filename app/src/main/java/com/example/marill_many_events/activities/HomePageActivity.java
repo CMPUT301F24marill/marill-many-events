@@ -47,6 +47,12 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.navbar_container, navbarFragment)
                 .commit();
+
+        EventFragment eventFragment = new EventFragment();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, eventFragment) // replace the fragment already in fragment_container
+                .addToBackStack(null) // add to back stack
+                .commit();
     }
 
 

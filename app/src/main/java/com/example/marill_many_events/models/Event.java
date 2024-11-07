@@ -20,6 +20,10 @@ public class Event {
     Integer capacity;
     boolean checkGeo;
 
+    public Event() {
+        // This constructor is needed by Firebase or Gson
+    }
+
     public Event(String imageURL, String name, String location, Date startDate, Date drawDate, Integer capacity, @Nullable boolean checkGeo, String QRcode){
         this.entrants = new entrantList();
         this.ImageURL = imageURL;

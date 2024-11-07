@@ -299,8 +299,6 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
      */
     public Bitmap generateQR(String documentID){
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
-        String url = "https://marill-test.firebaseapp.com/events/" + documentID;
-
 
         int size = 500;
 
@@ -309,7 +307,7 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         hints.put(EncodeHintType.MARGIN, 1);  // Set margin size to 1 for compact QR code
 
         try {
-            com.google.zxing.common.BitMatrix bitMatrix = qrCodeWriter.encode(url, BarcodeFormat.QR_CODE, size, size, hints);
+            com.google.zxing.common.BitMatrix bitMatrix = qrCodeWriter.encode(documentID, BarcodeFormat.QR_CODE, size, size, hints);
             Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565);
 
             for (int x = 0; x < size; x++) {
