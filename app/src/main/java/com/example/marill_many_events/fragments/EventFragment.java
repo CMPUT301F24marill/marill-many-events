@@ -13,7 +13,10 @@ import com.example.marill_many_events.R;
 import com.example.marill_many_events.models.Event;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 public class EventFragment extends Fragment {
 

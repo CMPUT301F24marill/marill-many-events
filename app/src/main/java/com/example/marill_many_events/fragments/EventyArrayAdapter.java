@@ -48,7 +48,7 @@ public class EventyArrayAdapter extends RecyclerView.Adapter<EventyArrayAdapter.
         String imageURL = currentItem.getImageURL();
 
         // Load the image into the ImageView using Glide
-        Glide.with(getContext())  // 'getContext()' is used to specify the context
+        Glide.with(holder.itemView.getContext())  // 'getContext()' is used to specify the context
                 .load(imageURL)       // URL of the image
                 .into(holder.poster);  // The ImageView to load the image into
         holder.eventName.setText(currentItem.getName());
