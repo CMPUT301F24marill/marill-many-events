@@ -1,5 +1,6 @@
 package com.example.marill_many_events.fragments;
 
+import android.content.Context;
 import android.graphics.text.TextRunShaper;
 import android.os.Bundle;
 import android.util.Patterns;
@@ -13,8 +14,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.marill_many_events.FacilityCallback;
+import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.models.FirebaseFacilityRegistration;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
  * CreateFacilityFragment represents a fragment that allow non-organizer users
@@ -26,8 +30,38 @@ public class CreateFacilityFragment extends Fragment {
     private EditText editTextLocation;
     private Button buttonCreate;
 
+    private Identity identity;
+    private FirebaseFirestore firestore;
+
+    private String facilityId;
+
     FirebaseFacilityRegistration firebaseFacilityRegistration;
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        // Make sure the activity implements the required interface
+        if (context instanceof Identity) {
+            identity = (Identity) context;
+        } else {
+            throw new ClassCastException(context.toString() + " must implement Identity Interface");
+        }
+    }
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        facilityId = identity.getdeviceID();
+        firestore = identity.getFirestore();
+
+
+        firebaseFacilityRegistration = new FirebaseFacilityRegistration(firestore, facilityId, (FacilityCallback) this);
+
+
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
