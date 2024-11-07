@@ -23,7 +23,7 @@
 
         <!-- Name Field -->
         <EditText
-            android:id="@+id/facilityName"
+            android:id="@+id/editTextFacilityName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Enter facility name"
@@ -34,7 +34,7 @@
 
         <!-- Phone Number Input -->
         <EditText
-            android:id="@+id/facilityLocation"
+            android:id="@+id/editTextFacilityLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Enter facility location"
@@ -45,6 +45,7 @@
 
         <!-- Create Account Button -->
         <Button
+            android:id="@+id/buttonCreateFacility"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
