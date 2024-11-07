@@ -1,14 +1,17 @@
 package com.example.marill_many_events.models;
 
+import android.os.Parcelable;
+
 import com.example.marill_many_events.models.User;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
-public class Event {
+public class Event{
     entrantList entrants;
     String Name;
     String Location;
@@ -147,4 +150,11 @@ public class Event {
         this.checkGeo = checkGeo;
     }
 
+    public String getQRcode() {
+        return QRcode;
+    }
+
+    public void setQRcode(String QRcode) {
+        this.QRcode = QRcode;
+    }
 }

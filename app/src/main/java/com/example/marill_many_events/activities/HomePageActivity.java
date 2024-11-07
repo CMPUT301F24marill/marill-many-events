@@ -16,6 +16,7 @@ import com.example.marill_many_events.fragments.RegistrationFragment;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.marill_many_events.models.Event;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
@@ -30,6 +31,9 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
     private FirebaseFirestore firestore; // Firestore instance
     private String deviceId; // Store deviceId here
     private FirebaseStorage firebaseStorage; // Firebase Storage for images
+
+
+    private Event currentEvent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,5 +122,13 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
     @Override
     public FirebaseFirestore getFirestore(){
         return firestore;
+    }
+
+    public Event getCurrentEvent(){
+        return currentEvent;
+    }
+
+    public void setCurrentEvent(Event event){
+        currentEvent = event;
     }
 }

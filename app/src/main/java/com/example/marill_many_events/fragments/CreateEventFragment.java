@@ -1,5 +1,6 @@
 package com.example.marill_many_events.fragments;
 
+import static com.google.firebase.appcheck.internal.util.Logger.TAG;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -10,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +26,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
@@ -90,6 +93,7 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+
 
         // Make sure the activity implements the required interface
         if (context instanceof Identity) {
@@ -173,7 +177,7 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
 
         Bitmap code = generateQR(documentID);
         QRview.setImageBitmap(code);
-        QRview.setVisibility(0);
+        QRview.setVisibility(View.VISIBLE);
 
         //bottomSheetDialog.show();
         ImageView qrview = sheetView.findViewById(R.id.QRcode);
@@ -181,8 +185,14 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
     }
 
     public void onEventDelete(){}
+
+
     public void joinEvent(){}
-    public void getEvent(Event event){}
+
+    public void getEvent(Event event){
+
+
+    }
 
     /**
      * Initializes the date picker on a given view.

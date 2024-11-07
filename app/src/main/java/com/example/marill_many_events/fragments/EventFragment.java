@@ -18,7 +18,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
+import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Event;
+import com.example.marill_many_events.models.FirebaseEvents;
 import com.example.marill_many_events.models.FirebaseUserRegistration;
 import com.example.marill_many_events.models.PhotoPicker;
 import com.example.marill_many_events.models.User;
@@ -40,6 +42,8 @@ import javax.annotation.Nullable;
 
 public class EventFragment extends Fragment {
 
+    private Event currentEvent;
+
     private RecyclerView waitlistList;
     private EventyArrayAdapter eventAdapter;
     private List<Event> eventItemList;
@@ -48,6 +52,7 @@ public class EventFragment extends Fragment {
     ScanOptions options = new ScanOptions();
 
 
+    private FirebaseEvents firebaseEvents;
     private FirebaseFirestore firestore;
     private String deviceId;
     private StorageReference storageReference;
@@ -95,13 +100,14 @@ public class EventFragment extends Fragment {
 
         deviceId = identity.getdeviceID();
         firestore = identity.getFirestore();
-
         user = firestore.collection("users").document(deviceId);
 
 
         View view = inflater.inflate(R.layout.home, container, false);
 
         FloatingActionButton scanButton = view.findViewById(R.id.scan);
+        FloatingActionButton addbutton = view.findViewById(R.id.getdetails);
+
         scanButton.setOnClickListener(v -> {
             // Launch the QR scanner using the ActivityResultLauncher
             Intent intent = new Intent(getActivity(), com.journeyapps.barcodescanner.CaptureActivity.class);
@@ -118,6 +124,13 @@ public class EventFragment extends Fragment {
         // Initialize the adapter and set it to RecyclerView
         eventAdapter = new EventyArrayAdapter(eventItemList);
         waitlistList.setAdapter(eventAdapter);
+
+        addbutton.setOnClickListener(v-> {
+            HomePageActivity parentActivity = (HomePageActivity) getActivity();
+            parentActivity.setCurrentEvent(eventItemList.get(1));
+            Log.d("FragmentLifecycle", "Opening details.");
+            showEventDetails();
+        });
 
         return view;
     }
@@ -202,7 +215,19 @@ public class EventFragment extends Fragment {
             eventItemList.add(event);
         }
         eventAdapter.notifyDataSetChanged();
-
     }
 
+    public Event getCurrentEvent(){
+        return currentEvent;
+    }
+
+    public void showEventDetails(){
+        EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
+
+        // Replace the current fragment with the child fragment
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, eventDetailsFragment)
+                .addToBackStack(null)
+                .commit();
+    }
 }
