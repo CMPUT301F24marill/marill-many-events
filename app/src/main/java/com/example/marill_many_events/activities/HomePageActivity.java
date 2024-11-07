@@ -5,19 +5,19 @@ import static com.google.firebase.appcheck.internal.util.Logger.TAG;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.fragments.EventFragment;
-import com.example.marill_many_events.fragments.MenuFragment;
+import com.example.marill_many_events.fragments.CreateEventFragment;
 import com.example.marill_many_events.fragments.NavbarFragment;
-import com.example.marill_many_events.models.NavbarListener;
+import com.example.marill_many_events.NavbarListener;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.fragments.RegistrationFragment;
-
-import android.widget.FrameLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
 
 
 /**
@@ -25,18 +25,20 @@ import com.google.firebase.firestore.FirebaseFirestore;
  * display of the navigation bar and handling user profile interactions.
  * It implements the NavbarListener interface to respond to navigation events.
  */
-public class HomePageActivity extends AppCompatActivity implements NavbarListener {
+public class HomePageActivity extends AppCompatActivity implements NavbarListener, Identity{
 
     private FirebaseFirestore firestore; // Firestore instance
     private String deviceId; // Store deviceId here
+    private FirebaseStorage firebaseStorage; // Firebase Storage for images
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        deviceId = getIntent().getStringExtra("deviceId"); // Retrieve deviceId
 
+        deviceId = getIntent().getStringExtra("deviceId"); // Retrieve deviceId
         firestore = FirebaseFirestore.getInstance();
+        firebaseStorage = FirebaseStorage.getInstance();
 
         Log.d("HomePageActivity", "Fragment Container Visibility: " + findViewById(R.id.fragment_container).getVisibility());
 
@@ -57,20 +59,10 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
         EventFragment eventFragment = new EventFragment();
         Log.d(TAG, "onHomeSelected called with deviceId: " + deviceId);
 
-        // Pass deviceId to the fragment
-        Bundle args = new Bundle();
-        args.putString("deviceId", deviceId);
-        eventFragment.setArguments(args);
-
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, eventFragment) // replace the fragment already in fragment_container
                 .addToBackStack(null) // add to back stack
                 .commit();
-
-        FrameLayout fragmentContainer = findViewById(R.id.fragment_container);
-        FrameLayout navbarContainer = findViewById(R.id.navbar_container);
-        Log.d(TAG, "Fragment Container Visibility: " + fragmentContainer.getVisibility());
-        Log.d(TAG, "NavbarFragment Container Visibility: " + navbarContainer.getVisibility());
     }
 
     /**
@@ -78,13 +70,13 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
      * It opens a placeholder.
      */
     public void onMenuSelected(){
-        MenuFragment menuFragment = new MenuFragment();
+        CreateEventFragment createEventFragment = new CreateEventFragment();
 
         Log.d(TAG, "onMenuSelected called");
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, menuFragment)
+                .replace(R.id.fragment_container, createEventFragment)
                 .commit();
     }
 
@@ -100,22 +92,25 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
 
         Log.d(TAG, "onProfileSelected called with deviceId: " + deviceId);
 
-        // Pass deviceId to the fragment
-        Bundle args = new Bundle();
-        args.putString("deviceId", deviceId);
-        registrationFragment.setArguments(args);
-
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, registrationFragment) // replace the fragment already in fragment_container
                 .addToBackStack(null) // add to back stack
                 .commit();
 
+    }
 
-        FrameLayout fragmentContainer = findViewById(R.id.fragment_container);
-        FrameLayout navbarContainer = findViewById(R.id.navbar_container);
-        Log.d(TAG, "Fragment Container Visibility: " + fragmentContainer.getVisibility());
-        Log.d(TAG, "NavbarFragment Container Visibility: " + navbarContainer.getVisibility());
+    @Override
+    public String getdeviceID(){
+        return deviceId;
+    }
 
+    @Override
+    public FirebaseStorage getStorage(){
+        return firebaseStorage;
+    }
 
+    @Override
+    public FirebaseFirestore getFirestore(){
+        return firestore;
     }
 }

@@ -1,39 +1,34 @@
 package com.example.marill_many_events.models;
 
-import com.example.marill_many_events.User;
+import com.example.marill_many_events.models.User;
 
 import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 public class Event {
     entrantList entrants;
     String Name;
     String Location;
     String ImageURL;
-    QRcode eventQRcode;
-    DateFormat startDate;
-    DateFormat drawDate;
+    String QRcode;
+    Date startDate;
+    Date drawDate;
 
-    boolean limitEntrants;
     Integer capacity;
     boolean checkGeo;
 
-    public void event(String imageURL, String name, String location, DateFormat startDate, DateFormat drawDate, boolean limitEntrants, Integer capacity, boolean checkGeo){
+    public Event(String imageURL, String name, String location, Date startDate, Date drawDate, Integer capacity, @Nullable boolean checkGeo, String QRcode){
         this.entrants = new entrantList();
         this.ImageURL = imageURL;
-        this.eventQRcode = new QRcode();
-
+        this.QRcode = QRcode;
+        this.capacity = capacity;
         this.Name = name;
         this.Location = location;
         this.startDate = startDate;
         this.drawDate = drawDate;
-        this.limitEntrants = limitEntrants;
-        if(limitEntrants){
-            this.capacity = capacity;
-        }
-        else{
-            this.capacity = 0;
-        }
         this.checkGeo = checkGeo;
     }
 
@@ -55,7 +50,7 @@ public class Event {
      * @param x_cord        User x coordinate
      * @param y_cord        User y coordinate
      */
-    public void addEntrant(com.example.marill_many_events.User user, float x_cord, float y_cord){
+    public void addEntrant(User user, float x_cord, float y_cord){
         Entrant entrant = new Entrant("Waitlist", user);
         if(this.checkGeo){
             //entrant location is set if event checks for geo, else the coordinates within the entrant will remain null
@@ -100,37 +95,29 @@ public class Event {
         this.capacity = capacity;
     }
 
-    public boolean isLimitEntrants() {
-        return limitEntrants;
-    }
-
-    public void setLimitEntrants(boolean limitEntrants) {
-        this.limitEntrants = limitEntrants;
-    }
-
-    public DateFormat getDrawDate() {
+    public Date getDrawDate() {
         return drawDate;
     }
 
-    public void setDrawDate(DateFormat drawDate) {
+    public void setDrawDate(Date drawDate) {
         this.drawDate = drawDate;
     }
 
-    public DateFormat getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(DateFormat startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public QRcode getEventQRcode() {
-        return eventQRcode;
-    }
-
-    public void setEventQRcode(QRcode eventQRcode) {
-        this.eventQRcode = eventQRcode;
-    }
+//    public QRcode getEventQRcode() {
+//        return eventQRcode;
+//    }
+//
+//    public void setEventQRcode(QRcode eventQRcode) {
+//        this.eventQRcode = eventQRcode;
+//    }
 
     public String getLocation() {
         return Location;

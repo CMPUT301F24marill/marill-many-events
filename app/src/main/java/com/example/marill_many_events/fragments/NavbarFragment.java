@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.marill_many_events.models.NavbarListener;
+import com.example.marill_many_events.NavbarListener;
 import com.example.marill_many_events.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 

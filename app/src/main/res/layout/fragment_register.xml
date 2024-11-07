@@ -89,10 +89,12 @@
 
     <ImageView
         android:id="@+id/imageView3"
-        android:layout_width="29dp"
-        android:layout_height="30dp"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
         android:layout_marginEnd="-15dp"
         android:scaleType="fitXY"
+        android:padding="3dp"
+        android:background="@drawable/edit_pencil_background"
         app:layout_constraintEnd_toEndOf="@+id/profile_picture"
         app:layout_constraintTop_toTopOf="@+id/profile_picture"
         app:srcCompat="@drawable/pencil" />

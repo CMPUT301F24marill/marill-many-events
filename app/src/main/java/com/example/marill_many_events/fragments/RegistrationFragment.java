@@ -1,11 +1,9 @@
 package com.example.marill_many_events.fragments;
 
-import static android.app.Activity.RESULT_OK;
-
-import android.content.Intent;
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,32 +12,25 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
 
 import com.example.marill_many_events.UserCallback;
 import com.example.marill_many_events.models.PhotoPicker;
 import com.example.marill_many_events.models.ProfilePictureGenerator;
 import com.example.marill_many_events.models.User;
-import com.example.marill_many_events.models.FirebaseRegistration;
+import com.example.marill_many_events.models.FirebaseUserRegistration;
 
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -52,33 +43,54 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
 
     private TextInputLayout textInputLayoutName, textInputLayoutEmail, textInputLayoutMobile;
     private TextInputEditText editTextName, editTextEmail, editTextMobile;
-    private FirebaseFirestore firestore;
-    private String deviceId;
-    private ImageView profilePicture;
-
-    private String profilePictureUrl;
-    private StorageReference storageReference;
-    private boolean isEditMode = false;
-
     private Button buttonRegister;
+
+    private ImageView profilePicture;
+    private String profilePictureUrl;
     private Uri profilePictureUri;
-    private PhotoPicker.OnPhotoSelectedListener listener;
     private PhotoPicker photoPicker;
     private User user;
     String name;
 
-    FirebaseRegistration firebaseRegistration;
+    private FirebaseFirestore firestore;
+    private String deviceId;
+    private StorageReference storageReference;
+    private Identity identity;
+
+    private boolean isEditMode = false;
+    FirebaseUserRegistration firebaseUserRegistration;
 
     public RegistrationFragment() {}
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        // Make sure the activity implements the required interface
+        if (context instanceof Identity) {
+            identity = (Identity) context;
+        } else {
+            throw new ClassCastException(context.toString() + " must implement Identity Interface");
+        }
+    }
+
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        deviceId = getArguments() != null ? getArguments().getString("deviceId") : null; // Get device ID from arguments
-        firestore = FirebaseFirestore.getInstance();
-        storageReference = FirebaseStorage.getInstance().getReference("profile_pictures");
-        firebaseRegistration = new FirebaseRegistration(firestore, storageReference, deviceId, this);
+//        deviceId = getArguments() != null ? getArguments().getString("deviceId") : null; // Get device ID from arguments
+//        firestore = FirebaseFirestore.getInstance();
+//        storageReference = FirebaseStorage.getInstance().getReference("profile_pictures");
+
+        deviceId = identity.getdeviceID();
+        firestore = identity.getFirestore();
+        storageReference = identity.getStorage().getReference("profile_pictures");
+
+        firebaseUserRegistration = new FirebaseUserRegistration(firestore, storageReference, deviceId, this);
+
         photoPicker = new PhotoPicker(this, this);
+
+
     }
 
     /**
@@ -112,30 +124,29 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
         textInputLayoutEmail = view.findViewById(R.id.textInputLayoutEmail);
         textInputLayoutMobile = view.findViewById(R.id.textInputLayoutMobile);
 
-
+        buttonRegister = view.findViewById(R.id.buttonRegister);
         editTextName = view.findViewById(R.id.editTextName);
         editTextEmail = view.findViewById(R.id.editTextEmail);
         editTextMobile = view.findViewById(R.id.editTextMobile);
         profilePicture = view.findViewById(R.id.profile_picture);
 
-        firebaseRegistration.loadUserDetails(); // Try getting an existing user
+        firebaseUserRegistration.loadUserDetails(); // Try getting an existing user
 
         profilePicture.setOnClickListener(v -> photoPicker.showPhotoOptions(profilePictureUrl));
 
-        // Load existing user details if in edit mode
-        loadUserDetails();
+        firebaseUserRegistration.loadUserDetails();
 
         // Set click listener for the register button
         buttonRegister.setOnClickListener(v -> {
             if (validateInputs()) {
                 if (isEditMode) {
-                    firebaseRegistration.updateUser(
+                    firebaseUserRegistration.updateUser(
                             editTextName.getText().toString().trim(),
                             editTextEmail.getText().toString().trim(),
                             editTextMobile.getText().toString().trim(),
                             profilePictureUri);
                 } else {
-                    firebaseRegistration.registerUser(
+                    firebaseUserRegistration.registerUser(
                             editTextName.getText().toString().trim(),
                             editTextEmail.getText().toString().trim(),
                             editTextMobile.getText().toString().trim(),
@@ -147,7 +158,7 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
 
     private Bitmap generateprofile() {
         if (name != null) {
-            return ProfilePictureGenerator.generateAvatar(name, 200);
+            return ProfilePictureGenerator.generateProfilePicture(name, 200);
         }
         return null;
     }
@@ -231,7 +242,7 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
     }
 
     public void onUserUpdated() {
-        firebaseRegistration.loadUserDetails();
+        firebaseUserRegistration.loadUserDetails();
     }
 
     public void onRegistered(){
@@ -246,7 +257,7 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
 
     public void onPhotoDeleted(){ // when the delete photo button in the bottom sheet is pressed
         profilePictureUri = null;
-        firebaseRegistration.deleteProfilePicture();
+        firebaseUserRegistration.deleteProfilePicture();
     }
 
 }
