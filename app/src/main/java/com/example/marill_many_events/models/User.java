@@ -5,6 +5,7 @@ public class User {
     public String email;
     public String phone;
     public String profilePictureUrl;
+    public String status;
 
     public User() {
         // Default constructor
@@ -16,6 +17,7 @@ public class User {
         this.email = email;
         this.phone = phone;
         this.profilePictureUrl = profilePictureUrl;
+        this.status = "E";  // initialize user status with normal entrant
     }
 
     public String getName() {
@@ -49,4 +51,8 @@ public class User {
     public void setProfilePictureUrl(String profilePictureUrl) {
         this.profilePictureUrl = profilePictureUrl;
     }
+
+    public String getStatus() { return  status; }
+
+    public void setStatus(String status) { this.status = status; }
 }
