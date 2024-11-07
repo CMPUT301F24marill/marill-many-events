@@ -5,7 +5,7 @@ public class User {
     public String email;
     public String phone;
     public String profilePictureUrl;
-    public boolean isFacility;
+    public boolean hasFacility;
 
     public User() {
         // Default constructor
@@ -17,7 +17,7 @@ public class User {
         this.email = email;
         this.phone = phone;
         this.profilePictureUrl = profilePictureUrl;
-        this.isFacility = false;  // initialize user status with normal entrant
+        this.hasFacility = false;  // initialize user status with normal entrant
     }
 
     public String getName() {
@@ -52,7 +52,7 @@ public class User {
         this.profilePictureUrl = profilePictureUrl;
     }
 
-    public boolean getFacilityStatus() { return  isFacility; }
+    public boolean getFacilityStatus() { return  hasFacility; }
 
-    public void setFacilityStatus(boolean status) { this.isFacility = status; }
+    public void setFacilityStatus(boolean status) { this.hasFacility = status; }
 }
