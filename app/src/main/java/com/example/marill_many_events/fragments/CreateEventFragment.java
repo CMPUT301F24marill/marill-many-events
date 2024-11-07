@@ -62,8 +62,6 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
     private ImageView posterview, QRview;
 
 
-    private Button scanButton;
-
     //Variables
     private String eventName;
     private Date startDate;
@@ -145,30 +143,6 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         switchCompat = view.findViewById(R.id.GeoSwitch);
         QRview = view.findViewById(R.id.QRcode);
 
-        scanButton = view.findViewById(R.id.scan);
-
-
-        final ActivityResultLauncher<ScanOptions> qrCodeLauncher = registerForActivityResult(
-                new ScanContract(),
-                result -> {
-                    if (result.getContents() == null) {
-                        Toast.makeText(getContext(), "Scan canceled", Toast.LENGTH_LONG).show();
-                    } else {
-                        String scannedData = result.getContents();
-                        Toast.makeText(getContext(), "Scanned: " + scannedData, Toast.LENGTH_LONG).show();
-                        // Here you can handle the scanned data (for example, open event details or process the URL)
-                    }
-                });
-
-        ScanOptions options = new ScanOptions();
-
-        scanButton.setOnClickListener(v -> {
-            // Launch the QR scanner using the ActivityResultLauncher
-            Intent intent = new Intent(getActivity(), com.journeyapps.barcodescanner.CaptureActivity.class);
-            qrCodeLauncher.launch(options);
-        });
-
-
         datePicker(datePickerStart, true);
         datePicker(datePickerEnd,false);
 
@@ -198,9 +172,10 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         bottomSheetDialog.setContentView(sheetView);
 
         Bitmap code = generateQR(documentID);
-
         QRview.setImageBitmap(code);
-        bottomSheetDialog.show();
+        QRview.setVisibility(0);
+
+        //bottomSheetDialog.show();
         ImageView qrview = sheetView.findViewById(R.id.QRcode);
         qrview.setImageBitmap(code);
     }
@@ -300,7 +275,7 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
     public Bitmap generateQR(String documentID){
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
 
-        int size = 500;
+        int size = 400;
 
         // Set the hints for QR Code encoding
         Hashtable<EncodeHintType, Object> hints = new Hashtable<>();

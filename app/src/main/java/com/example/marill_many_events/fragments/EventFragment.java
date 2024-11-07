@@ -3,6 +3,7 @@ package com.example.marill_many_events.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +23,11 @@ import com.example.marill_many_events.models.FirebaseUserRegistration;
 import com.example.marill_many_events.models.PhotoPicker;
 import com.example.marill_many_events.models.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.StorageReference;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
@@ -48,6 +52,7 @@ public class EventFragment extends Fragment {
     private String deviceId;
     private StorageReference storageReference;
     private Identity identity;
+    DocumentReference user;
 
     public EventFragment() {
         // Required empty public constructor
@@ -61,7 +66,7 @@ public class EventFragment extends Fragment {
                 } else {
                     String scannedData = result.getContents();
                     Toast.makeText(getContext(), "Scanned: " + scannedData, Toast.LENGTH_LONG).show();
-                    joinEvent(scannedData);
+                    getEvent(scannedData);
                 }
             });
 
@@ -79,10 +84,20 @@ public class EventFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        getUserEvents();
+        Log.d("FragmentLifecycle", "Fragment is now visible.");
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {// Inflate the layout for this fragment
 
         deviceId = identity.getdeviceID();
         firestore = identity.getFirestore();
+
+        user = firestore.collection("users").document(deviceId);
+
 
         View view = inflater.inflate(R.layout.home, container, false);
 
@@ -107,7 +122,7 @@ public class EventFragment extends Fragment {
         return view;
     }
 
-    public void joinEvent(String eventID){
+    public void getEvent(String eventID){
         firestore.collection("events").document(eventID)
                 .get()
                 .addOnCompleteListener(task -> {
@@ -115,10 +130,79 @@ public class EventFragment extends Fragment {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
                             Event event = document.toObject(Event.class);
-                            eventItemList.add(event);
-                            eventAdapter.notifyItemInserted(eventItemList.size() - 1); // Notify the adapter that a new item was added
+                            registerUser(eventID);
                         }
                     }
                 });
     }
+
+    public void registerUser(String eventID){ // Register the current deviceID (user) to the given event by writing to the user and event a reference to each other
+        WriteBatch batch = firestore.batch();
+        DocumentReference eventUsers = firestore.collection("events").document(eventID);
+
+        batch.update(user, "waitList", FieldValue.arrayUnion(eventUsers));
+        batch.update(eventUsers, "waitList", FieldValue.arrayUnion(user));
+
+        batch.commit()
+                .addOnSuccessListener(aVoid -> {
+                    firestore.collection("events").document(eventID).get()
+                            .addOnSuccessListener(documentSnapshot -> {
+                                if (documentSnapshot.exists()) {
+                                    Event newEvent = documentSnapshot.toObject(Event.class);
+                                    if (newEvent != null) {
+                                        addToItemList(newEvent); // Add directly to the list
+                                    }
+                                }
+                            });
+                    Toast.makeText(getContext(), "Item added to the list!", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Error adding item to the list", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    public void getUserEvents(){
+        eventItemList.clear();
+        user.get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // Retrieve the array of DocumentReferences
+                        List<DocumentReference> docRefs = (List<DocumentReference>) documentSnapshot.get("waitList");
+
+                        if (docRefs != null) {
+                            // Iterate through the list of DocumentReferences
+                            for (DocumentReference reference : docRefs) {
+                                // Fetch each document using the DocumentReference
+                                reference.get()
+                                        .addOnSuccessListener(innerDoc -> {
+                                            if (innerDoc.exists()) {
+                                                Event eventIter = innerDoc.toObject(Event.class);
+                                                addToItemList(eventIter);
+                                            }
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            // Handle error in fetching the referenced document
+                                            Toast.makeText(getContext(), "Error fetching referenced document", Toast.LENGTH_SHORT).show();
+                                        });
+                            }
+                        }
+                    } else {
+                        // Document doesn't exist
+                        Toast.makeText(getContext(), "Document not found", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Handle error in retrieving the document
+                    Toast.makeText(getContext(), "Error getting document", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    public void addToItemList(Event event){
+        if (!eventItemList.contains(event)) {
+            eventItemList.add(event);
+        }
+        eventAdapter.notifyDataSetChanged();
+
+    }
+
 }
