@@ -4,7 +4,9 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,7 +17,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
@@ -30,14 +34,20 @@ import com.example.marill_many_events.R;
 import com.example.marill_many_events.models.Event;
 import com.example.marill_many_events.models.FirebaseEvents;
 import com.example.marill_many_events.models.PhotoPicker;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.StorageReference;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
+import java.util.Hashtable;
 
 public class CreateEventFragment extends Fragment implements EventsCallback, PhotoPicker.OnPhotoSelectedListener {
 
@@ -49,7 +59,10 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
     private EventyArrayAdapter waitlistAdapter, registeredAdapter;
     private SwitchCompat switchCompat;
     private Button createButton;
-    private ImageView posterview;
+    private ImageView posterview, QRview;
+
+
+    private Button scanButton;
 
     //Variables
     private String eventName;
@@ -72,6 +85,9 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
     public CreateEventFragment() {
         // Required empty public constructor
     }
+
+
+
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -108,7 +124,7 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_createevent, container, false);
+        return inflater.inflate(R.layout.fragment_create_event, container, false);
     }
 
     /**
@@ -117,7 +133,6 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
      * @param view              The view returned by onCreateView.
      * @param savedInstanceState A Bundle containing the activity's previously saved state.
      */
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         NameField = view.findViewById(R.id.NameField);
@@ -128,6 +143,31 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         capacityField = view.findViewById(R.id.Capacityfield);
         locationField = view.findViewById(R.id.LocationField);
         switchCompat = view.findViewById(R.id.GeoSwitch);
+        QRview = view.findViewById(R.id.QRcode);
+
+        scanButton = view.findViewById(R.id.scan);
+
+
+        final ActivityResultLauncher<ScanOptions> qrCodeLauncher = registerForActivityResult(
+                new ScanContract(),
+                result -> {
+                    if (result.getContents() == null) {
+                        Toast.makeText(getContext(), "Scan canceled", Toast.LENGTH_LONG).show();
+                    } else {
+                        String scannedData = result.getContents();
+                        Toast.makeText(getContext(), "Scanned: " + scannedData, Toast.LENGTH_LONG).show();
+                        // Here you can handle the scanned data (for example, open event details or process the URL)
+                    }
+                });
+
+        ScanOptions options = new ScanOptions();
+
+        scanButton.setOnClickListener(v -> {
+            // Launch the QR scanner using the ActivityResultLauncher
+            Intent intent = new Intent(getActivity(), com.journeyapps.barcodescanner.CaptureActivity.class);
+            qrCodeLauncher.launch(options);
+        });
+
 
         datePicker(datePickerStart, true);
         datePicker(datePickerEnd,false);
@@ -147,13 +187,34 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
 
     }
 
+    /**
+     * Callback for when an event document is created. The qr code is drawn using the url locally
+     *
+     * @param documentID          The firestore document ID for the newly created event
+     */
+    public void onEventCreate(String documentID){
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
+        View sheetView = LayoutInflater.from(getContext()).inflate(R.layout.qr_sheet, null);
+        bottomSheetDialog.setContentView(sheetView);
 
-    public void onEventCreate(String documentID){}
+        Bitmap code = generateQR(documentID);
+
+        QRview.setImageBitmap(code);
+        bottomSheetDialog.show();
+        ImageView qrview = sheetView.findViewById(R.id.QRcode);
+        qrview.setImageBitmap(code);
+    }
+
     public void onEventDelete(){}
     public void joinEvent(){}
     public void getEvent(Event event){}
 
-
+    /**
+     * Initializes the date picker on a given view.
+     *
+     * @param view              The view on which datepicker is initialized.
+     * @param isStartDate boolean indicating if this view is for the start date.
+     */
     public void datePicker(TextView view, boolean isStartDate) {
 
         view.setOnClickListener(v -> {
@@ -172,6 +233,11 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         });
     }
 
+    /**
+     * Sets the poster imageview once an image is selected.
+     *
+     * @param uri The image resource id.
+     */
     public void onPhotoSelected(Uri uri){ // when the upload photo button is pressed and a photo is uploaded
         posterUri = uri;
         Glide.with(this).asBitmap().load(uri)
@@ -206,18 +272,57 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
             // reset the view height to the height of a default "add poster here" image
     }
 
+    /**
+     * Creates an event object with a poster link embedded once the create button is pressed.
+     *
+     * @param url The url of the image uploaded to firebase storage.
+     */
     public void onPosterUpload(String url){
         posterUrl = url;
         Event event = createEvent();
         firebaseEvents.createEvent(event);
     }
 
+    /**
+     * Create an event object.
+     */
     public Event createEvent(){
         capacity = Integer.parseInt(capacityField.getText().toString().trim());
         eventName = NameField.getText().toString().trim();
         location = locationField.getText().toString().trim();
-        Event event = new Event(posterUrl, eventName, location, startDate, endDate, capacity, geolocation);
+        Event event = new Event(posterUrl, eventName, location, startDate, endDate, capacity, geolocation, null);
         return event;
+    }
+
+    /**
+     * Locally generate QR code from a documentID.
+     */
+    public Bitmap generateQR(String documentID){
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        String url = "https://marill-test.firebaseapp.com/events/" + documentID;
+
+
+        int size = 500;
+
+        // Set the hints for QR Code encoding
+        Hashtable<EncodeHintType, Object> hints = new Hashtable<>();
+        hints.put(EncodeHintType.MARGIN, 1);  // Set margin size to 1 for compact QR code
+
+        try {
+            com.google.zxing.common.BitMatrix bitMatrix = qrCodeWriter.encode(url, BarcodeFormat.QR_CODE, size, size, hints);
+            Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565);
+
+            for (int x = 0; x < size; x++) {
+                for (int y = 0; y < size; y++) {
+                    bitmap.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
+                }
+            }
+
+            return bitmap;
+        } catch (WriterException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

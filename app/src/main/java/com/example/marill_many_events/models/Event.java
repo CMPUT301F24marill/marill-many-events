@@ -13,17 +13,17 @@ public class Event {
     String Name;
     String Location;
     String ImageURL;
-    //QRcode eventQRcode;
+    String QRcode;
     Date startDate;
     Date drawDate;
 
     Integer capacity;
     boolean checkGeo;
 
-    public Event(String imageURL, String name, String location, Date startDate, Date drawDate, Integer capacity, @Nullable boolean checkGeo){
+    public Event(String imageURL, String name, String location, Date startDate, Date drawDate, Integer capacity, @Nullable boolean checkGeo, String QRcode){
         this.entrants = new entrantList();
         this.ImageURL = imageURL;
-        //this.eventQRcode = new QRcode();
+        this.QRcode = QRcode;
         this.capacity = capacity;
         this.Name = name;
         this.Location = location;

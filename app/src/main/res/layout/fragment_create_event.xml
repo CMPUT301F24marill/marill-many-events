@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.RoundedCorners"
         app:cardBackgroundColor="@color/blue_end_translucent"
-        app:strokeWidth="0dp"> <!-- translucent background color -->
+        app:strokeWidth="1dp"> <!-- translucent background color -->
 
         <ImageView
             android:id="@+id/poster"
@@ -209,5 +209,33 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/TextView" />
+
+    <Button
+        android:id="@+id/scan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:text="Scan"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/create" />
+
+    <com.google.android.material.card.MaterialCardView
+        app:layout_constraintTop_toBottomOf="@id/scan"
+        android:id="@+id/QRView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.RoundedCorners"
+        app:cardBackgroundColor="@color/blue_end_translucent"
+        app:strokeWidth="0dp">
+
+        <ImageView
+            android:id="@+id/QRcode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/default_profile"
+            android:background="@android:color/transparent"/>
+
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

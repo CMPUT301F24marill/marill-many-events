@@ -1,5 +1,7 @@
 package com.example.marill_many_events.models;
 
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.util.Log;
 
@@ -8,7 +10,12 @@ import com.example.marill_many_events.UserCallback;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.StorageReference;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.qrcode.QRCodeWriter;
 
+import java.util.Hashtable;
 import java.util.UUID;
 
 public class FirebaseEvents {
@@ -25,7 +32,7 @@ public class FirebaseEvents {
     }
 
     /**
-     * Loads user details from Firestore if in edit mode.
+     * Loads Event details from Firestore.
      */
     public void getEventDetails(String documentID) {
         firestore.collection("events").document(documentID)
@@ -42,7 +49,7 @@ public class FirebaseEvents {
     }
 
     /**
-     * Update an existing user's details.
+     * Create an event.
      */
     public void createEvent(Event event) {
         firestore.collection("events") // "events" is the name of your collection
@@ -99,7 +106,7 @@ public class FirebaseEvents {
 
 
     /**
-     * Upload profile picture to firebase storage and get the download url.
+     * Upload poster picture to firebase storage and get the download url.
      */
     public void uploadPoster(Uri profilePictureUri) {
         String filename = generateRandomFilename();
@@ -125,6 +132,7 @@ public class FirebaseEvents {
 //        //.addOnFailureListener(e -> Toast.makeText(getActivity(), "Failed to update profile picture.", Toast.LENGTH_SHORT).show());
 //    }
 
+
     public void deleteUser(){
         firestore.collection("users").document(deviceId).delete();
     }
@@ -133,4 +141,6 @@ public class FirebaseEvents {
         long timestamp = System.currentTimeMillis();
         return "image_" + timestamp + "_" + UUID.randomUUID().toString() + ".jpg"; // Add your desired extension
     }
+
+
 }

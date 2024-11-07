@@ -13,6 +13,7 @@ fragmentTesting = "1.8.5"
 monitor = "1.6.1"
 androidxJunit = "1.1.5"
 espressoIntents = "3.6.1"
+cameraView = "1.4.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -28,6 +29,7 @@ fragment-testing = { group = "androidx.fragment", name = "fragment-testing", ver
 monitor = { group = "androidx.test", name = "monitor", version.ref = "monitor" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxJunit" }
 androidx-espresso-intents = { group = "androidx.test.espresso", name = "espresso-intents", version.ref = "espressoIntents" }
+androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "cameraView" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
