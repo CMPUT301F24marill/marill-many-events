@@ -12,7 +12,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 public class Event{
-    entrantList entrants;
+    EntrantList entrants;
     String Name;
     String Location;
     String ImageURL;
@@ -28,7 +28,7 @@ public class Event{
     }
 
     public Event(String imageURL, String name, String location, Date startDate, Date drawDate, Integer capacity, @Nullable boolean checkGeo, String QRcode){
-        this.entrants = new entrantList();
+        this.entrants = new EntrantList();
         this.ImageURL = imageURL;
         this.QRcode = QRcode;
         this.capacity = capacity;
