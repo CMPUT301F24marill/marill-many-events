@@ -5,7 +5,6 @@ public class User {
     public String email;
     public String phone;
     public String profilePictureUrl;
-    public boolean hasFacility;
     public String[] events;
 
     public User() {
@@ -18,7 +17,6 @@ public class User {
         this.email = email;
         this.phone = phone;
         this.profilePictureUrl = profilePictureUrl;
-        this.hasFacility = false;  // initialize user status with normal entrant
         this.events = events;
     }
 
@@ -53,8 +51,4 @@ public class User {
     public void setProfilePictureUrl(String profilePictureUrl) {
         this.profilePictureUrl = profilePictureUrl;
     }
-
-    public boolean getFacilityStatus() { return  hasFacility; }
-
-    public void setFacilityStatus(boolean status) { this.hasFacility = status; }
 }
