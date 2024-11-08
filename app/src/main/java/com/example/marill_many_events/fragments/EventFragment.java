@@ -33,6 +33,9 @@ import com.journeyapps.barcodescanner.ScanOptions;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Displays all events as a list, events can either be user's waitlist or organizer's created events
+ */
 public class EventFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener{
 
     private Event currentEvent;
@@ -133,6 +136,9 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
         return view;
     }
 
+    /**
+     * Get event details from a qr code of its firebase reference
+     */
     public void getEvent(String eventID){
         firestore.collection("events").document(eventID)
                 .get()
@@ -147,6 +153,10 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
                 });
     }
 
+    /**
+     * Register a user to an event by atomically adding user to event's waitlist and event to user's events
+     * @param eventID the document reference for the event in firebase
+     */
     public void registerUser(String eventID){ // Register the current deviceID (user) to the given event by writing to the user and event a reference to each other
         WriteBatch batch = firestore.batch();
         DocumentReference eventUsers = firestore.collection("events").document(eventID);
@@ -172,6 +182,9 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
                 });
     }
 
+    /**
+     * Get all of the events that a user is registered in and populate the adapter
+     */
     public void getUserEvents(){
         eventItemList.clear();
         user.get()
@@ -208,6 +221,9 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
                 });
     }
 
+    /**
+     * Add en event to the list
+     */
     public void addToItemList(Event event){
         if (!eventItemList.contains(event)) {
             eventItemList.add(event);
@@ -215,6 +231,9 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
         eventAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Remove an item from the list
+     */
     public void removeItemfromList(Event event){
         if (eventItemList.contains(event)) {
             eventItemList.remove(event);
@@ -235,7 +254,9 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
                 .commit();
     }
 
-
+    /**
+     * Leave an event as a user
+     */
     public void onDeleteClick(Event event){
             // Register the current deviceID (user) to the given event by writing to the user and event a reference to each other
             WriteBatch batch = firestore.batch();
