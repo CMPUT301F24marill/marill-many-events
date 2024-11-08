@@ -5,6 +5,11 @@ import com.example.marill_many_events.models.User;
 import java.text.DateFormat;
 import java.util.List;
 
+/**
+ * Event represents an event that users can register for. It includes details such as the name,
+ * location, start date, and a list of entrants. It also has an option to limit the number of entrants
+ * and verify geographical locations.
+ */
 public class Event {
     entrantList entrants;
     String Name;
@@ -18,6 +23,18 @@ public class Event {
     Integer capacity;
     boolean checkGeo;
 
+    /**
+     * Initializes an event with the specified parameters.
+     *
+     * @param imageURL      The URL of the event image.
+     * @param name          The name of the event.
+     * @param location      The location of the event.
+     * @param startDate     The start date of the event.
+     * @param drawDate      The draw date of the event.
+     * @param limitEntrants Indicates if the number of entrants should be limited.
+     * @param capacity      The capacity of the event (if entrants are limited).
+     * @param checkGeo      Indicates if geographical verification is required.
+     */
     public void event(String imageURL, String name, String location, DateFormat startDate, DateFormat drawDate, boolean limitEntrants, Integer capacity, boolean checkGeo){
         this.entrants = new entrantList();
         this.ImageURL = imageURL;
@@ -86,11 +103,13 @@ public class Event {
     /**
      * set event poster
      *
-     * @param  url for event poster
+     * @param url for event poster
      */
     public void setImageURL(String url){
         this.ImageURL = url;
     }
+
+    // Getter and setter methods for event properties
 
     public Integer getCapacity() {
         return capacity;

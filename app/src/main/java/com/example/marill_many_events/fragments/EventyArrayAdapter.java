@@ -19,7 +19,10 @@ import com.example.marill_many_events.models.Event;
 
 import java.util.ArrayList;
 
-//EventyArrayAdapter contains Events in list and retrieves a books information for the view
+/**
+ * EventyArrayAdapter is an ArrayAdapter for displaying a list of {@link Event} objects in a ListView or GridView.
+ * It inflates the event list layout and binds data from an Event object to the view components.
+ */
 public class EventyArrayAdapter extends ArrayAdapter<Event> {
     /**
      * Constructor for creating an EventyArrayAdapter.
@@ -48,10 +51,13 @@ public class EventyArrayAdapter extends ArrayAdapter<Event> {
         } else {
             view = convertView;
         }
+
+        // Get the Event object for the current position
         Event event = getItem(position);
         TextView eventName = view.findViewById(R.id.EventName);
         ImageView eventPoster = view.findViewById(R.id.EventPoster);
 
+        // Set the event name and load the poster image (if available)
         eventName.setText(event.getName());
         String posterURL = event.getImageURL();
         return view;

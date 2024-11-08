@@ -5,9 +5,16 @@ import com.example.marill_many_events.models.User;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * entrantList represents a list of {@link Entrant} objects.
+ * It provides methods for adding, updating, retrieving, and removing entrants based on their status.
+ */
 public class entrantList {
     private List<Entrant> entrants = new ArrayList<>();
 
+    /**
+     * Default constructor for entrantList.
+     */
     public entrantList(){
     }
 
@@ -15,7 +22,6 @@ public class entrantList {
      * Add entrant to list. They are added as waitlisted.
      *
      * @param entrant           User to add
-     * @return The list of entrants in this event under that status
      */
     public void addEntrant(Entrant entrant){
         this.entrants.add(entrant);
@@ -63,6 +69,7 @@ public class entrantList {
             User currentuser = entrant.getUser();
             if(currentuser == user){
                 this.entrants.remove(entrant);
+                break; // Exit loop after removing to prevent concurrent modification
             }
         }
     }

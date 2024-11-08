@@ -70,6 +70,9 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
 
     FirebaseRegistration firebaseRegistration;
 
+    /**
+     * Default constructor for RegistrationFragment.
+     */
     public RegistrationFragment() {}
 
     @Override
@@ -145,6 +148,11 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
         });
     }
 
+    /**
+     * Generates a profile picture bitmap based on the user's name.
+     *
+     * @return A Bitmap representation of the profile picture.
+     */
     private Bitmap generateprofile() {
         if (name != null) {
             return ProfilePictureGenerator.generateAvatar(name, 200);
@@ -152,6 +160,13 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
         return null;
     }
 
+    /**
+     * Loads the profile picture into the ImageView using Glide, prioritizing the URI if available,
+     * otherwise falling back to a URL or a generated bitmap.
+     *
+     * @param profilePictureUri The URI of the profile picture.
+     * @param profilePictureUrl The URL of the profile picture.
+     */
     private void loadProfilewithGlide(Uri profilePictureUri, String profilePictureUrl) {
         if (profilePictureUri != null) {
             // Load from URI if it exists
@@ -209,6 +224,11 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
         return true;
     }
 
+    /**
+     * Callback method called when user details are loaded from Firestore.
+     *
+     * @param returnedUser The User object retrieved from Firestore.
+     */
     public void onUserloaded(User returnedUser){
         if (returnedUser != null) {
             user = returnedUser;
@@ -230,20 +250,34 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
         }
     }
 
+    /**
+     * Callback method called when user details are updated in Firestore.
+     */
     public void onUserUpdated() {
         firebaseRegistration.loadUserDetails();
     }
 
+    /**
+     * Callback method called when a new user is successfully registered.
+     */
     public void onRegistered(){
         assert getActivity() != null;
         getActivity().finish(); // new user activity only starts when user isn't found on login
     }
 
+    /**
+     * Callback method called when a photo is selected by the user.
+     *
+     * @param uri The URI of the selected photo.
+     */
     public void onPhotoSelected(Uri uri){ // when the upload photo button is pressed and a photo is uploaded
         profilePictureUri = uri;
         loadProfilewithGlide(profilePictureUri, null);
     }
 
+    /**
+     * Callback method called when the user deletes their photo.
+     */
     public void onPhotoDeleted(){ // when the delete photo button in the bottom sheet is pressed
         profilePictureUri = null;
         firebaseRegistration.deleteProfilePicture();

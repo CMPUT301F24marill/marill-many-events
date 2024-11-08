@@ -20,7 +20,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.CollectionReference;
 
 /**
- *  Checks for an existing user registration based on the device ID and navigates to the appropriate screen.
+ * MainActivity checks for an existing user registration based on the device ID
+ * and navigates the user to the appropriate screen (e.g., home or registration).
  */
 public class MainActivity extends AppCompatActivity {
 

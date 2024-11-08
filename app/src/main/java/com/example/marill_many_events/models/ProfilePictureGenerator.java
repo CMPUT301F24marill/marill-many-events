@@ -7,8 +7,19 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 
+/**
+ * ProfilePictureGenerator is a utility class for generating bitmap profile pictures
+ * with a unique background color and an initial letter based on an input string.
+ */
 public class ProfilePictureGenerator {
 
+    /**
+     * Generates an avatar as a {@link Bitmap} with a colored background and the first letter of the input string.
+     *
+     * @param input The input string used to generate the color and letter for the avatar.
+     * @param size  The size of the avatar (width and height).
+     * @return A {@link Bitmap} representing the generated avatar.
+     */
     public static Bitmap generateAvatar(String input, int size) {
         // Create a bitmap with a square shape
         Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
@@ -33,6 +44,12 @@ public class ProfilePictureGenerator {
         return bitmap;
     }
 
+    /**
+     * Generates a color based on the hash code of the input string.
+     *
+     * @param input The input string used to generate the color.
+     * @return An integer representing the generated color in ARGB format.
+     */
     private static int generateColor(String input) {
 
         int hash = input.hashCode(); // Generate a hash code from the input string

@@ -32,13 +32,19 @@ public class NavbarFragment extends Fragment {
      * @param savedInstanceState A Bundle containing the activity's previously saved state.
      * @return The view for this fragment.
      */
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.navbar, container, false);
     }
 
+    /**
+     * Called after the view has been created. Initializes the BottomNavigationView and sets
+     * up listeners for navigation item selection.
+     *
+     * @param view              The view returned by {@link #onCreateView}.
+     * @param savedInstanceState A Bundle containing the activity's previously saved state.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
