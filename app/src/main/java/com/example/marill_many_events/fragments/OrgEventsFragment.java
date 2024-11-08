@@ -1,5 +1,7 @@
 package com.example.marill_many_events.fragments;
 
+import static com.google.firebase.appcheck.internal.util.Logger.TAG;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +14,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -94,8 +97,11 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
 
         View view = inflater.inflate(R.layout.home, container, false);
 
-        FloatingActionButton scanButton = view.findViewById(R.id.scan);
+        FloatingActionButton createEvent = view.findViewById(R.id.scan);
+        createEvent.setImageResource(R.drawable.plus);
 
+
+        createEvent.setOnClickListener(v-> createEvent());
 
         // Initialize RecyclerView and CardAdapter
         waitlistList = view.findViewById(R.id.waitlist_list);
@@ -178,9 +184,15 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
         eventAdapter.notifyDataSetChanged();
     }
 
-    public Event getCurrentEvent(){
-        return currentEvent;
+    public void createEvent(){
+        CreateEventFragment createEventFragment = new CreateEventFragment();
+
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, createEventFragment)
+                .addToBackStack(null)
+                .commit();
     }
+
 
     public void showEventDetails(){
         EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
