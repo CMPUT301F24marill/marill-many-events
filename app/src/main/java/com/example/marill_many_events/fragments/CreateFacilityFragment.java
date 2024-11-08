@@ -17,6 +17,8 @@ import androidx.fragment.app.Fragment;
 import com.example.marill_many_events.FacilityCallback;
 import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
+import com.example.marill_many_events.UserCallback;
+import com.example.marill_many_events.models.Facility;
 import com.example.marill_many_events.models.FirebaseFacilityRegistration;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -24,7 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
  * CreateFacilityFragment represents a fragment that allow non-organizer users
  * to create facility profile.
  */
-public class CreateFacilityFragment extends Fragment {
+public class CreateFacilityFragment extends Fragment implements FacilityCallback {
 
     private EditText editTextName;
     private EditText editTextLocation;
@@ -36,6 +38,10 @@ public class CreateFacilityFragment extends Fragment {
     private String facilityId;
 
     FirebaseFacilityRegistration firebaseFacilityRegistration;
+
+    public CreateFacilityFragment() {
+        // Required empty public constructor
+    }
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -49,7 +55,6 @@ public class CreateFacilityFragment extends Fragment {
         }
     }
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,16 +62,17 @@ public class CreateFacilityFragment extends Fragment {
         facilityId = identity.getdeviceID();
         firestore = identity.getFirestore();
 
-
-        firebaseFacilityRegistration = new FirebaseFacilityRegistration(firestore, facilityId, (FacilityCallback) this);
-
-
+        firebaseFacilityRegistration = new FirebaseFacilityRegistration(firestore, facilityId, this);
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_create_facility, container, false);  // inflate the layout
+        return inflater.inflate(R.layout.fragment_create_facility, container, false);  // inflate the layout
+    }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // initialize the views
         editTextName = view.findViewById(R.id.editTextFacilityName);
         editTextLocation = view.findViewById(R.id.editTextFacilityLocation);
@@ -83,8 +89,6 @@ public class CreateFacilityFragment extends Fragment {
                 }
             }
         });
-
-        return view;
     }
 
     /**
@@ -111,6 +115,30 @@ public class CreateFacilityFragment extends Fragment {
         }
 
         return true;
+    }
+
+    /**
+     * @param facility
+     */
+    @Override
+    public void onFacilityLoaded(Facility facility) {
+
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void onFacilityUpdated() {
+
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void onFacilityRegistered() {
+
     }
 }
 

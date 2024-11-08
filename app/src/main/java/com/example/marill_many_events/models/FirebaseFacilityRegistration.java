@@ -3,6 +3,7 @@ package com.example.marill_many_events.models;
 import com.example.marill_many_events.FacilityCallback;
 import com.example.marill_many_events.fragments.CreateFacilityFragment;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.StorageReference;
 
 public class FirebaseFacilityRegistration {
 
@@ -10,7 +11,7 @@ public class FirebaseFacilityRegistration {
     private String facilityId;
     private FacilityCallback callback;
 
-    public FirebaseFacilityRegistration(FirebaseFirestore firestore, String facilityId, FacilityCallback callback) {
+    public FirebaseFacilityRegistration(FirebaseFirestore firestore,  String facilityId, FacilityCallback callback) {
         this.firestore = firestore;
         this.facilityId = facilityId;
         this.callback = callback;
