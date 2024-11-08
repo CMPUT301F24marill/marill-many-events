@@ -38,7 +38,7 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
     private FirebaseFirestore firestore; // Firestore instance
     private String deviceId; // Store deviceId here
     private FirebaseStorage firebaseStorage; // Firebase Storage for images
-
+    private boolean isOrgList;
 
     private Event currentEvent;
 
@@ -116,9 +116,10 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
 
         EventFragment eventFragment = new EventFragment();
         Log.d(TAG, "onHomeSelected called with deviceId: " + deviceId);
+        isOrgList = false;
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, eventFragment) // replace the fragment already in fragment_container
+                .replace(R.id.fragment_container, eventFragment, "user events") // replace the fragment already in fragment_container
                 .addToBackStack(null) // add to back stack
                 .commit();
     }
@@ -128,7 +129,6 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
      * {@link MenuFragment}.
      */
     public void onMenuSelected(){
-
         // Log the event for debugging purposes
         Log.d(TAG, "onMenuSelected called");
 

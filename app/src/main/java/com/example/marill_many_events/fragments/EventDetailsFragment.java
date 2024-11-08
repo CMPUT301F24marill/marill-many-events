@@ -1,9 +1,12 @@
 package com.example.marill_many_events.fragments;
 
+import static android.content.ContentValues.TAG;
+
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,12 +57,14 @@ public class EventDetailsFragment extends Fragment {
 
 
         Button createButton = view.findViewById(R.id.create);
+        createButton.setText("Leave Event");
         createButton.setVisibility(View.INVISIBLE);
+        Event event = parentActivity.getCurrentEvent();
 
 
         SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
 
-        Event event = parentActivity.getCurrentEvent();
+
         // Initialize TextView
 
         if(event != null) {
@@ -102,5 +107,10 @@ public class EventDetailsFragment extends Fragment {
                 public void onLoadCleared(@Nullable Drawable placeholder) {}
             });
         });
+    }
+
+
+    public void leaveEvent(){
+
     }
 }
