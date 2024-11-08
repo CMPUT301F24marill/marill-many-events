@@ -43,7 +43,7 @@ import javax.annotation.Nullable;
 
 public class EventFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener{
 
-    private Event currentEvent
+    private Event currentEvent;
     private RecyclerView waitlistList;
     private EventyArrayAdapter eventAdapter;
     private List<Event> eventItemList;
