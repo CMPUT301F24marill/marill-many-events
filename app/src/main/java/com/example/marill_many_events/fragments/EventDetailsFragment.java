@@ -21,6 +21,7 @@ import com.bumptech.glide.request.transition.Transition;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Event;
+import com.example.marill_many_events.models.GenerateQRcode;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,6 +30,7 @@ public class EventDetailsFragment extends Fragment {
 
     private TextView NameField, locationField ,capacityField, datePickerStart, datePickerEnd;
     private ImageView QRview, posterView;
+    private GenerateQRcode generateQRcode;
 
     public EventDetailsFragment() {
         // Required empty public constructor
@@ -39,6 +41,7 @@ public class EventDetailsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_create_event, container, false);
         HomePageActivity parentActivity = (HomePageActivity) getActivity();
+        generateQRcode = new GenerateQRcode();
 
         NameField = view.findViewById(R.id.NameField);
         datePickerStart = view.findViewById(R.id.Startdatefield);
@@ -47,6 +50,8 @@ public class EventDetailsFragment extends Fragment {
         locationField = view.findViewById(R.id.LocationField);
         QRview = view.findViewById(R.id.QRcode);
         posterView = view.findViewById(R.id.poster);
+
+
 
         Button createButton = view.findViewById(R.id.create);
         createButton.setVisibility(View.INVISIBLE);
@@ -64,6 +69,11 @@ public class EventDetailsFragment extends Fragment {
 
             datePickerStart.setText(formatter.format(event.getStartDate()));
             datePickerEnd.setText(formatter.format(event.getDrawDate()));
+
+            if(event.getQRcode() != null){
+                QRview.setVisibility(View.VISIBLE);
+                QRview.setImageBitmap(generateQRcode.generateQR(event.getQRcode()));
+            }
 
             capacityField.setText(Integer.toString(event.getCapacity()));
         }

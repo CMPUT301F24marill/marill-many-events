@@ -36,6 +36,7 @@ import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.models.Event;
 import com.example.marill_many_events.models.FirebaseEvents;
+import com.example.marill_many_events.models.GenerateQRcode;
 import com.example.marill_many_events.models.PhotoPicker;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -74,6 +75,7 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
     private PhotoPicker photoPicker;
     private Uri posterUri;
     private String posterUrl, location;
+    private GenerateQRcode generateQRcode;
 
     //Data Storage
     private FirebaseFirestore firestore;
@@ -109,6 +111,7 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         storageReference = identity.getStorage().getReference("event_posters");
         firebaseEvents = new FirebaseEvents(firestore, storageReference, deviceId, this);
         photoPicker = new PhotoPicker(this, this);
+        generateQRcode = new GenerateQRcode();
     }
 
     /**
@@ -173,9 +176,10 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         View sheetView = LayoutInflater.from(getContext()).inflate(R.layout.qr_sheet, null);
         bottomSheetDialog.setContentView(sheetView);
 
-        Bitmap code = generateQR(documentID);
+        Bitmap code = generateQRcode.generateQR(documentID);
         QRview.setImageBitmap(code);
         QRview.setVisibility(View.VISIBLE);
+
 
         //bottomSheetDialog.show();
         ImageView qrview = sheetView.findViewById(R.id.QRcode);
@@ -279,30 +283,6 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
     /**
      * Locally generate QR code from a documentID.
      */
-    public Bitmap generateQR(String documentID){
-        QRCodeWriter qrCodeWriter = new QRCodeWriter();
 
-        int size = 400;
-
-        // Set the hints for QR Code encoding
-        Hashtable<EncodeHintType, Object> hints = new Hashtable<>();
-        hints.put(EncodeHintType.MARGIN, 1);  // Set margin size to 1 for compact QR code
-
-        try {
-            com.google.zxing.common.BitMatrix bitMatrix = qrCodeWriter.encode(documentID, BarcodeFormat.QR_CODE, size, size, hints);
-            Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565);
-
-            for (int x = 0; x < size; x++) {
-                for (int y = 0; y < size; y++) {
-                    bitmap.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
-                }
-            }
-
-            return bitmap;
-        } catch (WriterException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
 }
