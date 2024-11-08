@@ -56,7 +56,8 @@ public class FirebaseEvents {
                 .add(event) // This automatically generates a document ID
                 .addOnSuccessListener(documentReference -> {
                     Log.d("Firestore", "Event added with ID: " + documentReference.getId());
-                    eventsCallback.onEventCreate(documentReference.getId());
+                    updateQR(documentReference.getId());
+
                 })
                 .addOnFailureListener(e -> {
                     Log.w("Firestore", "Error adding event", e);
@@ -68,16 +69,17 @@ public class FirebaseEvents {
      * Registers a new user and uploads the profile picture to Firebase Storage if provided.
      */
 
-//    public void registerUser(String name, String email, String phone, Uri profilePictureUri) {
-//        User user = new User(name, email, phone, null); // Register without profile picture
-//        firestore.collection("users").document(deviceId)
-//                .set(user)
-//                .addOnSuccessListener(aVoid -> {
-//                    uploadProfilePicture(profilePictureUri);
-//                    callback.onRegistered();
-//                });
-//        //.addOnFailureListener(e -> Toast.makeText(,"Failed to register user.", Toast.LENGTH_SHORT).show());
-//    }
+    public void updateQR(String documentID) {
+        firestore.collection("events") // "events" is the name of your collection
+                .document(documentID) // This automatically generates a document ID
+                .update("qrcode", documentID)
+                .addOnSuccessListener(documentReference -> {
+                    eventsCallback.onEventCreate(documentID);
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("Firestore", "Error adding event", e);
+                });
+    }
 
 
     /**
