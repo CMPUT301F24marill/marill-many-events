@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -21,9 +20,6 @@ import com.example.marill_many_events.R;
 import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Event;
 import com.example.marill_many_events.models.FirebaseEvents;
-import com.example.marill_many_events.models.FirebaseUserRegistration;
-import com.example.marill_many_events.models.PhotoPicker;
-import com.example.marill_many_events.models.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -34,12 +30,8 @@ import com.google.firebase.storage.StorageReference;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-
-import javax.annotation.Nullable;
 
 public class EventFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener{
 
@@ -58,6 +50,7 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
     private StorageReference storageReference;
     private Identity identity;
     DocumentReference user;
+    //private onLeaveListener listener;
 
     /**
      * Default constructor for EventFragment.
@@ -66,6 +59,7 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
     public EventFragment() {
         // Required empty public constructor
     }
+
 
     final ActivityResultLauncher<ScanOptions> qrCodeLauncher = registerForActivityResult(
             new ScanContract(),
@@ -78,6 +72,8 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
                     getEvent(scannedData);
                 }
             });
+
+
 
 
     @Override
@@ -112,9 +108,10 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
         user = firestore.collection("users").document(deviceId);
 
 
-        View view = inflater.inflate(R.layout.home, container, false);
+        View view = inflater.inflate(R.layout.fragment_eventlist, container, false);
 
         FloatingActionButton scanButton = view.findViewById(R.id.scan);
+
 
         scanButton.setOnClickListener(v -> {
             // Launch the QR scanner using the ActivityResultLauncher
@@ -218,6 +215,12 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
         eventAdapter.notifyDataSetChanged();
     }
 
+    public void removeItemfromList(Event event){
+        if (eventItemList.contains(event)) {
+            eventItemList.remove(event);
+        }
+    }
+
     public Event getCurrentEvent(){
         return currentEvent;
     }
@@ -231,6 +234,35 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
                 .addToBackStack(null)
                 .commit();
     }
+
+
+    public void onDeleteClick(Event event){
+            // Register the current deviceID (user) to the given event by writing to the user and event a reference to each other
+            WriteBatch batch = firestore.batch();
+            DocumentReference eventUsers = firestore.collection("events").document(event.getQRcode());
+
+            batch.update(user, "waitList", FieldValue.arrayRemove(eventUsers));
+            batch.update(eventUsers, "waitList", FieldValue.arrayRemove(user));
+
+            batch.commit()
+                    .addOnSuccessListener(aVoid -> {
+                        firestore.collection("events").document(event.getQRcode()).get()
+                                .addOnSuccessListener(documentSnapshot -> {
+                                    if (documentSnapshot.exists()) {
+                                        Event newEvent = documentSnapshot.toObject(Event.class);
+                                        if (newEvent != null) {
+                                            removeItemfromList(newEvent); // Remove from list
+                                            getUserEvents();
+                                        }
+                                    }
+                                });
+                        Toast.makeText(getContext(), "Left the event!", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Error leaving the event", Toast.LENGTH_SHORT).show();
+                    });
+    }
+
 
     @Override
     public void onItemClick(Event event) {
