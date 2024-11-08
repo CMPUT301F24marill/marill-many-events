@@ -7,6 +7,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 
+/**
+ * Draw the first letter of someones name into a bitmap
+ * to generate a deterministic profile picture
+ */
 //https://developer.android.com/reference/android/graphics/Canvas
 public class ProfilePictureGenerator {
 
