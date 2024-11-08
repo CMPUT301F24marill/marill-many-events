@@ -19,7 +19,7 @@ import java.util.Hashtable;
 import java.util.UUID;
 
 /**
- *Manage firebase operations for events
+ * Manage firebase operations for events
  *
  */
 public class FirebaseEvents {
