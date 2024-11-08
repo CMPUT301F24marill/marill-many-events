@@ -40,7 +40,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-public class EventFragment extends Fragment {
+public class EventFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener{
 
     private Event currentEvent;
 
@@ -93,6 +93,11 @@ public class EventFragment extends Fragment {
         super.onResume();
         getUserEvents();
         Log.d("FragmentLifecycle", "Fragment is now visible.");
+
+        addToItemList( new Event("https://firebasestorage.googleapis.com/v0/b/marill-many-events.appspot.com/o/event_posters%2Feventposters%2Fimage_1730935799965_05ae8f93-85df-4308-aa48-cdd23874342a.jpg.jpg?alt=media&token=81e266fb-bc73-4489-9f10-8f893e3260ae"
+                , "Event1", null, null, null, 1, false, null));
+        addToItemList( new Event("https://firebasestorage.googleapis.com/v0/b/marill-many-events.appspot.com/o/event_posters%2Feventposters%2Fimage_1730935799965_05ae8f93-85df-4308-aa48-cdd23874342a.jpg.jpg?alt=media&token=81e266fb-bc73-4489-9f10-8f893e3260ae"
+                , "Event9001", null, null, null, 1, false, null));
     }
 
     @Override
@@ -106,7 +111,6 @@ public class EventFragment extends Fragment {
         View view = inflater.inflate(R.layout.home, container, false);
 
         FloatingActionButton scanButton = view.findViewById(R.id.scan);
-        FloatingActionButton addbutton = view.findViewById(R.id.getdetails);
 
         scanButton.setOnClickListener(v -> {
             // Launch the QR scanner using the ActivityResultLauncher
@@ -122,15 +126,8 @@ public class EventFragment extends Fragment {
         eventItemList = new ArrayList<Event>();
 
         // Initialize the adapter and set it to RecyclerView
-        eventAdapter = new EventyArrayAdapter(eventItemList);
+        eventAdapter = new EventyArrayAdapter(eventItemList, this);
         waitlistList.setAdapter(eventAdapter);
-
-        addbutton.setOnClickListener(v-> {
-            HomePageActivity parentActivity = (HomePageActivity) getActivity();
-            parentActivity.setCurrentEvent(eventItemList.get(1));
-            Log.d("FragmentLifecycle", "Opening details.");
-            showEventDetails();
-        });
 
         return view;
     }
@@ -229,5 +226,13 @@ public class EventFragment extends Fragment {
                 .replace(R.id.fragment_container, eventDetailsFragment)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    @Override
+    public void onItemClick(Event event) {
+        HomePageActivity parentActivity = (HomePageActivity) getActivity();
+        parentActivity.setCurrentEvent(event);
+        Log.d("FragmentLifecycle", "Opening details.");
+        showEventDetails();
     }
 }
