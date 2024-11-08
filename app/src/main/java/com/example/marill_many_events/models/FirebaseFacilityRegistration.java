@@ -23,7 +23,9 @@ public class FirebaseFacilityRegistration {
     public void registerFacility(String Name, String location) {
         Facility facility = new Facility(Name, location);
         firestore.collection("facilities").document(facilityId)
-                .set(facility);
+                .set(facility).addOnSuccessListener(v->{
+                    callback.onFacilityRegistered();
+                });
     }
 
 

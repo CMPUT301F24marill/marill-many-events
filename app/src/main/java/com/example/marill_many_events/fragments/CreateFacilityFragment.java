@@ -18,6 +18,7 @@ import com.example.marill_many_events.FacilityCallback;
 import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.UserCallback;
+import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Facility;
 import com.example.marill_many_events.models.FirebaseFacilityRegistration;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -42,6 +43,8 @@ public class CreateFacilityFragment extends Fragment implements FacilityCallback
     public CreateFacilityFragment() {
         // Required empty public constructor
     }
+
+
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -138,7 +141,8 @@ public class CreateFacilityFragment extends Fragment implements FacilityCallback
      */
     @Override
     public void onFacilityRegistered() {
-
+        HomePageActivity homePageActivity = (HomePageActivity) getActivity();
+        homePageActivity.checkAndOpenFragment();
     }
 }
 

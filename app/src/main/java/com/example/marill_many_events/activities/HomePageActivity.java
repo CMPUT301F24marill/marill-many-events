@@ -78,7 +78,7 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
      * Check if the deviceId exists in Firestore's "facilities" collection.
      * Opens CreateEventFragment if the device ID exists, otherwise opens CreateFacilityFragment.
      */
-    private void checkAndOpenFragment() {
+    public void checkAndOpenFragment() {
         firestore.collection("facilities").document(deviceId).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
