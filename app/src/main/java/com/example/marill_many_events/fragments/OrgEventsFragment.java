@@ -33,6 +33,9 @@ import com.journeyapps.barcodescanner.ScanOptions;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Displays all events as a list, events can either be user's waitlist or organizer's created events
+ */
 public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener, FacilityCallback {
 
 

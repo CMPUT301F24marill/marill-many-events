@@ -18,6 +18,10 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import java.util.Hashtable;
 import java.util.UUID;
 
+/**
+ *Manage firebase operations for events
+ *
+ */
 public class FirebaseEvents {
     private FirebaseFirestore firestore;
     private StorageReference storageReference;

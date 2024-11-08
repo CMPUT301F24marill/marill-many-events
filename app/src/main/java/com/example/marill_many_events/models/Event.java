@@ -131,14 +131,6 @@ public class Event{
         this.startDate = startDate;
     }
 
-//    public QRcode getEventQRcode() {
-//        return eventQRcode;
-//    }
-//
-//    public void setEventQRcode(QRcode eventQRcode) {
-//        this.eventQRcode = eventQRcode;
-//    }
-
     /**
      * Retrieves the location of the event.
      *
