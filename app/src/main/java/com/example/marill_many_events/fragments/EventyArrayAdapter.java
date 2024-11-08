@@ -5,6 +5,7 @@ import static androidx.test.InstrumentationRegistry.getContext;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,6 +20,7 @@ import java.util.List;
 //EventyArrayAdapter contains Events in list and retrieves a books information for the view
 public class EventyArrayAdapter extends RecyclerView.Adapter<EventyArrayAdapter.EventViewHolder> {
     private List<Event> eventList;
+    private OnItemClickListener listener; // Listener for item clicks
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
         public ImageView poster;
@@ -31,8 +33,9 @@ public class EventyArrayAdapter extends RecyclerView.Adapter<EventyArrayAdapter.
         }
     }
 
-    public EventyArrayAdapter(List<Event> eventItemList) {
+    public EventyArrayAdapter(List<Event> eventItemList, OnItemClickListener listener) {
         this.eventList = eventItemList;
+        this.listener = listener;
     }
 
     @Override
@@ -48,10 +51,23 @@ public class EventyArrayAdapter extends RecyclerView.Adapter<EventyArrayAdapter.
         String imageURL = currentItem.getImageURL();
 
         // Load the image into the ImageView using Glide
-        Glide.with(getContext())  // 'getContext()' is used to specify the context
+        Glide.with(holder.itemView.getContext())  // 'getContext()' is used to specify the context
                 .load(imageURL)       // URL of the image
                 .into(holder.poster);  // The ImageView to load the image into
         holder.eventName.setText(currentItem.getName());
+
+        // Set click listener on the CardView
+        holder.itemView.setOnClickListener(v -> {
+            // Pass the clicked item to the listener
+            if (listener != null) {
+                listener.onItemClick(currentItem);
+            }
+        });
+    }
+
+    // Define an interface for item click listener
+    public interface OnItemClickListener {
+        void onItemClick(Event event);  // Pass a single Event object on click
     }
 
     @Override
