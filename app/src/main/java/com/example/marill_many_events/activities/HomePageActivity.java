@@ -24,7 +24,7 @@ import com.google.firebase.storage.FirebaseStorage;
 /**
  * HomePageActivity serves as the main activity for the application, managing the
  * display of the navigation bar and handling user profile interactions.
- * It implements the NavbarListener interface to respond to navigation events.
+ * It implements the {@link NavbarListener} interface to respond to navigation events.
  */
 public class HomePageActivity extends AppCompatActivity implements NavbarListener, Identity{
 
@@ -35,6 +35,14 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
 
     private Event currentEvent;
 
+    /**
+     * Called when the activity is starting. Initializes the activity, sets up the layout,
+     * and loads the initial navigation bar fragment.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously
+     *                           being shut down, this Bundle contains the most recent
+     *                           data supplied. Otherwise, it is null.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,7 +70,7 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
 
     /**
      * Handles the event when the home option is selected from the navigation bar.
-     * It opens the list of events
+     * Opens the EventFragment and passes the device ID as an argument.
      */
     public void onHomeSelected(){
         // Open the eventfragment when profile is selected
@@ -77,7 +85,7 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
 
     /**
      * Handles the event when the menu option is selected from the navigation bar.
-     * It opens a placeholder.
+     * Opens the MenuFragment as a placeholder.
      */
     public void onMenuSelected(){
         CreateEventFragment createEventFragment = new CreateEventFragment();
@@ -92,7 +100,7 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
 
     /**
      * Handles the event when the profile option is selected from the navigation bar.
-     * It opens the RegistrationFragment and passes the deviceId as an argument.
+     * Opens the RegistrationFragment and passes the device ID as an argument.
      */
     @Override
     public void onProfileSelected() {
