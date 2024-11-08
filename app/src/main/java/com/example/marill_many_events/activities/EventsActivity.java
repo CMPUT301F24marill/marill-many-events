@@ -14,14 +14,14 @@ import com.example.marill_many_events.fragments.RegistrationFragment;
  * display of the EventFragment, passing data as needed.
  */
 public class EventsActivity extends AppCompatActivity {
-    /**
-     * Called when the activity is starting. This is where most initialization should go.
-     *
-     * @param savedInstanceState If the activity is being re-initialized after previously
-     *                           being shut down, this Bundle contains the most recent
-     *                           data supplied. Otherwise, it is null.
-     */
 
+    /**
+     * Called when the activity is first created. Initializes the activity, sets up the layout,
+     * and loads the {@link EventFragment} if no previous state is saved.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
+     *                           this Bundle contains the most recent data supplied. Otherwise, it is null.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
