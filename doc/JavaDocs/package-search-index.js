@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.example.marill_many_events"},{"l":"com.example.marill_many_events.activities"},{"l":"com.example.marill_many_events.fragments"},{"l":"com.example.marill_many_events.models"}];updateSearchResults();
