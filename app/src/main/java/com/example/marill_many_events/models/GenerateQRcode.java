@@ -10,6 +10,10 @@ import com.google.zxing.qrcode.QRCodeWriter;
 
 import java.util.Hashtable;
 
+/**
+ * Draw the first letter of someones name into a bitmap
+ * to generate a deterministic profile picture
+ */
 public class GenerateQRcode {
     public Bitmap generateQR(String documentID){
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
