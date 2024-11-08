@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.example.marill_many_events.Identity;
+import com.example.marill_many_events.fragments.CreateFacilityFragment;
 import com.example.marill_many_events.fragments.EventFragment;
 import com.example.marill_many_events.fragments.CreateEventFragment;
 import com.example.marill_many_events.fragments.NavbarFragment;
@@ -20,6 +21,11 @@ import androidx.fragment.app.FragmentManager;
 import com.example.marill_many_events.models.Event;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
+
+import androidx.annotation.NonNull;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 
 /**
@@ -68,6 +74,37 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
                 .commit();
     }
 
+    /**
+     * Check if the deviceId exists in Firestore's "facilities" collection.
+     * Opens CreateEventFragment if the device ID exists, otherwise opens CreateFacilityFragment.
+     */
+    public void checkAndOpenFragment() {
+        firestore.collection("facilities").document(deviceId).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful() && task.getResult().exists()) {
+                            Log.d(TAG, "Device ID exists in facilities. Opening CreateEventFragment.");
+                            OrgEventsFragment orgEventsFragment = new OrgEventsFragment();
+
+                            // Replace the current fragment in the container with MenuFragment
+                            FragmentManager fragmentManager = getSupportFragmentManager();
+                            fragmentManager.beginTransaction()
+                                    .replace(R.id.fragment_container, orgEventsFragment)
+                                    .commit();
+
+                        } else {
+                            Log.d(TAG, "Device ID does not exist in facilities. Opening CreateFacilityFragment.");
+                            CreateFacilityFragment createFacilityFragment = new CreateFacilityFragment();
+                            getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.fragment_container, createFacilityFragment)
+                                    .addToBackStack(null)
+                                    .commit();
+
+                        }
+                    }
+                });
+    }
 
     /**
      * Called when the home navigation item is selected. Replaces the current fragment with
@@ -75,6 +112,8 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
      */
     public void onHomeSelected(){
         // Open the eventfragment when profile is selected
+        deviceId = getIntent().getStringExtra("deviceId"); // Retrieve deviceId
+
         EventFragment eventFragment = new EventFragment();
         Log.d(TAG, "onHomeSelected called with deviceId: " + deviceId);
         isOrgList = false;
@@ -90,18 +129,10 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
      * {@link MenuFragment}.
      */
     public void onMenuSelected(){
-        //CreateEventFragment createEventFragment = new CreateEventFragment();
-        OrgEventsFragment orgEventsFragment = new OrgEventsFragment();
-        isOrgList = true;
-
         // Log the event for debugging purposes
         Log.d(TAG, "onMenuSelected called");
 
-        // Replace the current fragment in the container with MenuFragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, orgEventsFragment, "organizer events")
-                .commit();
+        checkAndOpenFragment();
     }
 
     /**
