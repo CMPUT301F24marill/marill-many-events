@@ -23,6 +23,10 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
+/**
+ * EventFragment displays a list of events that a user is registered for and a waitlist of events.
+ * It retrieves and displays the user's event data from a Firestore database.
+ */
 public class EventFragment extends Fragment {
 
     private TextView registrationText, waitlistText;
@@ -40,7 +44,13 @@ public class EventFragment extends Fragment {
     public EventFragment() {
         // Required empty public constructor
     }
-
+    /**
+     * Called when the fragment is being created. Initializes essential data such as the device ID,
+     * Firestore instance, and storage reference.
+     *
+     * @param savedInstanceState If the fragment is being re-created from a previous saved state,
+     *                           this is the state.
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,9 +76,10 @@ public class EventFragment extends Fragment {
     }
 
     /**
-     * Initializes UI elements and sets up click listeners.
+     * Called immediately after {@link #onCreateView} has returned, but before any saved state has been restored.
+     * Initializes UI elements, sets up adapters, and sets click listeners for the event lists.
      *
-     * @param view              The view returned by onCreateView.
+     * @param view              The view returned by {@link #onCreateView}.
      * @param savedInstanceState A Bundle containing the activity's previously saved state.
      */
 
