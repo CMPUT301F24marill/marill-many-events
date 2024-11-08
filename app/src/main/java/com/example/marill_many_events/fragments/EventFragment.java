@@ -41,6 +41,10 @@ public class EventFragment extends Fragment {
 
     private boolean isEditMode = false; // Flag to indicate edit mode
 
+    /**
+     * Default constructor for EventFragment.
+     * Required to ensure proper fragment instantiation.
+     */
     public EventFragment() {
         // Required empty public constructor
     }
@@ -86,6 +90,7 @@ public class EventFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
+        // Initialize data lists and set up adapters for the ListViews
         registereddataList = new ArrayList<Event>();
         registeredAdapter = new EventyArrayAdapter(getContext(), registereddataList);
         registeredList.setAdapter(registeredAdapter);

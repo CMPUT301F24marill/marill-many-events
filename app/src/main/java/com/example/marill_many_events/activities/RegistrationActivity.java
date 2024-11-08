@@ -12,8 +12,6 @@ import com.example.marill_many_events.fragments.RegistrationFragment;
  * It initializes the activity layout and loads the {@link RegistrationFragment},
  * passing the device ID to the fragment for user registration purposes.
  */
-
-
 public class RegistrationActivity extends AppCompatActivity {
 
     /**
@@ -30,6 +28,7 @@ public class RegistrationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register); // Ensure this layout exists
 
+        // Retrieve the device ID passed with the intent
         String deviceId = getIntent().getStringExtra("deviceId");
 
         // Load the Fragment

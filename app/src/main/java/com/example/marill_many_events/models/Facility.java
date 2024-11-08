@@ -5,7 +5,8 @@ import java.util.List;
 
 /**
  * Facility represents a physical or virtual location where events take place.
- * It holds a list of events and provides methods to manage these events and the facility's location.
+ * It holds a list of {@link Event} objects and provides methods to manage these events
+ * and the location of the facility.
  */
 public class Facility {
     private List<Event> Events;
@@ -43,7 +44,7 @@ public class Facility {
     /**
      * Retrieves the list of events associated with this facility.
      *
-     * @return The list of events.
+     * @return A {@link List} of {@link Event} objects linked to the facility.
      */
     public List<Event> getEvents() {
         return Events;

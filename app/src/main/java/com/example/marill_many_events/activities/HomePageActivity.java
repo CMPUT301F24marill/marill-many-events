@@ -57,8 +57,8 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
 
 
     /**
-     * Handles the event when the home option is selected from the navigation bar.
-     * This method opens the {@link EventFragment} and passes the device ID to it.
+     * Called when the home navigation item is selected. Replaces the current fragment with
+     * {@link EventFragment} and passes the device ID as an argument.
      */
     public void onHomeSelected(){
         // Open the eventfragment when profile is selected
@@ -70,6 +70,7 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
         args.putString("deviceId", deviceId);
         eventFragment.setArguments(args);
 
+        // Replace the current fragment in the container and add to back stack
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, eventFragment) // replace the fragment already in fragment_container
                 .addToBackStack(null) // add to back stack
@@ -83,8 +84,8 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
     }
 
     /**
-     * Handles the event when the menu option is selected from the navigation bar.
-     * This method opens the {@link MenuFragment} as a placeholder for the menu section.
+     * Called when the menu navigation item is selected. Replaces the current fragment with
+     * {@link MenuFragment}.
      */
     public void onMenuSelected(){
         MenuFragment menuFragment = new MenuFragment();
@@ -92,6 +93,7 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
         // Log the event for debugging purposes
         Log.d(TAG, "onMenuSelected called");
 
+        // Replace the current fragment in the container with MenuFragment
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, menuFragment)
@@ -99,8 +101,8 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
     }
 
     /**
-     * Handles the event when the profile option is selected from the navigation bar.
-     * Opens the RegistrationFragment and passes the device ID as an argument.
+     * Called when the profile navigation item is selected. Replaces the current fragment with
+     * {@link RegistrationFragment} and passes the device ID as an argument.
      */
     @Override
     public void onProfileSelected() {
@@ -115,12 +117,13 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
         args.putString("deviceId", deviceId);
         registrationFragment.setArguments(args);
 
+        // Replace the current fragment in the container and add to back stack
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, registrationFragment) // replace the fragment already in fragment_container
                 .addToBackStack(null) // add to back stack
                 .commit();
 
-
+        // Log the visibility status of containers for debugging
         FrameLayout fragmentContainer = findViewById(R.id.fragment_container);
         FrameLayout navbarContainer = findViewById(R.id.navbar_container);
         Log.d(TAG, "Fragment Container Visibility: " + fragmentContainer.getVisibility());

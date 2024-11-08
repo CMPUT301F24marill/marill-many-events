@@ -25,7 +25,7 @@ import com.google.firebase.firestore.CollectionReference;
  */
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "MainActivity"; // Tag for logging
     private static final int REQUEST_CODE_REGISTER = 1;
     private FirebaseFirestore firestore;
     private CollectionReference usersRef;
@@ -49,14 +49,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Retrieve the unique device ID
         deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
+        // Initialize the login button
         Button logInButton = findViewById(R.id.loginButton);
 
-
+        // Set up Firestore instance and reference to the 'users' collection
         firestore = FirebaseFirestore.getInstance();
         usersRef = firestore.collection("users");
 
+        // Register the activity result launcher for the registration activity
         registrationActivityLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -82,14 +85,17 @@ public class MainActivity extends AppCompatActivity {
      */
 
     private void checkDeviceId(String deviceId) {
+        // Pass the device ID to the RegistrationFragment
         args.putString("deviceId", deviceId); // Pass the device ID
         registrationFragment.setArguments(args);
 
+        // Query the Firestore database for the user document with the given device ID
         usersRef.document(deviceId).get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
+                            // User exists, navigate to HomePageActivity
                             Intent intent = new Intent(MainActivity.this, HomePageActivity.class);
                             intent.putExtra("deviceId", deviceId);
                             startActivity(intent);; // Use the launcher to start RegistrationActivity
@@ -102,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
                             registrationActivityLauncher.launch(intent); // Use the launcher to start RegistrationActivity
                         }
                     } else {
+                        // Log an error if the task fails
                         Log.e(TAG, "Error checking device ID", task.getException());
                     }
                 });
