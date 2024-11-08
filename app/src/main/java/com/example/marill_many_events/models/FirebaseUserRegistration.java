@@ -1,21 +1,8 @@
 package com.example.marill_many_events.models;
 
-import android.content.Intent;
 import android.net.Uri;
-import android.provider.MediaStore;
-import android.util.Patterns;
-import android.view.View;
-import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
-import com.example.marill_many_events.R;
 import com.example.marill_many_events.UserCallback;
-import com.google.android.gms.auth.api.signin.internal.Storage;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.StorageReference;
@@ -23,12 +10,7 @@ import com.google.firebase.storage.StorageReference;
 import java.util.HashMap;
 import java.util.Map;
 
-
-/**
- * FirebaseRegistration handles user registration, profile updates, and related operations
- * involving Firebase Firestore and Firebase Storage.
- */
-public class FirebaseRegistration {
+public class FirebaseUserRegistration {
 
     private FirebaseFirestore firestore;
     private StorageReference storageReference;
@@ -37,15 +19,7 @@ public class FirebaseRegistration {
     private boolean isEditMode;
     private UserCallback callback;
 
-    /**
-     * Constructs a FirebaseRegistration instance for handling user-related operations.
-     *
-     * @param firestore        The FirebaseFirestore instance.
-     * @param storageReference The StorageReference instance for Firebase Storage.
-     * @param deviceId         The unique device ID for the user.
-     * @param callback         The callback interface for user actions.
-     */
-    public FirebaseRegistration(FirebaseFirestore firestore, StorageReference storageReference, String deviceId, UserCallback callback) {
+    public FirebaseUserRegistration(FirebaseFirestore firestore, StorageReference storageReference, String deviceId, UserCallback callback) {
         this.firestore = firestore;
         this.storageReference = storageReference;
         this.deviceId = deviceId;
@@ -105,7 +79,7 @@ public class FirebaseRegistration {
      * @param profilePictureUri The URI of the profile picture.
      */
     public void registerUser(String name, String email, String phone, Uri profilePictureUri) {
-        User user = new User(name, email, phone, null); // Register without profile picture
+        User user = new User(name, email, phone, null, null); // Register without profile picture
         firestore.collection("users").document(deviceId)
                 .set(user)
                 .addOnSuccessListener(aVoid -> {

@@ -3,8 +3,12 @@ package com.example.marill_many_events.activities;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.fragments.RegistrationFragment;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 
 /**
@@ -12,7 +16,14 @@ import com.example.marill_many_events.fragments.RegistrationFragment;
  * It initializes the activity layout and loads the {@link RegistrationFragment},
  * passing the device ID to the fragment for user registration purposes.
  */
-public class RegistrationActivity extends AppCompatActivity {
+
+
+public class RegistrationActivity extends AppCompatActivity implements Identity {
+
+    private FirebaseFirestore firestore; // Firestore instance
+    private String deviceId; // Store deviceId here
+    private FirebaseStorage firebaseStorage; // Firebase Storage for images
+
 
     /**
      * Called when the activity is starting. This method sets up the layout and
@@ -27,6 +38,12 @@ public class RegistrationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register); // Ensure this layout exists
+        deviceId = getIntent().getStringExtra("deviceId"); // Retrieve deviceId
+        firestore = FirebaseFirestore.getInstance();
+        firebaseStorage = FirebaseStorage.getInstance();
+
+
+
 
         // Retrieve the device ID passed with the intent
         String deviceId = getIntent().getStringExtra("deviceId");
@@ -43,5 +60,20 @@ public class RegistrationActivity extends AppCompatActivity {
                     .commit();
 
         }
+    }
+
+    @Override
+    public String getdeviceID(){
+        return deviceId;
+    }
+
+    @Override
+    public FirebaseStorage getStorage(){
+        return firebaseStorage;
+    }
+
+    @Override
+    public FirebaseFirestore getFirestore(){
+        return firestore;
     }
 }

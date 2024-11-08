@@ -9,6 +9,7 @@ public class User {
     public String email;
     public String phone;
     public String profilePictureUrl;
+    public String[] events;
 
     /**
      * Default constructor for User.
@@ -17,20 +18,13 @@ public class User {
         // Default constructor
     }
 
-    /**
-     * Constructs a User with specified details.
-     *
-     * @param name              The name of the user.
-     * @param email             The email address of the user.
-     * @param phone             The phone number of the user.
-     * @param profilePictureUrl The URL of the user's profile picture.
-     */
-    public User(String name, String email, String phone, String profilePictureUrl) {
+    public User(String name, String email, String phone, String profilePictureUrl, String[] events) {
         // Initialize user profile
         this.name = name;
         this.email = email;
         this.phone = phone;
         this.profilePictureUrl = profilePictureUrl;
+        this.events = events;
     }
 
     /**

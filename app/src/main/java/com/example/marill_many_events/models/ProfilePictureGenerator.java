@@ -7,20 +7,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 
-/**
- * ProfilePictureGenerator is a utility class for generating bitmap profile pictures
- * with a unique background color and an initial letter based on an input string.
- */
+//https://developer.android.com/reference/android/graphics/Canvas
 public class ProfilePictureGenerator {
 
-    /**
-     * Generates an avatar as a {@link Bitmap} with a colored background and the first letter of the input string.
-     *
-     * @param input The input string used to generate the color and letter for the avatar.
-     * @param size  The size of the avatar (width and height).
-     * @return A {@link Bitmap} representing the generated avatar.
-     */
-    public static Bitmap generateAvatar(String input, int size) {
+    public static Bitmap generateProfilePicture(String input, int size) {
         // Create a bitmap with a square shape
         Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
@@ -37,7 +27,7 @@ public class ProfilePictureGenerator {
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
 
-        // Draw the first letter of the input string in the center of the bitmap
+        // Draw the first letter of the input string in the center of the rectangle
         String letter = input.substring(0, 1).toUpperCase();
         canvas.drawText(letter, size/2, size/2 + (paint.getTextSize() / 3), paint);
 

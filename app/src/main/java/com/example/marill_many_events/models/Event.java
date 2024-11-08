@@ -1,54 +1,41 @@
 package com.example.marill_many_events.models;
 
+import android.os.Parcelable;
+
+import com.example.marill_many_events.models.User;
+
+import java.io.Serializable;
 import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
-/**
- * Event represents an event that users can register for. It includes details such as the name,
- * location, start date, and a list of entrants. It also has an option to limit the number of entrants
- * and verify geographical locations.
- */
-public class Event {
-    EntrantList entrants;
+import javax.annotation.Nullable;
+
+public class Event{
+    entrantList entrants;
     String Name;
     String Location;
     String ImageURL;
-    QRcode eventQRcode;
-    DateFormat startDate;
-    DateFormat drawDate;
+    String QRcode;
+    Date startDate;
+    Date drawDate;
 
-    boolean limitEntrants;
     Integer capacity;
     boolean checkGeo;
 
-    /**
-     * Initializes an event with the specified parameters.
-     *
-     * @param imageURL      The URL of the event image.
-     * @param name          The name of the event.
-     * @param location      The location of the event.
-     * @param startDate     The start date of the event.
-     * @param drawDate      The draw date of the event.
-     * @param limitEntrants Indicates if the number of entrants should be limited.
-     * @param capacity      The capacity of the event (if entrants are limited).
-     * @param checkGeo      Indicates if geographical verification is required.
-     */
-    public void event(String imageURL, String name, String location, DateFormat startDate, DateFormat drawDate, boolean limitEntrants, Integer capacity, boolean checkGeo){
-        this.entrants = new EntrantList();
-        this.ImageURL = imageURL;
-        this.eventQRcode = new QRcode();
+    public Event() {
+        // This constructor is needed by Firebase or Gson
+    }
 
+    public Event(String imageURL, String name, String location, Date startDate, Date drawDate, Integer capacity, @Nullable boolean checkGeo, String QRcode){
+        this.entrants = new entrantList();
+        this.ImageURL = imageURL;
+        this.QRcode = QRcode;
+        this.capacity = capacity;
         this.Name = name;
         this.Location = location;
         this.startDate = startDate;
         this.drawDate = drawDate;
-        this.limitEntrants = limitEntrants;
-        if(limitEntrants){
-            this.capacity = capacity;
-        }
-        else{
-            this.capacity = 0;
-        }
         this.checkGeo = checkGeo;
     }
 
@@ -128,77 +115,29 @@ public class Event {
         this.capacity = capacity;
     }
 
-    /**
-     * Checks if the event has a limit on the number of entrants.
-     *
-     * @return True if the event limits entrants; otherwise, false.
-     */
-    public boolean isLimitEntrants() {
-        return limitEntrants;
-    }
-
-    /**
-     * Sets whether the event should limit the number of entrants.
-     *
-     * @param limitEntrants A boolean indicating whether to limit entrants.
-     */
-    public void setLimitEntrants(boolean limitEntrants) {
-        this.limitEntrants = limitEntrants;
-    }
-
-    /**
-     * Retrieves the draw date of the event.
-     *
-     * @return The draw date as a {@link DateFormat}.
-     */
-    public DateFormat getDrawDate() {
+    public Date getDrawDate() {
         return drawDate;
     }
 
-    /**
-     * Sets the draw date for the event.
-     *
-     * @param drawDate The new draw date.
-     */
-    public void setDrawDate(DateFormat drawDate) {
+    public void setDrawDate(Date drawDate) {
         this.drawDate = drawDate;
     }
 
-    /**
-     * Retrieves the start date of the event.
-     *
-     * @return The start date as a {@link DateFormat}.
-     */
-    public DateFormat getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    /**
-     * Sets the start date for the event.
-     *
-     * @param startDate The new start date.
-     */
-    public void setStartDate(DateFormat startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    /**
-     * Retrieves the QR code associated with the event.
-     *
-     * @return The event's {@link QRcode}.
-     */
-    public QRcode getEventQRcode() {
-        return eventQRcode;
-    }
-
-    /**
-     * Sets the QR code for the event.
-     *
-     * @param eventQRcode The new {@link QRcode} object.
-     */
-    public void setEventQRcode(QRcode eventQRcode) {
-        this.eventQRcode = eventQRcode;
-    }
+//    public QRcode getEventQRcode() {
+//        return eventQRcode;
+//    }
+//
+//    public void setEventQRcode(QRcode eventQRcode) {
+//        this.eventQRcode = eventQRcode;
+//    }
 
     /**
      * Retrieves the location of the event.
@@ -254,4 +193,11 @@ public class Event {
         this.checkGeo = checkGeo;
     }
 
+    public String getQRcode() {
+        return QRcode;
+    }
+
+    public void setQRcode(String QRcode) {
+        this.QRcode = QRcode;
+    }
 }
