@@ -21,7 +21,7 @@ public class ProfilePictureGeneratorTest {
     public void testGenerateAvatar() {
         String input = "John";
         int size = 100;
-        Bitmap avatar = ProfilePictureGenerator.generateAvatar(input, size);
+        Bitmap avatar = ProfilePictureGenerator.generateProfilePicture(input, size);
 
         // Check that the avatar is not null
         assertNotNull(avatar);
@@ -35,7 +35,7 @@ public class ProfilePictureGeneratorTest {
     public void testGenerateAvatarColor() {
         String input = "TestColor";
         int size = 100;
-        Bitmap avatar = ProfilePictureGenerator.generateAvatar(input, size);
+        Bitmap avatar = ProfilePictureGenerator.generateProfilePicture(input, size);
 
         // Verify that the generated avatar has a pixel color set
         int color = avatar.getPixel(size / 2, size / 2);
@@ -46,7 +46,7 @@ public class ProfilePictureGeneratorTest {
     public void testGenerateAvatarInitialLetter() {
         String input = "Alice";
         int size = 100;
-        Bitmap avatar = ProfilePictureGenerator.generateAvatar(input, size);
+        Bitmap avatar = ProfilePictureGenerator.generateProfilePicture(input, size);
 
         // Ensure the avatar is created correctly without any issues
         assertNotNull(avatar);

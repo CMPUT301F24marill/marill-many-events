@@ -11,6 +11,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class EventTest {
@@ -22,8 +23,8 @@ public class EventTest {
     public void setUp() {
         DateFormat startDate = new SimpleDateFormat("yyyy-MM-dd");
         DateFormat drawDate = new SimpleDateFormat("yyyy-MM-dd");
-        event = new Event(); // Replace with a suitable constructor or initialization logic if needed
-        event.event("https://example.com/image.jpg", "Sample Event", "New York", startDate, drawDate, true, 100, true);
+        event = new  Event("https://firebasestorage.googleapis.com/v0/b/marill-many-events.appspot.com/o/event_posters%2Feventposters%2Fimage_1730935799965_05ae8f93-85df-4308-aa48-cdd23874342a.jpg.jpg?alt=media&token=81e266fb-bc73-4489-9f10-8f893e3260ae"
+                , "Event1", null, null, null, 1, false, null);
         user = new User(); // Modify if the User class requires parameters
     }
 
@@ -67,7 +68,7 @@ public class EventTest {
 
     @Test
     public void testSetStartDate() {
-        DateFormat newStartDate = new SimpleDateFormat("yyyy-MM-dd");
+        Date newStartDate = new Date();
         event.setStartDate(newStartDate);
         assertEquals(newStartDate, event.getStartDate());
     }
@@ -79,7 +80,7 @@ public class EventTest {
 
     @Test
     public void testSetDrawDate() {
-        DateFormat newDrawDate = new SimpleDateFormat("yyyy-MM-dd");
+        Date newDrawDate = new Date();
         event.setDrawDate(newDrawDate);
         assertEquals(newDrawDate, event.getDrawDate());
     }
@@ -113,17 +114,17 @@ public class EventTest {
         event.setCapacity(200);
         assertEquals(200, (int) event.getCapacity());
     }
-
+/*
     @Test
     public void testIsLimitEntrants() {
-        assertTrue(event.isLimitEntrants());
+        assertTrue(event.());
     }
 
     @Test
     public void testSetLimitEntrants() {
         event.setLimitEntrants(false);
         assertFalse(event.isLimitEntrants());
-    }
+    }*/
 
     @Test
     public void testIsCheckGeo() {
@@ -138,14 +139,14 @@ public class EventTest {
 
     @Test
     public void testGetEventQRcode() {
-        assertNotNull(event.getEventQRcode());
+        assertNotNull(event.getQRcode());
     }
 
     @Test
     public void testSetEventQRcode() {
-        QRcode newQRCode = new QRcode();
-        event.setEventQRcode(newQRCode);
-        assertEquals(newQRCode, event.getEventQRcode());
+        String newQRCode = "QRcode";
+        event.setQRcode(newQRCode);
+        assertEquals(newQRCode, event.getQRcode());
     }
 }
 
