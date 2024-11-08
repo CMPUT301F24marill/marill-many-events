@@ -5,19 +5,19 @@ public class User {
     public String email;
     public String phone;
     public String profilePictureUrl;
-    public boolean hasFacility;
+    public String[] events;
 
     public User() {
         // Default constructor
     }
 
-    public User(String name, String email, String phone, String profilePictureUrl) {
+    public User(String name, String email, String phone, String profilePictureUrl, String[] events) {
         // Initialize user profile
         this.name = name;
         this.email = email;
         this.phone = phone;
         this.profilePictureUrl = profilePictureUrl;
-        this.hasFacility = false;  // initialize user status with normal entrant
+        this.events = events;
     }
 
     public String getName() {
@@ -51,8 +51,4 @@ public class User {
     public void setProfilePictureUrl(String profilePictureUrl) {
         this.profilePictureUrl = profilePictureUrl;
     }
-
-    public boolean getFacilityStatus() { return  hasFacility; }
-
-    public void setFacilityStatus(boolean status) { this.hasFacility = status; }
 }

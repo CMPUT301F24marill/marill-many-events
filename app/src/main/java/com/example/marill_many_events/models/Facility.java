@@ -3,24 +3,22 @@ package com.example.marill_many_events.models;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Facility{
+public class Facility {
     private List<Event> Events;
 
-    String Name;
-    String Location;
+    String location;
 
-    public Facility(String name, String location){
+    public Facility(String location){
         this.Events = new ArrayList<>();
-        this.Name = name;
-        this.Location = location;
+        this.location = location;
     }
 
     public String getLocation() {
-        return this.Location;
+        return location;
     }
 
     public void setLocation(String location) {
-        this.Location = location;
+        this.location = location;
     }
 
     public List<Event> getEvents() {

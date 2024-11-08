@@ -70,7 +70,7 @@ public class FirebaseUserRegistration {
      */
 
     public void registerUser(String name, String email, String phone, Uri profilePictureUri) {
-        User user = new User(name, email, phone, null); // Register without profile picture
+        User user = new User(name, email, phone, null, null); // Register without profile picture
         firestore.collection("users").document(deviceId)
                 .set(user)
                 .addOnSuccessListener(aVoid -> {

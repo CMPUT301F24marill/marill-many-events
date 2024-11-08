@@ -1,5 +1,6 @@
 package com.example.marill_many_events.fragments;
 
+import static com.google.firebase.appcheck.internal.util.Logger.TAG;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -10,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +26,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
@@ -62,8 +65,6 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
     private ImageView posterview, QRview;
 
 
-    private Button scanButton;
-
     //Variables
     private String eventName;
     private Date startDate;
@@ -87,11 +88,10 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
     }
 
 
-
-
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+
 
         // Make sure the activity implements the required interface
         if (context instanceof Identity) {
@@ -145,30 +145,6 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         switchCompat = view.findViewById(R.id.GeoSwitch);
         QRview = view.findViewById(R.id.QRcode);
 
-        scanButton = view.findViewById(R.id.scan);
-
-
-        final ActivityResultLauncher<ScanOptions> qrCodeLauncher = registerForActivityResult(
-                new ScanContract(),
-                result -> {
-                    if (result.getContents() == null) {
-                        Toast.makeText(getContext(), "Scan canceled", Toast.LENGTH_LONG).show();
-                    } else {
-                        String scannedData = result.getContents();
-                        Toast.makeText(getContext(), "Scanned: " + scannedData, Toast.LENGTH_LONG).show();
-                        // Here you can handle the scanned data (for example, open event details or process the URL)
-                    }
-                });
-
-        ScanOptions options = new ScanOptions();
-
-        scanButton.setOnClickListener(v -> {
-            // Launch the QR scanner using the ActivityResultLauncher
-            Intent intent = new Intent(getActivity(), com.journeyapps.barcodescanner.CaptureActivity.class);
-            qrCodeLauncher.launch(options);
-        });
-
-
         datePicker(datePickerStart, true);
         datePicker(datePickerEnd,false);
 
@@ -198,16 +174,22 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         bottomSheetDialog.setContentView(sheetView);
 
         Bitmap code = generateQR(documentID);
-
         QRview.setImageBitmap(code);
-        bottomSheetDialog.show();
+        QRview.setVisibility(View.VISIBLE);
+
+        //bottomSheetDialog.show();
         ImageView qrview = sheetView.findViewById(R.id.QRcode);
         qrview.setImageBitmap(code);
     }
 
     public void onEventDelete(){}
+
     public void joinEvent(){}
-    public void getEvent(Event event){}
+
+    public void getEvent(Event event){
+
+
+    }
 
     /**
      * Initializes the date picker on a given view.
@@ -299,17 +281,15 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
      */
     public Bitmap generateQR(String documentID){
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
-        String url = "https://marill-test.firebaseapp.com/events/" + documentID;
 
-
-        int size = 500;
+        int size = 400;
 
         // Set the hints for QR Code encoding
         Hashtable<EncodeHintType, Object> hints = new Hashtable<>();
         hints.put(EncodeHintType.MARGIN, 1);  // Set margin size to 1 for compact QR code
 
         try {
-            com.google.zxing.common.BitMatrix bitMatrix = qrCodeWriter.encode(url, BarcodeFormat.QR_CODE, size, size, hints);
+            com.google.zxing.common.BitMatrix bitMatrix = qrCodeWriter.encode(documentID, BarcodeFormat.QR_CODE, size, size, hints);
             Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565);
 
             for (int x = 0; x < size; x++) {
