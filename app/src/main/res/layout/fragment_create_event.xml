@@ -1,226 +1,165 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_gravity="center">
+    android:layout_height="match_parent">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/posterView"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.RoundedCorners"
-        app:cardBackgroundColor="@color/blue_end_translucent"
-        app:strokeWidth="1dp"> <!-- translucent background color -->
+        android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/poster"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/posterView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.RoundedCorners"
+            app:cardBackgroundColor="@color/blue_end_translucent"
+            app:strokeWidth="1dp">
+
+            <ImageView
+                android:id="@+id/poster"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/default_profile"
+                android:background="@android:color/transparent"/>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="38dp"
+            android:layout_height="41dp"
+            app:layout_constraintBottom_toBottomOf="@+id/NameField"
+            app:layout_constraintEnd_toStartOf="@+id/NameField"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/NameField"
+            app:srcCompat="@drawable/pencil" />
+
+        <ImageView
+            android:id="@+id/imageView8"
+            android:layout_width="38dp"
+            android:layout_height="41dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/pencil" />
+
+        <!-- Additional ImageViews and EditTexts -->
+
+        <EditText
+            android:id="@+id/NameField"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@color/blue_start"
+            android:padding="10dp"
+            android:hint="@string/Event_Name"
+            android:textAlignment="viewStart"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/posterView" />
+
+        <EditText
+            android:id="@+id/LocationField"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@color/blue_start"
+            android:padding="10dp"
+            android:hint="@string/Location"
+            android:textAlignment="viewStart"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/NameField" />
+
+        <TextView
+            android:id="@+id/Startdatefield"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@color/blue_start"
+            android:padding="10dp"
+            android:hint="@string/Start_Date"
+            android:textAlignment="viewStart"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/LocationField" />
+
+        <TextView
+            android:id="@+id/DrawdateField"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@color/blue_start"
+            android:padding="10dp"
+            android:hint="@string/Draw_Date"
+            android:textAlignment="viewStart"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/Startdatefield" />
+
+        <EditText
+            android:id="@+id/Capacityfield"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@color/blue_start"
+            android:padding="10dp"
+            android:hint="@string/Capacity_Prompt"
+            android:textAlignment="viewStart"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/DrawdateField" />
+
+        <TextView
+            android:id="@+id/TextView"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/Geolocation"
+            android:textSize="30sp"
+            android:textAlignment="viewStart"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/Capacityfield" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/GeoSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/TextView"
+            app:layout_constraintEnd_toEndOf="@+id/TextView"
+            app:layout_constraintTop_toTopOf="@+id/TextView"
+            android:trackTint="@color/blue_start" />
+
+        <Button
+            android:id="@+id/create"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="@string/Create"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/TextView" />
+
+        <ImageView
+            android:id="@+id/QRcode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
             android:src="@drawable/default_profile"
-            android:background="@android:color/transparent"/>
+            android:background="@android:color/transparent"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/create" />
 
-    </com.google.android.material.card.MaterialCardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="38dp"
-        android:layout_height="41dp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@+id/NameField"
-        app:layout_constraintEnd_toStartOf="@+id/NameField"
-        app:layout_constraintHorizontal_bias="0.611"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/NameField"
-        app:srcCompat="@drawable/pencil"/>
-
-    <ImageView
-        android:id="@+id/imageView8"
-        android:layout_width="38dp"
-        android:layout_height="41dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/pencil" />
-
-    <ImageView
-        android:id="@+id/imageView4"
-        android:layout_width="38dp"
-        android:layout_height="41dp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@+id/LocationField"
-        app:layout_constraintEnd_toStartOf="@+id/NameField"
-        app:layout_constraintHorizontal_bias="0.611"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/LocationField"
-        app:srcCompat="@drawable/map" />
-
-    <ImageView
-        android:id="@+id/imageView5"
-        android:layout_width="38dp"
-        android:layout_height="41dp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@+id/Startdatefield"
-        app:layout_constraintEnd_toStartOf="@+id/NameField"
-        app:layout_constraintHorizontal_bias="0.611"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/Startdatefield"
-        app:srcCompat="@drawable/calendar" />
-
-    <ImageView
-        android:id="@+id/imageView6"
-        android:layout_width="38dp"
-        android:layout_height="41dp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@+id/Capacityfield"
-        app:layout_constraintEnd_toStartOf="@+id/NameField"
-        app:layout_constraintHorizontal_bias="0.592"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/DrawdateField"
-        app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/calendar" />
-
-    <ImageView
-        android:id="@+id/imageView7"
-        android:layout_width="38dp"
-        android:layout_height="41dp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@+id/Capacityfield"
-        app:layout_constraintEnd_toStartOf="@+id/NameField"
-        app:layout_constraintHorizontal_bias="0.611"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/Capacityfield"
-        app:srcCompat="@drawable/default_profile" />
-
-
-
-    <EditText
-        android:id="@+id/NameField"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:background="@color/blue_start"
-        android:padding="10dp"
-        android:hint="@string/Event_Name"
-        android:textAlignment="viewStart"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/posterView" />
-
-    <EditText
-        android:id="@+id/LocationField"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        app:boxBackgroundColor="@color/blue_start"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/NameField"
-        android:hint="@string/Location"
-        android:textAlignment="viewStart"
-        android:textColor="@color/white"
-        android:background="@color/blue_start"
-        android:padding="10dp"/>
-
-    <TextView
-        android:id="@+id/Startdatefield"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        app:boxBackgroundColor="@color/blue_start"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/LocationField"
-        android:hint="@string/Start_Date"
-        android:textAlignment="viewStart"
-        android:textColor="@color/white"
-        android:background="@color/blue_start"
-        android:padding="10dp"/>
-
-    <TextView
-        android:id="@+id/DrawdateField"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        app:boxBackgroundColor="@color/blue_start"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Startdatefield"
-        android:hint="@string/Draw_Date"
-        android:textAlignment="viewStart"
-        android:textColor="@color/white"
-        android:background="@color/blue_start"
-        android:padding="10dp"/>
-
-    <EditText
-        android:id="@+id/Capacityfield"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:background="@color/blue_start"
-        android:padding="10dp"
-        android:hint="@string/Capacity_Prompt"
-        android:textAlignment="viewStart"
-        android:textColor="@color/white"
-        app:boxBackgroundColor="@color/blue_start"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/DrawdateField" />
-
-    <TextView
-        android:id="@+id/TextView"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="24dp"
-        android:text="@string/Geolocation"
-        android:textSize="30dp"
-        android:textAlignment="viewStart"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Capacityfield" />
-
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/GeoSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/light_blue"
-        android:backgroundTintMode="screen"
-        app:layout_constraintBottom_toBottomOf="@+id/TextView"
-        app:layout_constraintEnd_toEndOf="@+id/TextView"
-        app:layout_constraintTop_toTopOf="@+id/TextView"
-        android:trackTint="@color/blue_start" />
-
-    <Button
-        android:id="@+id/create"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="@string/Create"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/TextView" />
-
-
-    <ImageView
-        app:layout_constraintTop_toBottomOf="@id/create"
-        android:id="@+id/QRcode"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:src="@drawable/default_profile"
-        android:background="@android:color/transparent"
-        android:layout_marginTop="32dp"
-        android:visibility="gone"/>
-
-
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
