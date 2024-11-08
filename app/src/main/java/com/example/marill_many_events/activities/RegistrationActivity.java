@@ -26,7 +26,7 @@ public class RegistrationActivity extends AppCompatActivity implements Identity 
 
 
     /**
-     * Called when the activity is starting. This method sets up the layout and
+     * Called when the app is starting. This method sets up the layout and
      * loads the {@link RegistrationFragment}, passing any necessary data such as the
      * device ID for registration.
      *

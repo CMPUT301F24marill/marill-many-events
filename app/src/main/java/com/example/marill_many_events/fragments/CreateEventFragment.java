@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +53,11 @@ import com.journeyapps.barcodescanner.ScanOptions;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
+
+/**
+ * Fragment that is opened when a facility has been created and the user wants to create a new event.
+ * Implements creating an event in firebase and uploading poster
+ */
 
 public class CreateEventFragment extends Fragment implements EventsCallback, PhotoPicker.OnPhotoSelectedListener {
 
@@ -103,6 +109,13 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         }
     }
 
+
+    /**
+     * Initializes all variables
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
+     *                           this Bundle contains the most recent data supplied. Otherwise, it is null.
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -280,9 +293,7 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         return event;
     }
 
-    /**
-     * Locally generate QR code from a documentID.
-     */
+
 
 
 }

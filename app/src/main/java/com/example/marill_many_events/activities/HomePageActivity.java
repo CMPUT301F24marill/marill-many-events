@@ -125,8 +125,7 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
     }
 
     /**
-     * Called when the menu navigation item is selected. Replaces the current fragment with
-     * {@link MenuFragment}.
+     * Called when the menu navigation item is selected. Calls checkAndOpenFragment()
      */
     public void onMenuSelected(){
         // Log the event for debugging purposes

@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityResultLauncher<Intent> registrationActivityLauncher;
 
     /**
-     * Called when the activity is starting. Initializes the UI components, sets up the
+     * Called when the app is starting. Initializes the UI components, sets up the
      * Firestore instance, retrieves the device ID, and sets the login button's click listener.
      *
      * @param savedInstanceState If the activity is being re-initialized after previously being shut down,

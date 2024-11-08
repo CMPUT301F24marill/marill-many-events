@@ -44,8 +44,6 @@ public class CreateFacilityFragment extends Fragment implements FacilityCallback
         // Required empty public constructor
     }
 
-
-
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -137,7 +135,7 @@ public class CreateFacilityFragment extends Fragment implements FacilityCallback
     }
 
     /**
-     *
+     * Once a facility is registered the organizer event list is opened through the parent activity
      */
     @Override
     public void onFacilityRegistered() {
