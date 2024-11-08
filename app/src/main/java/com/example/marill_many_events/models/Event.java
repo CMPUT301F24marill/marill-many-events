@@ -1,7 +1,5 @@
 package com.example.marill_many_events.models;
 
-import com.example.marill_many_events.models.User;
-
 import java.text.DateFormat;
 import java.util.List;
 
@@ -11,7 +9,7 @@ import java.util.List;
  * and verify geographical locations.
  */
 public class Event {
-    entrantList entrants;
+    EntrantList entrants;
     String Name;
     String Location;
     String ImageURL;
@@ -36,7 +34,7 @@ public class Event {
      * @param checkGeo      Indicates if geographical verification is required.
      */
     public void event(String imageURL, String name, String location, DateFormat startDate, DateFormat drawDate, boolean limitEntrants, Integer capacity, boolean checkGeo){
-        this.entrants = new entrantList();
+        this.entrants = new EntrantList();
         this.ImageURL = imageURL;
         this.eventQRcode = new QRcode();
 

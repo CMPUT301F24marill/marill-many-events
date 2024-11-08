@@ -42,13 +42,11 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
  * RegistrationFragment is responsible for user registration and profile update functionalities.
  * It provides a form for users to input their details, upload a profile picture,
  * and store the information in Firebase Firestore and Firebase Storage.
  */
-
 public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhotoSelectedListener, UserCallback {
 
     private TextInputLayout textInputLayoutName, textInputLayoutEmail, textInputLayoutMobile;
@@ -93,7 +91,6 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
      * @param savedInstanceState A Bundle containing the activity's previously saved state.
      * @return The view for this fragment.
      */
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -107,11 +104,9 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
      * @param view              The view returned by onCreateView.
      * @param savedInstanceState A Bundle containing the activity's previously saved state.
      */
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // Initialize UI elements
-        //Initialization for error prompts within the textinput boxes
         textInputLayoutName = view.findViewById(R.id.textInputLayoutName);
         textInputLayoutEmail = view.findViewById(R.id.textInputLayoutEmail);
         textInputLayoutMobile = view.findViewById(R.id.textInputLayoutMobile);
@@ -169,24 +164,21 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
      */
     private void loadProfilewithGlide(Uri profilePictureUri, String profilePictureUrl) {
         if (profilePictureUri != null) {
-            // Load from URI if it exists
             Glide.with(this)
-                    .load(profilePictureUri) // Load from Uri
-                    .transform(new CircleCrop()) // Apply transformations if needed
-                    .into(profilePicture); // Set the ImageView
+                    .load(profilePictureUri)
+                    .transform(new CircleCrop())
+                    .into(profilePicture);
         } else if (profilePictureUrl != null) {
-            // Load from URL if it exists
             Glide.with(this)
-                    .load(profilePictureUrl) // Load from URL
-                    .transform(new CircleCrop()) // Apply transformations if needed
-                    .into(profilePicture); // Set the ImageView
+                    .load(profilePictureUrl)
+                    .transform(new CircleCrop())
+                    .into(profilePicture);
         } else {
-            // Load the generated Bitmap if both URL and URI are null
             Glide.with(this)
-                    .asBitmap() // Specify that you are loading a Bitmap
-                    .load(generateprofile()) // Load the Bitmap
-                    .transform(new CircleCrop()) // Apply transformations if needed
-                    .into(profilePicture); // Set the ImageView
+                    .asBitmap()
+                    .load(generateprofile())
+                    .transform(new CircleCrop())
+                    .into(profilePicture);
         }
     }
 
@@ -204,21 +196,21 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
             textInputLayoutName.setError("Name is required");
             return false;
         } else {
-            textInputLayoutName.setError(null); // Clear error
+            textInputLayoutName.setError(null);
         }
 
         if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             textInputLayoutEmail.setError("Valid email is required");
             return false;
         } else {
-            textInputLayoutEmail.setError(null); // Clear error
+            textInputLayoutEmail.setError(null);
         }
 
         if (!mobile.isEmpty() && mobile.length() < 10) {
             textInputLayoutMobile.setError("Valid mobile number is required");
             return false;
         } else {
-            textInputLayoutMobile.setError(null); // Clear error
+            textInputLayoutMobile.setError(null);
         }
 
         return true;
@@ -229,7 +221,7 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
      *
      * @param returnedUser The User object retrieved from Firestore.
      */
-    public void onUserloaded(User returnedUser){
+    public void onUserloaded(User returnedUser) {
         if (returnedUser != null) {
             user = returnedUser;
             isEditMode = true;
@@ -243,9 +235,7 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
             profilePictureUrl = user.getProfilePictureUrl();
 
             loadProfilewithGlide(null, profilePictureUrl);
-        }
-
-        else{
+        } else {
             Toast.makeText(getActivity(), "User not found. You can register.", Toast.LENGTH_SHORT).show();
         }
     }
@@ -260,9 +250,9 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
     /**
      * Callback method called when a new user is successfully registered.
      */
-    public void onRegistered(){
+    public void onRegistered() {
         assert getActivity() != null;
-        getActivity().finish(); // new user activity only starts when user isn't found on login
+        getActivity().finish();
     }
 
     /**
@@ -270,7 +260,7 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
      *
      * @param uri The URI of the selected photo.
      */
-    public void onPhotoSelected(Uri uri){ // when the upload photo button is pressed and a photo is uploaded
+    public void onPhotoSelected(Uri uri) {
         profilePictureUri = uri;
         loadProfilewithGlide(profilePictureUri, null);
     }
@@ -278,9 +268,9 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
     /**
      * Callback method called when the user deletes their photo.
      */
-    public void onPhotoDeleted(){ // when the delete photo button in the bottom sheet is pressed
+    public void onPhotoDeleted() {
         profilePictureUri = null;
         firebaseRegistration.deleteProfilePicture();
     }
-
 }
+

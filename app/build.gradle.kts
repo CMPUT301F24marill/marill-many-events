@@ -49,9 +49,11 @@ dependencies {
     testImplementation(libs.androidx.junit) // For unit testing
 
     // AndroidX Test dependencies
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.0.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.0.1")
     androidTestImplementation("androidx.test.ext:junit:1.1.5") // Ensure you have this
     androidTestImplementation("androidx.test:runner:1.5.2") // Ensure this is also present
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.2")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation("androidx.test:core:1.5.0") // Make sure core is included
 
     testImplementation("org.mockito:mockito-core:5.0.0")

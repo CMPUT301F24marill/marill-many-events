@@ -56,3 +56,4 @@ public class ProfilePictureGenerator {
         return Color.argb(255, (hash & 0xff0000) >> 16, (hash & 0x00ff00) >> 8, (hash & 0x0000ff)); // Use the hash to generate a color
     }
 }
+

@@ -1,20 +1,21 @@
 package com.example.marill_many_events;
 
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
 import androidx.fragment.app.testing.FragmentScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import org.junit.runner.RunWith;
-
 
 import com.example.marill_many_events.fragments.NavbarFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.*;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 @RunWith(AndroidJUnit4.class)
 public class NavbarFragmentTest {

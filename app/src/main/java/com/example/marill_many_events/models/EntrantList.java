@@ -1,7 +1,5 @@
 package com.example.marill_many_events.models;
 
-import com.example.marill_many_events.models.User;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,13 +7,13 @@ import java.util.List;
  * entrantList represents a list of {@link Entrant} objects.
  * It provides methods for adding, updating, retrieving, and removing entrants based on their status.
  */
-public class entrantList {
+public class EntrantList {
     private List<Entrant> entrants = new ArrayList<>();
 
     /**
      * Default constructor for entrantList.
      */
-    public entrantList(){
+    public EntrantList(){
     }
 
     /**
