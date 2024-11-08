@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -13,13 +14,17 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.marill_many_events.FacilityCallback;
 import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Event;
+import com.example.marill_many_events.models.Facility;
 import com.example.marill_many_events.models.FirebaseEvents;
+import com.example.marill_many_events.models.FirebaseFacilityRegistration;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.StorageReference;
@@ -28,7 +33,7 @@ import com.journeyapps.barcodescanner.ScanOptions;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener {
+public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener, FacilityCallback {
 
 
     private Event currentEvent;
@@ -36,6 +41,7 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
     private RecyclerView waitlistList;
     private EventyArrayAdapter eventAdapter;
     private List<Event> eventItemList;
+    FirebaseFacilityRegistration firebaseFacilityRegistration;
 
 
     ScanOptions options = new ScanOptions();
@@ -47,6 +53,7 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
     private StorageReference storageReference;
     private Identity identity;
     CollectionReference events;
+    Facility facility;
 
 
     public OrgEventsFragment() {
@@ -83,10 +90,13 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
         deviceId = identity.getdeviceID();
         firestore = identity.getFirestore();
         events = firestore.collection("events");
-
+        //firebaseFacilityRegistration.getFacility(deviceId);
 
         View view = inflater.inflate(R.layout.fragment_eventlist, container, false);
 
+        TextView titleView = view.findViewById(R.id.waitlist_label);
+        //titleView.setText(facility.getName());
+        titleView.setText("My Events");
         FloatingActionButton createEvent = view.findViewById(R.id.scan);
         createEvent.setImageResource(R.drawable.plus);
 
@@ -168,4 +178,20 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
 
     }
 
+
+    @Override
+    public void onFacilityLoaded(Facility facility) {
+        this.facility = facility;
+    }
+
+
+    @Override
+    public void onFacilityRegistered() {
+
+    }
+
+    @Override
+    public void onFacilityUpdated() {
+
+    }
 }

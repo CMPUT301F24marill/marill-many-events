@@ -30,5 +30,7 @@ public class Facility{
     public void onDestroy(){
         this.Events.clear();
     }
+
+    public String getName(){ return this.Name; }
     
 }
