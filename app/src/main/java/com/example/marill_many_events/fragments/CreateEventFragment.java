@@ -88,8 +88,6 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
     }
 
 
-
-
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -185,7 +183,6 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
     }
 
     public void onEventDelete(){}
-
 
     public void joinEvent(){}
 
