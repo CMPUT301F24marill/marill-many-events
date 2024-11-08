@@ -10,6 +10,10 @@ import com.google.firebase.storage.StorageReference;
 import java.util.HashMap;
 import java.util.Map;
 
+
+/**
+ * Handles firebase functions for user class
+ */
 public class FirebaseUserRegistration {
 
     private FirebaseFirestore firestore;
