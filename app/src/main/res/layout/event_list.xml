@@ -2,19 +2,17 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:background="#E0F7FA"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
-        android:layout_width="417dp"
-        android:layout_height="151dp"
-        android:layout_margin="4dp"
-        android:padding="4dp"
+        android:layout_width="419dp"
+        android:layout_height="132dp"
+        android:layout_margin="0dp"
+        android:padding="0dp"
         app:cardCornerRadius="16dp"
-        app:cardElevation="12dp"
+        app:cardElevation="4dp"
         app:cardUseCompatPadding="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -27,7 +25,7 @@
             android:padding="-4dp">
 
             <ImageView
-                android:id="@+id/EventPoster"
+                android:id="@+id/event_poster"
                 android:layout_width="223dp"
                 android:layout_height="124dp"
                 android:scaleType="centerCrop"
@@ -36,7 +34,7 @@
                 app:srcCompat="@drawable/walterdog" />
 
             <TextView
-                android:id="@+id/EventName"
+                android:id="@+id/event_name"
                 style="@style/TextAppearance.MaterialComponents.Headline3"
                 android:layout_width="298dp"
                 android:layout_height="55dp"
@@ -64,47 +62,4 @@
 
     </androidx.cardview.widget.CardView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
-
-<!--
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <ImageView
-        android:id="@+id/EventPoster"
-        android:layout_width="340dp"
-        android:layout_height="114dp"
-        android:layout_marginStart="16dp"
-        android:background="@color/navbarFragment"
-        android:clickable="true"
-        android:scaleType="fitStart"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/backgrounds/scenic" />
-
-    <ImageView
-        android:id="@+id/WhiteBar"
-        android:layout_width="29dp"
-        android:layout_height="115dp"
-        android:layout_marginStart="-10dp"
-        app:layout_constraintBottom_toBottomOf="@+id/EventPoster"
-        app:layout_constraintStart_toStartOf="@+id/EventPoster"
-        app:layout_constraintTop_toTopOf="@+id/EventPoster"
-        app:srcCompat="@drawable/whitebar" />
-
-    <TextView
-        android:id="@+id/EventName"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:text="@string/Event_Name"
-        android:textColor="@color/light_blue"
-        android:textSize="24sp"
-        android:textStyle="bold|italic"
-        app:layout_constraintBottom_toBottomOf="@+id/EventPoster"
-        app:layout_constraintEnd_toEndOf="@+id/EventPoster"
-        app:layout_constraintTop_toTopOf="@+id/EventPoster" />
 </androidx.constraintlayout.widget.ConstraintLayout>

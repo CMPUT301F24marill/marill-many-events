@@ -1,59 +1,61 @@
 package com.example.marill_many_events.fragments;
 
-import android.content.Context;
-import android.provider.CalendarContract;
+import static androidx.test.InstrumentationRegistry.getContext;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.models.Event;
 
-import java.util.ArrayList;
+import java.util.List;
 
 //EventyArrayAdapter contains Events in list and retrieves a books information for the view
-public class EventyArrayAdapter extends ArrayAdapter<Event> {
-    /**
-     * Constructor for creating an EventyArrayAdapter.
-     *
-     * @param context The context in which the adapter is running.
-     * @param events  The list of Event objects to be displayed.
-     */
-    public EventyArrayAdapter(Context context, ArrayList<Event> events) {
-        super(context, 0, events);
+public class EventyArrayAdapter extends RecyclerView.Adapter<EventyArrayAdapter.EventViewHolder> {
+    private List<Event> eventList;
+
+    public static class EventViewHolder extends RecyclerView.ViewHolder {
+        public ImageView poster;
+        public TextView eventName;
+
+        public EventViewHolder(View itemView) {
+            super(itemView);
+            poster = itemView.findViewById(R.id.event_poster);
+            eventName = itemView.findViewById(R.id.event_name);
+        }
     }
 
-    /**
-     * Provides a view for an adapter view (ListView, GridView, etc.).
-     *
-     * @param position    The position of the item within the adapter's data set.
-     * @param convertView The old view to reuse, if possible.
-     * @param parent      The parent view that this view will eventually be attached to.
-     * @return A View corresponding to the data at the specified position.
-     */
-    @NonNull
-    @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        View view;
-        if (convertView == null) {
-            view = LayoutInflater.from(getContext()).inflate(R.layout.event_list, parent, false);
-        } else {
-            view = convertView;
-        }
-        Event event = getItem(position);
-        TextView eventName = view.findViewById(R.id.EventName);
-        ImageView eventPoster = view.findViewById(R.id.EventPoster);
+    public EventyArrayAdapter(List<Event> eventItemList) {
+        this.eventList = eventItemList;
+    }
 
-        eventName.setText(event.getName());
-        String posterURL = event.getImageURL();
-        return view;
+    @Override
+    public EventViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View itemView = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.event_list, parent, false);
+        return new EventViewHolder(itemView);
+    }
+
+    @Override
+    public void onBindViewHolder(EventViewHolder holder, int position) {
+        Event currentItem = eventList.get(position);
+        String imageURL = currentItem.getImageURL();
+
+        // Load the image into the ImageView using Glide
+        Glide.with(holder.itemView.getContext())  // 'getContext()' is used to specify the context
+                .load(imageURL)       // URL of the image
+                .into(holder.poster);  // The ImageView to load the image into
+        holder.eventName.setText(currentItem.getName());
+    }
+
+    @Override
+    public int getItemCount() {
+        return eventList.size();
     }
 }

@@ -41,8 +41,17 @@ dependencies {
     implementation("androidx.navigation:navigation-ui:2.3.5")
     implementation("com.google.android.material:material")
 
+    implementation ("com.google.zxing:core:3.4.1")
+    implementation ("com.journeyapps:zxing-android-embedded:4.3.0")
+
+    implementation ("com.google.mlkit:barcode-scanning:17.0.0")
+    implementation ("androidx.camera:camera-core:1.2.0")
+    implementation ("androidx.camera:camera-camera2:1.2.0")
+    implementation ("androidx.camera:camera-lifecycle:1.2.0")
+
     implementation(libs.fragment.testing)
     implementation(libs.androidx.espresso.intents)
+    implementation(libs.androidx.camera.view)
 
     // JUnit dependencies
     testImplementation("junit:junit:4.13.2")
@@ -70,5 +79,6 @@ dependencies {
     testImplementation(libs.core) // This is for core testing
 
 
-    implementation("androidx.cardview:cardview:1.0.0"); // card based layout
+    implementation("androidx.cardview:cardview:1.0.0") // card based layout
+    implementation("androidx.recyclerview:recyclerview:1.2.1") // Recyclerview for viewing events
 }
