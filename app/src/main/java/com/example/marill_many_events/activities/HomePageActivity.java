@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.example.marill_many_events.Identity;
+import com.example.marill_many_events.fragments.CreateFacilityFragment;
 import com.example.marill_many_events.fragments.EventFragment;
 import com.example.marill_many_events.fragments.CreateEventFragment;
 import com.example.marill_many_events.fragments.NavbarFragment;
@@ -70,13 +71,13 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
      * It opens a placeholder.
      */
     public void onMenuSelected(){
-        CreateEventFragment createEventFragment = new CreateEventFragment();
+        CreateFacilityFragment createFacilityFragment = new CreateFacilityFragment();
 
         Log.d(TAG, "onMenuSelected called");
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, createEventFragment)
+                .replace(R.id.fragment_container, createFacilityFragment)
                 .commit();
     }
 
