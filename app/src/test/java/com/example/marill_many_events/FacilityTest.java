@@ -15,7 +15,7 @@ public class FacilityTest {
 
     @Before
     public void setUp() {
-        facility = new Facility("Central Park");
+        facility = new Facility("Central Park", "A");
         event = new Event(); // Replace with suitable initialization if needed
         facility.getEvents().add(event); // Add an event for testing purposes
     }

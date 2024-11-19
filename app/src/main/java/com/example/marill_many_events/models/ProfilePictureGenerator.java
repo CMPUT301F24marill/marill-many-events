@@ -7,6 +7,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 
+/**
+ * Draw the first letter of someones name into a bitmap
+ * to generate a deterministic profile picture
+ */
 //https://developer.android.com/reference/android/graphics/Canvas
 public class ProfilePictureGenerator {
 
@@ -34,9 +38,16 @@ public class ProfilePictureGenerator {
         return bitmap;
     }
 
+    /**
+     * Generates a color based on the hash code of the input string.
+     *
+     * @param input The input string used to generate the color.
+     * @return An integer representing the generated color in ARGB format.
+     */
     private static int generateColor(String input) {
 
         int hash = input.hashCode(); // Generate a hash code from the input string
         return Color.argb(255, (hash & 0xff0000) >> 16, (hash & 0x00ff00) >> 8, (hash & 0x0000ff)); // Use the hash to generate a color
     }
 }
+

@@ -1,44 +1,41 @@
 package com.example.marill_many_events.fragments;
 
-import static com.google.firebase.appcheck.internal.util.Logger.TAG;
-
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.marill_many_events.FacilityCallback;
 import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Event;
+import com.example.marill_many_events.models.Facility;
 import com.example.marill_many_events.models.FirebaseEvents;
+import com.example.marill_many_events.models.FirebaseFacilityRegistration;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.StorageReference;
-import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener {
+/**
+ * Displays all events as a list, events can either be user's waitlist or organizer's created events
+ */
+public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener, FacilityCallback {
 
 
     private Event currentEvent;
@@ -46,6 +43,7 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
     private RecyclerView waitlistList;
     private EventyArrayAdapter eventAdapter;
     private List<Event> eventItemList;
+    FirebaseFacilityRegistration firebaseFacilityRegistration;
 
 
     ScanOptions options = new ScanOptions();
@@ -57,6 +55,7 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
     private StorageReference storageReference;
     private Identity identity;
     CollectionReference events;
+    Facility facility;
 
 
     public OrgEventsFragment() {
@@ -94,9 +93,13 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
         firestore = identity.getFirestore();
         events = firestore.collection("events");
 
+        //firebaseFacilityRegistration.getFacility(deviceId);
 
-        View view = inflater.inflate(R.layout.home, container, false);
+        View view = inflater.inflate(R.layout.fragment_eventlist, container, false);
 
+        TextView titleView = view.findViewById(R.id.waitlist_label);
+        //titleView.setText(facility.getName());
+        titleView.setText("My Events");
         FloatingActionButton createEvent = view.findViewById(R.id.scan);
         createEvent.setImageResource(R.drawable.plus);
 
@@ -113,48 +116,10 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
         // Initialize the adapter and set it to RecyclerView
         eventAdapter = new EventyArrayAdapter(eventItemList, this);
         waitlistList.setAdapter(eventAdapter);
+        //eventAdapter.hideLeaveButton();
 
         return view;
     }
-
-//    public void getEvent(String eventID){
-//        firestore.collection("events").document(eventID)
-//                .get()
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        DocumentSnapshot document = task.getResult();
-//                        if (document.exists()) {
-//                            Event event = document.toObject(Event.class);
-//                            registerUser(eventID);
-//                        }
-//                    }
-//                });
-//    }
-
-//    public void registerUser(String eventID){ // Register the current deviceID (user) to the given event by writing to the user and event a reference to each other
-//        WriteBatch batch = firestore.batch();
-//        DocumentReference eventUsers = firestore.collection("events").document(eventID);
-//
-//        batch.update(user, "waitList", FieldValue.arrayUnion(eventUsers));
-//        batch.update(eventUsers, "waitList", FieldValue.arrayUnion(user));
-//
-//        batch.commit()
-//                .addOnSuccessListener(aVoid -> {
-//                    firestore.collection("events").document(eventID).get()
-//                            .addOnSuccessListener(documentSnapshot -> {
-//                                if (documentSnapshot.exists()) {
-//                                    Event newEvent = documentSnapshot.toObject(Event.class);
-//                                    if (newEvent != null) {
-//                                        addToItemList(newEvent); // Add directly to the list
-//                                    }
-//                                }
-//                            });
-//                    Toast.makeText(getContext(), "Item added to the list!", Toast.LENGTH_SHORT).show();
-//                })
-//                .addOnFailureListener(e -> {
-//                    Toast.makeText(getContext(), "Error adding item to the list", Toast.LENGTH_SHORT).show();
-//                });
-//    }
 
     public void getUserEvents(){
         eventItemList.clear();
@@ -180,6 +145,8 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
     public void addToItemList(Event event){
         if (!eventItemList.contains(event)) {
             eventItemList.add(event);
+            Log.d("FragmentLifecycle", event.getFirebaseID());
+
         }
         eventAdapter.notifyDataSetChanged();
     }
@@ -212,4 +179,42 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
         showEventDetails();
     }
 
+    public void onDeleteClick(Event event){
+        if(event != null) {
+            firestore.collection("events") // "events" is the name of your collection
+                    .document(event.getFirebaseID())
+                    .delete()
+                    .addOnSuccessListener(documentReference -> {
+                        removeItemfromList(event);
+                        Log.d("Firestore", "Event deleted");
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.w("Firestore", "Error adding event", e);
+                    });
+        }
+    }
+
+    public void removeItemfromList(Event event){
+        if (eventItemList.contains(event)) {
+            eventItemList.remove(event);
+        }
+        eventAdapter.notifyDataSetChanged();
+    }
+
+
+    @Override
+    public void onFacilityLoaded(Facility facility) {
+        this.facility = facility;
+    }
+
+
+    @Override
+    public void onFacilityRegistered() {
+
+    }
+
+    @Override
+    public void onFacilityUpdated() {
+
+    }
 }

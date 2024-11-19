@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.example.marill_many_events.Identity;
+import com.example.marill_many_events.fragments.CreateFacilityFragment;
 import com.example.marill_many_events.fragments.EventFragment;
 import com.example.marill_many_events.fragments.CreateEventFragment;
 import com.example.marill_many_events.fragments.NavbarFragment;
@@ -21,6 +22,11 @@ import com.example.marill_many_events.models.Event;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
+import androidx.annotation.NonNull;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+
 
 /**
  * HomePageActivity serves as the main activity for the application, managing the
@@ -32,7 +38,7 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
     private FirebaseFirestore firestore; // Firestore instance
     private String deviceId; // Store deviceId here
     private FirebaseStorage firebaseStorage; // Firebase Storage for images
-
+    private boolean isOrgList;
 
     private Event currentEvent;
 
@@ -68,42 +74,69 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
                 .commit();
     }
 
+    /**
+     * Check if the deviceId exists in Firestore's "facilities" collection.
+     * Opens CreateEventFragment if the device ID exists, otherwise opens CreateFacilityFragment.
+     */
+    public void checkAndOpenFragment() {
+        firestore.collection("facilities").document(deviceId).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful() && task.getResult().exists()) {
+                            Log.d(TAG, "Device ID exists in facilities. Opening CreateEventFragment.");
+                            OrgEventsFragment orgEventsFragment = new OrgEventsFragment();
+
+                            // Replace the current fragment in the container with MenuFragment
+                            FragmentManager fragmentManager = getSupportFragmentManager();
+                            fragmentManager.beginTransaction()
+                                    .replace(R.id.fragment_container, orgEventsFragment)
+                                    .commit();
+
+                        } else {
+                            Log.d(TAG, "Device ID does not exist in facilities. Opening CreateFacilityFragment.");
+                            CreateFacilityFragment createFacilityFragment = new CreateFacilityFragment();
+                            getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.fragment_container, createFacilityFragment)
+                                    .addToBackStack(null)
+                                    .commit();
+
+                        }
+                    }
+                });
+    }
 
     /**
-     * Handles the event when the home option is selected from the navigation bar.
-     * Opens the EventFragment and passes the device ID as an argument.
+     * Called when the home navigation item is selected. Replaces the current fragment with
+     * {@link EventFragment} and passes the device ID as an argument.
      */
     public void onHomeSelected(){
         // Open the eventfragment when profile is selected
+        deviceId = getIntent().getStringExtra("deviceId"); // Retrieve deviceId
+
         EventFragment eventFragment = new EventFragment();
         Log.d(TAG, "onHomeSelected called with deviceId: " + deviceId);
+        isOrgList = false;
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, eventFragment) // replace the fragment already in fragment_container
+                .replace(R.id.fragment_container, eventFragment, "user events") // replace the fragment already in fragment_container
                 .addToBackStack(null) // add to back stack
                 .commit();
     }
 
     /**
-     * Handles the event when the menu option is selected from the navigation bar.
-     * Opens the MenuFragment as a placeholder.
+     * Called when the menu navigation item is selected. Calls checkAndOpenFragment()
      */
     public void onMenuSelected(){
-        //CreateEventFragment createEventFragment = new CreateEventFragment();
-        OrgEventsFragment orgEventsFragment = new OrgEventsFragment();
-
-
+        // Log the event for debugging purposes
         Log.d(TAG, "onMenuSelected called");
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, orgEventsFragment)
-                .commit();
+        checkAndOpenFragment();
     }
 
     /**
-     * Handles the event when the profile option is selected from the navigation bar.
-     * Opens the RegistrationFragment and passes the device ID as an argument.
+     * Called when the profile navigation item is selected. Replaces the current fragment with
+     * {@link RegistrationFragment} and passes the device ID as an argument.
      */
     @Override
     public void onProfileSelected() {
@@ -142,4 +175,14 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
     public void setCurrentEvent(Event event){
         currentEvent = event;
     }
+
+    public void setOrgList(boolean orgList){
+        isOrgList = orgList;
+    }
+
+    public boolean getOrgList(){
+        return isOrgList;
+    }
+
+
 }

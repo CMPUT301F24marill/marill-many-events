@@ -12,7 +12,7 @@ public class UserTest {
 
     @Before
     public void setUp() {
-        user = new User("John Doe", "john.doe@example.com", "1234567890", "https://example.com/profile.jpg");
+        user = new User();
     }
 
     @Test

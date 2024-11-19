@@ -19,7 +19,7 @@ We are splitting the UI in different sections/pages in Figma. We will also expor
 
 **I could not find a mock for leaving an event (US 01.01.02).**
 
-We have added this in.
+We have added this in.![image](https://github.com/user-attachments/assets/ae860bb3-1046-4390-b16e-380d5e19632e)
 
 **For facilities, you should at least have a location as well as its name.**
 

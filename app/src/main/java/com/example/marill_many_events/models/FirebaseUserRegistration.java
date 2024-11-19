@@ -10,6 +10,10 @@ import com.google.firebase.storage.StorageReference;
 import java.util.HashMap;
 import java.util.Map;
 
+
+/**
+ * Handles firebase functions for user class
+ */
 public class FirebaseUserRegistration {
 
     private FirebaseFirestore firestore;
@@ -46,7 +50,12 @@ public class FirebaseUserRegistration {
     }
 
     /**
-     * Update an existing user's details.
+     * Updates an existing user's details in Firestore and uploads a new profile picture if provided.
+     *
+     * @param name              The name of the user.
+     * @param email             The email of the user.
+     * @param phone             The phone number of the user.
+     * @param profilePictureUri The URI of the new profile picture.
      */
     public void updateUser(String name, String email,String phone, Uri profilePictureUri) {
         Map<String, Object> userUpdates = new HashMap<>();
@@ -66,9 +75,13 @@ public class FirebaseUserRegistration {
 
 
     /**
-     * Registers a new user and uploads the profile picture to Firebase Storage if provided.
+     * Registers a new user in Firestore and uploads a profile picture to Firebase Storage if provided.
+     *
+     * @param name              The name of the user.
+     * @param email             The email of the user.
+     * @param phone             The phone number of the user.
+     * @param profilePictureUri The URI of the profile picture.
      */
-
     public void registerUser(String name, String email, String phone, Uri profilePictureUri) {
         User user = new User(name, email, phone, null, null); // Register without profile picture
         firestore.collection("users").document(deviceId)
@@ -107,7 +120,9 @@ public class FirebaseUserRegistration {
 
 
     /**
-     * Upload profile picture to firebase storage and get the download url.
+     * Uploads the profile picture to Firebase Storage and updates the Firestore profile picture URL.
+     *
+     * @param profilePictureUri The URI of the profile picture to upload.
      */
     private void uploadProfilePicture(Uri profilePictureUri) {
         if (profilePictureUri != null) {
@@ -124,7 +139,9 @@ public class FirebaseUserRegistration {
     }
 
     /**
-     * Upload profile picture URL to firestore under a user's profilepictureurl field.
+     * Updates the profile picture URL in Firestore.
+     *
+     * @param profilePictureUrl The new profile picture URL.
      */
     public void updateProfilePictureUrl(String profilePictureUrl) {
         firestore.collection("users").document(deviceId)
@@ -133,6 +150,9 @@ public class FirebaseUserRegistration {
         //.addOnFailureListener(e -> Toast.makeText(getActivity(), "Failed to update profile picture.", Toast.LENGTH_SHORT).show());
     }
 
+    /**
+     * Deletes the user record from Firestore.
+     */
     public void deleteUser(){
         firestore.collection("users").document(deviceId).delete();
     }

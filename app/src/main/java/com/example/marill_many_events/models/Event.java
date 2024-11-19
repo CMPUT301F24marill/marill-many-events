@@ -1,22 +1,16 @@
 package com.example.marill_many_events.models;
 
-import android.os.Parcelable;
-
-import com.example.marill_many_events.models.User;
-
-import java.io.Serializable;
-import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 public class Event{
-    entrantList entrants;
+    EntrantList entrants;
     String Name;
     String Location;
     String ImageURL;
-    String QRcode;
+    String FirebaseID;
     Date startDate;
     Date drawDate;
 
@@ -27,10 +21,10 @@ public class Event{
         // This constructor is needed by Firebase or Gson
     }
 
-    public Event(String imageURL, String name, String location, Date startDate, Date drawDate, Integer capacity, @Nullable boolean checkGeo, String QRcode){
-        this.entrants = new entrantList();
+    public Event(String imageURL, String name, String location, Date startDate, Date drawDate, Integer capacity, @Nullable boolean checkGeo, String FirebaseID){
+        this.entrants = new EntrantList();
         this.ImageURL = imageURL;
-        this.QRcode = QRcode;
+        this.FirebaseID = FirebaseID;
         this.capacity = capacity;
         this.Name = name;
         this.Location = location;
@@ -41,21 +35,22 @@ public class Event{
 
 
     /**
-     * Gets a list of entrants under specified status
+     * Retrieves a list of entrants with a specified status.
      *
-     * @param Status           The status to search for: Waitlist, Cancelled, Enrolled, Invited
-     * @return The list of entrants in this event under that status
+     * @param Status The status to filter entrants by (e.g., Waitlist, Cancelled, Enrolled, Invited).
+     * @return A list of {@link Entrant} objects matching the specified status.
      */
     public List<Entrant> getStatusEntrants(String Status){
         return this.entrants.getStatusEntrantsList(Status);
     }
 
     /**
-     * Add entrant to list. They are added as waitlisted.
+     * Adds a new entrant to the list and sets their initial status as 'Waitlist'.
+     * Optionally sets the location coordinates if the event requires geographical verification.
      *
-     * @param user          User to add
-     * @param x_cord        User x coordinate
-     * @param y_cord        User y coordinate
+     * @param user   The {@link User} to be added as an entrant.
+     * @param x_cord The x-coordinate of the user's location.
+     * @param y_cord The y-coordinate of the user's location.
      */
     public void addEntrant(User user, float x_cord, float y_cord){
         Entrant entrant = new Entrant("Waitlist", user);
@@ -67,19 +62,19 @@ public class Event{
     }
 
     /**
-     * Set the status of an entrant in the list
+     * Updates the status of an entrant in the event.
      *
-     * @param user              The user to apply the status to
-     * @param Status           The status to apply for: Waitlist, Cancelled, Enrolled, Invited
+     * @param user   The {@link User} whose status needs to be updated.
+     * @param Status The new status to be applied (e.g., Waitlist, Cancelled, Enrolled, Invited).
      */
     public void setEntrantStatus(User user, String Status){
         this.entrants.setEntrantStatus(user, Status);
     }
 
     /**
-     * get event poster
+     * Retrieves the image URL of the event.
      *
-     * @return String for event poster
+     * @return The image URL as a {@link String}.
      */
     public String getImageURL(){
         return this.ImageURL;
@@ -88,16 +83,28 @@ public class Event{
     /**
      * set event poster
      *
-     * @param  url for event poster
+     * @param url for event poster
      */
     public void setImageURL(String url){
         this.ImageURL = url;
     }
 
+    // Getter and setter methods for event properties
+
+    /**
+     * Retrieves the capacity of the event.
+     *
+     * @return The event's capacity as an {@link Integer}.
+     */
     public Integer getCapacity() {
         return capacity;
     }
 
+    /**
+     * Sets the capacity for the event.
+     *
+     * @param capacity The new capacity.
+     */
     public void setCapacity(Integer capacity) {
         this.capacity = capacity;
     }
@@ -118,43 +125,65 @@ public class Event{
         this.startDate = startDate;
     }
 
-//    public QRcode getEventQRcode() {
-//        return eventQRcode;
-//    }
-//
-//    public void setEventQRcode(QRcode eventQRcode) {
-//        this.eventQRcode = eventQRcode;
-//    }
-
+    /**
+     * Retrieves the location of the event.
+     *
+     * @return The event location as a {@link String}.
+     */
     public String getLocation() {
         return Location;
     }
 
+    /**
+     * Sets the location of the event.
+     *
+     * @param location The new event location.
+     */
     public void setLocation(String location) {
         Location = location;
     }
 
+    /**
+     * Retrieves the name of the event.
+     *
+     * @return The event name as a {@link String}.
+     */
     public String getName() {
         return Name;
     }
 
+    /**
+     * Sets the name of the event.
+     *
+     * @param name The new event name.
+     */
     public void setName(String name) {
         Name = name;
     }
 
+    /**
+     * Checks if the event requires geographical verification for entrants.
+     *
+     * @return True if geographical verification is required; otherwise, false.
+     */
     public boolean isCheckGeo() {
         return checkGeo;
     }
 
+    /**
+     * Sets whether the event should check geographical location for entrants.
+     *
+     * @param checkGeo A boolean indicating whether to check geo-location.
+     */
     public void setCheckGeo(boolean checkGeo) {
         this.checkGeo = checkGeo;
     }
 
-    public String getQRcode() {
-        return QRcode;
+    public String getFirebaseID() {
+        return this.FirebaseID;
     }
 
-    public void setQRcode(String QRcode) {
-        this.QRcode = QRcode;
+    public void setFirebaseID(String FirebaseID) {
+        this.FirebaseID = FirebaseID;
     }
 }

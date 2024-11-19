@@ -2,7 +2,6 @@ package com.example.marill_many_events.fragments;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,8 +23,10 @@ import com.example.marill_many_events.models.Event;
 import com.example.marill_many_events.models.GenerateQRcode;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
+/**
+ * Shows the details of any selected event object, invoked from either user's waitlist or organizers event list
+ */
 public class EventDetailsFragment extends Fragment {
 
     private TextView NameField, locationField ,capacityField, datePickerStart, datePickerEnd;
@@ -54,13 +55,15 @@ public class EventDetailsFragment extends Fragment {
 
 
         Button createButton = view.findViewById(R.id.create);
+        createButton.setText("Leave Event");
         createButton.setVisibility(View.INVISIBLE);
+        Event event = parentActivity.getCurrentEvent();
 
 
         SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
 
-        Event event = parentActivity.getCurrentEvent();
-        // Initialize TextView
+
+        // Fill in all views as long as a valid event was passed
 
         if(event != null) {
             loadPoster(event.getImageURL());
@@ -70,9 +73,9 @@ public class EventDetailsFragment extends Fragment {
             datePickerStart.setText(formatter.format(event.getStartDate()));
             datePickerEnd.setText(formatter.format(event.getDrawDate()));
 
-            if(event.getQRcode() != null){
+            if(event.getFirebaseID() != null){ // If a qr code string is available generate and display it
                 QRview.setVisibility(View.VISIBLE);
-                QRview.setImageBitmap(generateQRcode.generateQR(event.getQRcode()));
+                QRview.setImageBitmap(generateQRcode.generateQR(event.getFirebaseID()));
             }
 
             capacityField.setText(Integer.toString(event.getCapacity()));
@@ -80,6 +83,10 @@ public class EventDetailsFragment extends Fragment {
 
         return view;
     }
+
+    /**
+     * Retrieve poster from firebase storage and load with aspect ratio in mind
+     */
 
     public void loadPoster(String url) {
         posterView.post(() -> {
@@ -102,5 +109,10 @@ public class EventDetailsFragment extends Fragment {
                 public void onLoadCleared(@Nullable Drawable placeholder) {}
             });
         });
+    }
+
+
+    public void leaveEvent(){
+
     }
 }

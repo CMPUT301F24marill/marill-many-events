@@ -38,7 +38,6 @@ import com.google.android.material.textfield.TextInputLayout;
  * It provides a form for users to input their details, upload a profile picture,
  * and store the information in Firebase Firestore and Firebase Storage.
  */
-
 public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhotoSelectedListener, UserCallback {
 
     private TextInputLayout textInputLayoutName, textInputLayoutEmail, textInputLayoutMobile;
@@ -60,6 +59,9 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
     private boolean isEditMode = false;
     FirebaseUserRegistration firebaseUserRegistration;
 
+    /**
+     * Default constructor for RegistrationFragment.
+     */
     public RegistrationFragment() {}
 
     @Override
@@ -101,7 +103,6 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
      * @param savedInstanceState A Bundle containing the activity's previously saved state.
      * @return The view for this fragment.
      */
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -115,11 +116,9 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
      * @param view              The view returned by onCreateView.
      * @param savedInstanceState A Bundle containing the activity's previously saved state.
      */
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // Initialize UI elements
-        //Initialization for error prompts within the textinput boxes
         textInputLayoutName = view.findViewById(R.id.textInputLayoutName);
         textInputLayoutEmail = view.findViewById(R.id.textInputLayoutEmail);
         textInputLayoutMobile = view.findViewById(R.id.textInputLayoutMobile);
@@ -156,6 +155,11 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
         });
     }
 
+    /**
+     * Generates a profile picture bitmap based on the user's name.
+     *
+     * @return A Bitmap representation of the profile picture.
+     */
     private Bitmap generateprofile() {
         if (name != null) {
             return ProfilePictureGenerator.generateProfilePicture(name, 200);
@@ -163,26 +167,30 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
         return null;
     }
 
+    /**
+     * Loads the profile picture into the ImageView using Glide, prioritizing the URI if available,
+     * otherwise falling back to a URL or a generated bitmap.
+     *
+     * @param profilePictureUri The URI of the profile picture.
+     * @param profilePictureUrl The URL of the profile picture.
+     */
     private void loadProfilewithGlide(Uri profilePictureUri, String profilePictureUrl) {
         if (profilePictureUri != null) {
-            // Load from URI if it exists
             Glide.with(this)
-                    .load(profilePictureUri) // Load from Uri
-                    .transform(new CircleCrop()) // Apply transformations if needed
-                    .into(profilePicture); // Set the ImageView
+                    .load(profilePictureUri)
+                    .transform(new CircleCrop())
+                    .into(profilePicture);
         } else if (profilePictureUrl != null) {
-            // Load from URL if it exists
             Glide.with(this)
-                    .load(profilePictureUrl) // Load from URL
-                    .transform(new CircleCrop()) // Apply transformations if needed
-                    .into(profilePicture); // Set the ImageView
+                    .load(profilePictureUrl)
+                    .transform(new CircleCrop())
+                    .into(profilePicture);
         } else {
-            // Load the generated Bitmap if both URL and URI are null
             Glide.with(this)
-                    .asBitmap() // Specify that you are loading a Bitmap
-                    .load(generateprofile()) // Load the Bitmap
-                    .transform(new CircleCrop()) // Apply transformations if needed
-                    .into(profilePicture); // Set the ImageView
+                    .asBitmap()
+                    .load(generateprofile())
+                    .transform(new CircleCrop())
+                    .into(profilePicture);
         }
     }
 
@@ -200,27 +208,32 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
             textInputLayoutName.setError("Name is required");
             return false;
         } else {
-            textInputLayoutName.setError(null); // Clear error
+            textInputLayoutName.setError(null);
         }
 
         if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             textInputLayoutEmail.setError("Valid email is required");
             return false;
         } else {
-            textInputLayoutEmail.setError(null); // Clear error
+            textInputLayoutEmail.setError(null);
         }
 
         if (!mobile.isEmpty() && mobile.length() < 10) {
             textInputLayoutMobile.setError("Valid mobile number is required");
             return false;
         } else {
-            textInputLayoutMobile.setError(null); // Clear error
+            textInputLayoutMobile.setError(null);
         }
 
         return true;
     }
 
-    public void onUserloaded(User returnedUser){
+    /**
+     * Callback method called when user details are loaded from Firestore.
+     *
+     * @param returnedUser The User object retrieved from Firestore.
+     */
+    public void onUserloaded(User returnedUser) {
         if (returnedUser != null) {
             user = returnedUser;
             isEditMode = true;
@@ -234,30 +247,42 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
             profilePictureUrl = user.getProfilePictureUrl();
 
             loadProfilewithGlide(null, profilePictureUrl);
-        }
-
-        else{
+        } else {
             Toast.makeText(getActivity(), "User not found. You can register.", Toast.LENGTH_SHORT).show();
         }
     }
 
+    /**
+     * Callback method called when user details are updated in Firestore.
+     */
     public void onUserUpdated() {
         firebaseUserRegistration.loadUserDetails();
     }
 
-    public void onRegistered(){
+    /**
+     * Callback method called when a new user is successfully registered.
+     */
+    public void onRegistered() {
         assert getActivity() != null;
-        getActivity().finish(); // new user activity only starts when user isn't found on login
+        getActivity().finish();
     }
 
-    public void onPhotoSelected(Uri uri){ // when the upload photo button is pressed and a photo is uploaded
+    /**
+     * Callback method called when a photo is selected by the user.
+     *
+     * @param uri The URI of the selected photo.
+     */
+    public void onPhotoSelected(Uri uri) {
         profilePictureUri = uri;
         loadProfilewithGlide(profilePictureUri, null);
     }
 
-    public void onPhotoDeleted(){ // when the delete photo button in the bottom sheet is pressed
+    /**
+     * Callback method called when the user deletes their photo.
+     */
+    public void onPhotoDeleted() {
         profilePictureUri = null;
         firebaseUserRegistration.deleteProfilePicture();
     }
-
 }
+

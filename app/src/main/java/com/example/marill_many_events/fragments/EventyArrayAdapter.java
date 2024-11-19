@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.models.Event;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ import java.util.List;
 public class EventyArrayAdapter extends RecyclerView.Adapter<EventyArrayAdapter.EventViewHolder> {
     private List<Event> eventList;
     private OnItemClickListener listener; // Listener for item clicks
+    private FloatingActionButton leaveButton;
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
         public ImageView poster;
@@ -49,6 +51,7 @@ public class EventyArrayAdapter extends RecyclerView.Adapter<EventyArrayAdapter.
     public void onBindViewHolder(EventViewHolder holder, int position) {
         Event currentItem = eventList.get(position);
         String imageURL = currentItem.getImageURL();
+        leaveButton = holder.itemView.findViewById(R.id.leave);
 
         // Load the image into the ImageView using Glide
         Glide.with(holder.itemView.getContext())  // 'getContext()' is used to specify the context
@@ -63,15 +66,28 @@ public class EventyArrayAdapter extends RecyclerView.Adapter<EventyArrayAdapter.
                 listener.onItemClick(currentItem);
             }
         });
+
+        leaveButton.setOnClickListener(v-> {
+            if (listener != null) {
+                listener.onDeleteClick(currentItem);
+            }
+
+        });
+
     }
 
     // Define an interface for item click listener
     public interface OnItemClickListener {
         void onItemClick(Event event);  // Pass a single Event object on click
+        void onDeleteClick(Event event);
     }
 
     @Override
     public int getItemCount() {
         return eventList.size();
+    }
+
+    public void hideLeaveButton(){
+        leaveButton.setVisibility(View.GONE);
     }
 }

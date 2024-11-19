@@ -1,23 +1,19 @@
 package com.example.marill_many_events.models;
 
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.util.Log;
 
 import com.example.marill_many_events.EventsCallback;
-import com.example.marill_many_events.UserCallback;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.StorageReference;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.EncodeHintType;
-import com.google.zxing.WriterException;
-import com.google.zxing.qrcode.QRCodeWriter;
 
-import java.util.Hashtable;
 import java.util.UUID;
 
+/**
+ * Manage firebase operations for events
+ *
+ */
 public class FirebaseEvents {
     private FirebaseFirestore firestore;
     private StorageReference storageReference;
@@ -56,7 +52,7 @@ public class FirebaseEvents {
                 .add(event) // This automatically generates a document ID
                 .addOnSuccessListener(documentReference -> {
                     Log.d("Firestore", "Event added with ID: " + documentReference.getId());
-                    updateQR(documentReference.getId());
+                    updateID(documentReference.getId());
 
                 })
                 .addOnFailureListener(e -> {
@@ -65,14 +61,26 @@ public class FirebaseEvents {
     }
 
 
+    public void deleteEvent(String eventID) {
+        firestore.collection("events") // "events" is the name of your collection
+                .document(eventID)
+                .delete()
+                .addOnSuccessListener(documentReference -> {
+                    Log.d("Firestore", "Event deleted");
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("Firestore", "Error adding event", e);
+                });
+    }
+
     /**
      * Registers a new user and uploads the profile picture to Firebase Storage if provided.
      */
 
-    public void updateQR(String documentID) {
+    public void updateID(String documentID) {
         firestore.collection("events") // "events" is the name of your collection
                 .document(documentID) // This automatically generates a document ID
-                .update("qrcode", documentID)
+                .update("firebaseID", documentID)
                 .addOnSuccessListener(documentReference -> {
                     eventsCallback.onEventCreate(documentID);
                 })
@@ -104,6 +112,23 @@ public class FirebaseEvents {
 //                    //.addOnFailureListener(e -> Toast.makeText(getActivity(), "Failed to remove picture reference from Firestore.", Toast.LENGTH_SHORT).show());
 //                });
 //        //.addOnFailureListener(e -> Toast.makeText(getActivity(), "Failed to delete profile picture.", Toast.LENGTH_SHORT).show());
+//    }
+
+//    /**
+//     * Delete poster picture to firebase storage.
+//     */
+//    public void deletePoster(Uri profilePictureUri) {
+//        String filename = generateRandomFilename();
+//        if (profilePictureUri != null) {
+//            StorageReference fileReference = storageReference.child("eventposters/" + filename + ".jpg");
+//            fileReference.putFile(profilePictureUri)
+//                    .addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
+//                        //updateProfilePictureUrl(uri.toString());
+//                        String posterurl = uri.toString();
+//                        eventsCallback.onPosterUpload(posterurl);
+//                    }));
+//            //.addOnFailureListener(e -> Toast.makeText(getActivity(), "Image upload failed.", Toast.LENGTH_SHORT).show());
+//        }
 //    }
 
 

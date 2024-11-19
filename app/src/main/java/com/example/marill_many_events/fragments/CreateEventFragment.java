@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,6 +54,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 
+/**
+ * Fragment that is opened when a facility has been created and the user wants to create a new event.
+ * Implements creating an event in firebase and uploading poster
+ */
+
 public class CreateEventFragment extends Fragment implements EventsCallback, PhotoPicker.OnPhotoSelectedListener {
 
     //Views
@@ -76,6 +82,7 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
     private Uri posterUri;
     private String posterUrl, location;
     private GenerateQRcode generateQRcode;
+    private Event event;
 
     //Data Storage
     private FirebaseFirestore firestore;
@@ -103,6 +110,13 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         }
     }
 
+
+    /**
+     * Initializes all variables
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
+     *                           this Bundle contains the most recent data supplied. Otherwise, it is null.
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -176,6 +190,7 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         View sheetView = LayoutInflater.from(getContext()).inflate(R.layout.qr_sheet, null);
         bottomSheetDialog.setContentView(sheetView);
 
+        event.setFirebaseID(documentID);
         Bitmap code = generateQRcode.generateQR(documentID);
         QRview.setImageBitmap(code);
         QRview.setVisibility(View.VISIBLE);
@@ -276,13 +291,11 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         capacity = Integer.parseInt(capacityField.getText().toString().trim());
         eventName = NameField.getText().toString().trim();
         location = locationField.getText().toString().trim();
-        Event event = new Event(posterUrl, eventName, location, startDate, endDate, capacity, geolocation, null);
+        event = new Event(posterUrl, eventName, location, startDate, endDate, capacity, geolocation, null);
         return event;
     }
 
-    /**
-     * Locally generate QR code from a documentID.
-     */
+
 
 
 }

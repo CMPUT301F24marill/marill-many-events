@@ -10,6 +10,7 @@ import com.google.zxing.qrcode.QRCodeWriter;
 
 import java.util.Hashtable;
 
+
 public class GenerateQRcode {
     public Bitmap generateQR(String documentID){
         QRCodeWriter qrCodeWriter = new QRCodeWriter();

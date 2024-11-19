@@ -29,6 +29,9 @@
             android:stateNotNeeded="true"/>
         <activity android:name=".activities.RegistrationActivity" />
         <activity android:name=".activities.HomePageActivity" />
+        <activity android:name=".activities.EventsActivity" />
     </application>
 
 </manifest>
+
+
