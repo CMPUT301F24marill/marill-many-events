@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
@@ -22,11 +25,12 @@ import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
 
 import com.example.marill_many_events.UserCallback;
+import com.example.marill_many_events.models.FirebaseUsers;
 import com.example.marill_many_events.models.PhotoPicker;
 import com.example.marill_many_events.models.ProfilePictureGenerator;
 import com.example.marill_many_events.models.User;
-import com.example.marill_many_events.models.FirebaseUserRegistration;
 
+import com.example.marill_many_events.models.RegistrationViewModel;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.StorageReference;
 import com.google.android.material.textfield.TextInputEditText;
@@ -38,11 +42,13 @@ import com.google.android.material.textfield.TextInputLayout;
  * It provides a form for users to input their details, upload a profile picture,
  * and store the information in Firebase Firestore and Firebase Storage.
  */
-public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhotoSelectedListener, UserCallback {
+public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhotoSelectedListener {
 
     private TextInputLayout textInputLayoutName, textInputLayoutEmail, textInputLayoutMobile;
     private TextInputEditText editTextName, editTextEmail, editTextMobile;
     private Button buttonRegister;
+    private RegistrationViewModel viewModel;
+
 
     private ImageView profilePicture;
     private String profilePictureUrl;
@@ -57,7 +63,7 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
     private Identity identity;
 
     private boolean isEditMode = false;
-    FirebaseUserRegistration firebaseUserRegistration;
+    FirebaseUsers firebaseUsers;
 
     /**
      * Default constructor for RegistrationFragment.
@@ -88,7 +94,15 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
         firestore = identity.getFirestore();
         storageReference = identity.getStorage().getReference("profile_pictures");
 
-        firebaseUserRegistration = new FirebaseUserRegistration(firestore, storageReference, deviceId, this);
+        viewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
+            @NonNull
+            @Override
+            public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+                return (T) new RegistrationViewModel(identity.getFirestore(),
+                        identity.getStorage(),
+                        identity.getdeviceID());
+            }
+        }).get(RegistrationViewModel.class);
 
         photoPicker = new PhotoPicker(this, this);
 
@@ -129,27 +143,55 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
         editTextMobile = view.findViewById(R.id.editTextMobile);
         profilePicture = view.findViewById(R.id.profile_picture);
 
-        firebaseUserRegistration.loadUserDetails(); // Try getting an existing user
+        //firebaseUsers.loadUserDetails(); // Try getting an existing user
 
-        profilePicture.setOnClickListener(v -> photoPicker.showPhotoOptions(profilePictureUrl));
 
-        firebaseUserRegistration.loadUserDetails();
+        viewModel.getUser().observe(getViewLifecycleOwner(), user -> {
+            if (user != null) {
+                name = user.getName();
+                editTextName.setText(name);
+                editTextEmail.setText(user.getEmail());
+                editTextMobile.setText(user.getPhone());
+            }
+        });
+
+        viewModel.isEditMode().observe(getViewLifecycleOwner(), isEditMode -> {
+            buttonRegister.setText(isEditMode ? "Save" : "Register");
+        });
+
+        viewModel.getProfilePictureUri().observe(getViewLifecycleOwner(), uri -> {
+            Log.d("Profile", "Profile URI: " + uri);
+            loadProfilewithGlide(uri, null);
+        });
+
+        viewModel.getProfilePictureUrl().observe(getViewLifecycleOwner(), url -> {
+            Log.d("Profile", "Profile URL: " + url);
+            loadProfilewithGlide(null, url);
+        });
+
+        viewModel.getProfilePictureUrl().observe(getViewLifecycleOwner(), profilePictureUrl -> {
+            profilePicture.setOnClickListener(v -> photoPicker.showPhotoOptions(profilePictureUrl));
+        });
+
+        viewModel.getMessage().observe(getViewLifecycleOwner(), message -> {
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        });
+
+
+        profilePicture.setOnClickListener(v -> photoPicker.showPhotoOptions(null));
 
         // Set click listener for the register button
         buttonRegister.setOnClickListener(v -> {
             if (validateInputs()) {
-                if (isEditMode) {
-                    firebaseUserRegistration.updateUser(
-                            editTextName.getText().toString().trim(),
-                            editTextEmail.getText().toString().trim(),
-                            editTextMobile.getText().toString().trim(),
-                            profilePictureUri);
+                String name = editTextName.getText().toString().trim();
+                String email = editTextEmail.getText().toString().trim();
+                String phone = editTextMobile.getText().toString().trim();
+                Uri profileUri = viewModel.getProfilePictureUri().getValue();
+
+                if (viewModel.isEditMode().getValue()) {
+                    viewModel.updateUser(name, email, phone, profileUri);
                 } else {
-                    firebaseUserRegistration.registerUser(
-                            editTextName.getText().toString().trim(),
-                            editTextEmail.getText().toString().trim(),
-                            editTextMobile.getText().toString().trim(),
-                            profilePictureUri);
+                    viewModel.registerUser(name, email, phone, profileUri);
                 }
             }
         });
@@ -175,6 +217,7 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
      * @param profilePictureUrl The URL of the profile picture.
      */
     private void loadProfilewithGlide(Uri profilePictureUri, String profilePictureUrl) {
+        Log.d("Profile", "Profile URL and URI: " + profilePictureUrl + profilePictureUri);
         if (profilePictureUri != null) {
             Glide.with(this)
                     .load(profilePictureUri)
@@ -228,44 +271,7 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
         return true;
     }
 
-    /**
-     * Callback method called when user details are loaded from Firestore.
-     *
-     * @param returnedUser The User object retrieved from Firestore.
-     */
-    public void onUserloaded(User returnedUser) {
-        if (returnedUser != null) {
-            user = returnedUser;
-            isEditMode = true;
 
-            editTextName.setText(user.getName());
-            editTextEmail.setText(user.getEmail());
-            editTextMobile.setText(user.getPhone());
-            buttonRegister.setText("Save");
-
-            name = user.getName();
-            profilePictureUrl = user.getProfilePictureUrl();
-
-            loadProfilewithGlide(null, profilePictureUrl);
-        } else {
-            Toast.makeText(getActivity(), "User not found. You can register.", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    /**
-     * Callback method called when user details are updated in Firestore.
-     */
-    public void onUserUpdated() {
-        firebaseUserRegistration.loadUserDetails();
-    }
-
-    /**
-     * Callback method called when a new user is successfully registered.
-     */
-    public void onRegistered() {
-        assert getActivity() != null;
-        getActivity().finish();
-    }
 
     /**
      * Callback method called when a photo is selected by the user.
@@ -273,16 +279,14 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
      * @param uri The URI of the selected photo.
      */
     public void onPhotoSelected(Uri uri) {
-        profilePictureUri = uri;
-        loadProfilewithGlide(profilePictureUri, null);
+        viewModel.onPhotoSelected(uri);
     }
 
     /**
      * Callback method called when the user deletes their photo.
      */
     public void onPhotoDeleted() {
-        profilePictureUri = null;
-        firebaseUserRegistration.deleteProfilePicture();
+        viewModel.onPhotoDeleted();
     }
 }
 

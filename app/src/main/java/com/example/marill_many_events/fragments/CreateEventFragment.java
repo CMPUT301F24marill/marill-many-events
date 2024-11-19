@@ -291,7 +291,7 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         capacity = Integer.parseInt(capacityField.getText().toString().trim());
         eventName = NameField.getText().toString().trim();
         location = locationField.getText().toString().trim();
-        event = new Event(posterUrl, eventName, location, startDate, endDate, capacity, geolocation, null);
+        event = new Event(posterUrl, eventName, location, startDate, endDate, capacity, geolocation, null, null);
         return event;
     }
 

@@ -13,6 +13,7 @@ public class Event{
     String FirebaseID;
     Date startDate;
     Date drawDate;
+    String facilityID;
 
     Integer capacity;
     boolean checkGeo;
@@ -21,16 +22,18 @@ public class Event{
         // This constructor is needed by Firebase or Gson
     }
 
-    public Event(String imageURL, String name, String location, Date startDate, Date drawDate, Integer capacity, @Nullable boolean checkGeo, String FirebaseID){
-        this.entrants = new EntrantList();
-        this.ImageURL = imageURL;
-        this.FirebaseID = FirebaseID;
-        this.capacity = capacity;
+    public Event(String imageURL, String name, String location, Date startDate, Date drawDate, @Nullable Integer capacity, boolean checkGeo, String FirebaseID, String facilityID){
+
         this.Name = name;
+        this.ImageURL = imageURL;
         this.Location = location;
         this.startDate = startDate;
         this.drawDate = drawDate;
+        this.FirebaseID = FirebaseID;
+        this.capacity = capacity;
+        this.entrants = new EntrantList();
         this.checkGeo = checkGeo;
+        this.facilityID = facilityID;
     }
 
 
@@ -185,5 +188,13 @@ public class Event{
 
     public void setFirebaseID(String FirebaseID) {
         this.FirebaseID = FirebaseID;
+    }
+
+    public String getFacilityID() {
+        return facilityID;
+    }
+
+    public void setFacilityID(String facilityID) {
+        this.facilityID = facilityID;
     }
 }
