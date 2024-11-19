@@ -12,6 +12,8 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -42,7 +44,7 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
     private RecyclerView waitlistList;
     private EventyArrayAdapter eventAdapter;
     private List<Event> eventItemList;
-
+    private HomePageActivity parentActivity;
 
     ScanOptions options = new ScanOptions();
 
@@ -77,12 +79,10 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
             });
 
 
-
-
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-
+        parentActivity = (HomePageActivity) getActivity();
         // Make sure the activity implements the required interface
         if (context instanceof Identity) {
             identity = (Identity) context;
@@ -147,10 +147,28 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
                             Event event = document.toObject(Event.class);
-                            registerUser(eventID);
+                            showDetails(event);
+                            registerUser(event.getFirebaseID());
                         }
                     }
                 });
+    }
+
+    private void showDetails(Event event) {
+        FragmentManager fragmentManager = getParentFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+        // Replace with your fragment class
+        EventDetailsFragment popupFragment = new EventDetailsFragment();
+
+        parentActivity.setCurrentEvent(event);
+        transaction.add(R.id.event_details, popupFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+
+        // Make the container visible
+        View container = getView().findViewById(R.id.event_details);
+        container.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -238,6 +256,7 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
         if (eventItemList.contains(event)) {
             eventItemList.remove(event);
         }
+        eventAdapter.notifyDataSetChanged();
     }
 
     public Event getCurrentEvent(){
@@ -258,16 +277,16 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
      * Leave an event as a user
      */
     public void onDeleteClick(Event event){
-            // Register the current deviceID (user) to the given event by writing to the user and event a reference to each other
+            // Leave an event as a user
             WriteBatch batch = firestore.batch();
-            DocumentReference eventUsers = firestore.collection("events").document(event.getQRcode());
+            DocumentReference eventUsers = firestore.collection("events").document(event.getFirebaseID());
 
             batch.update(user, "waitList", FieldValue.arrayRemove(eventUsers));
             batch.update(eventUsers, "waitList", FieldValue.arrayRemove(user));
 
             batch.commit()
                     .addOnSuccessListener(aVoid -> {
-                        firestore.collection("events").document(event.getQRcode()).get()
+                        firestore.collection("events").document(event.getFirebaseID()).get()
                                 .addOnSuccessListener(documentSnapshot -> {
                                     if (documentSnapshot.exists()) {
                                         Event newEvent = documentSnapshot.toObject(Event.class);
@@ -287,7 +306,6 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
 
     @Override
     public void onItemClick(Event event) {
-        HomePageActivity parentActivity = (HomePageActivity) getActivity();
         parentActivity.setCurrentEvent(event);
         Log.d("FragmentLifecycle", "Opening details.");
         showEventDetails();

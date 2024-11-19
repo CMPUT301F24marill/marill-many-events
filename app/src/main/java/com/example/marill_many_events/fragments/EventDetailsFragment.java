@@ -1,12 +1,8 @@
 package com.example.marill_many_events.fragments;
 
-import static android.content.ContentValues.TAG;
-
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +23,6 @@ import com.example.marill_many_events.models.Event;
 import com.example.marill_many_events.models.GenerateQRcode;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Shows the details of any selected event object, invoked from either user's waitlist or organizers event list
@@ -78,9 +73,9 @@ public class EventDetailsFragment extends Fragment {
             datePickerStart.setText(formatter.format(event.getStartDate()));
             datePickerEnd.setText(formatter.format(event.getDrawDate()));
 
-            if(event.getQRcode() != null){ // If a qr code string is available generate and display it
+            if(event.getFirebaseID() != null){ // If a qr code string is available generate and display it
                 QRview.setVisibility(View.VISIBLE);
-                QRview.setImageBitmap(generateQRcode.generateQR(event.getQRcode()));
+                QRview.setImageBitmap(generateQRcode.generateQR(event.getFirebaseID()));
             }
 
             capacityField.setText(Integer.toString(event.getCapacity()));

@@ -175,4 +175,14 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
     public void setCurrentEvent(Event event){
         currentEvent = event;
     }
+
+    public void setOrgList(boolean orgList){
+        isOrgList = orgList;
+    }
+
+    public boolean getOrgList(){
+        return isOrgList;
+    }
+
+
 }

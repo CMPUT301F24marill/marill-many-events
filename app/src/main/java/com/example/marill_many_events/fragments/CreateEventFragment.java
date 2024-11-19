@@ -82,6 +82,7 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
     private Uri posterUri;
     private String posterUrl, location;
     private GenerateQRcode generateQRcode;
+    private Event event;
 
     //Data Storage
     private FirebaseFirestore firestore;
@@ -189,6 +190,7 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         View sheetView = LayoutInflater.from(getContext()).inflate(R.layout.qr_sheet, null);
         bottomSheetDialog.setContentView(sheetView);
 
+        event.setFirebaseID(documentID);
         Bitmap code = generateQRcode.generateQR(documentID);
         QRview.setImageBitmap(code);
         QRview.setVisibility(View.VISIBLE);
@@ -289,7 +291,7 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         capacity = Integer.parseInt(capacityField.getText().toString().trim());
         eventName = NameField.getText().toString().trim();
         location = locationField.getText().toString().trim();
-        Event event = new Event(posterUrl, eventName, location, startDate, endDate, capacity, geolocation, null);
+        event = new Event(posterUrl, eventName, location, startDate, endDate, capacity, geolocation, null);
         return event;
     }
 

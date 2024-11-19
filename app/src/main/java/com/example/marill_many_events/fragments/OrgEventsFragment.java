@@ -24,7 +24,6 @@ import com.example.marill_many_events.models.FirebaseEvents;
 import com.example.marill_many_events.models.FirebaseFacilityRegistration;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.StorageReference;
@@ -93,6 +92,7 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
         deviceId = identity.getdeviceID();
         firestore = identity.getFirestore();
         events = firestore.collection("events");
+
         //firebaseFacilityRegistration.getFacility(deviceId);
 
         View view = inflater.inflate(R.layout.fragment_eventlist, container, false);
@@ -145,6 +145,8 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
     public void addToItemList(Event event){
         if (!eventItemList.contains(event)) {
             eventItemList.add(event);
+            Log.d("FragmentLifecycle", event.getFirebaseID());
+
         }
         eventAdapter.notifyDataSetChanged();
     }
@@ -178,7 +180,25 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
     }
 
     public void onDeleteClick(Event event){
+        if(event != null) {
+            firestore.collection("events") // "events" is the name of your collection
+                    .document(event.getFirebaseID())
+                    .delete()
+                    .addOnSuccessListener(documentReference -> {
+                        removeItemfromList(event);
+                        Log.d("Firestore", "Event deleted");
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.w("Firestore", "Error adding event", e);
+                    });
+        }
+    }
 
+    public void removeItemfromList(Event event){
+        if (eventItemList.contains(event)) {
+            eventItemList.remove(event);
+        }
+        eventAdapter.notifyDataSetChanged();
     }
 
 

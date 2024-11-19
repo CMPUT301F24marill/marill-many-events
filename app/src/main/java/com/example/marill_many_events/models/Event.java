@@ -1,11 +1,5 @@
 package com.example.marill_many_events.models;
 
-import android.os.Parcelable;
-
-import com.example.marill_many_events.models.User;
-
-import java.io.Serializable;
-import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -16,7 +10,7 @@ public class Event{
     String Name;
     String Location;
     String ImageURL;
-    String QRcode;
+    String FirebaseID;
     Date startDate;
     Date drawDate;
 
@@ -27,10 +21,10 @@ public class Event{
         // This constructor is needed by Firebase or Gson
     }
 
-    public Event(String imageURL, String name, String location, Date startDate, Date drawDate, Integer capacity, @Nullable boolean checkGeo, String QRcode){
+    public Event(String imageURL, String name, String location, Date startDate, Date drawDate, Integer capacity, @Nullable boolean checkGeo, String FirebaseID){
         this.entrants = new EntrantList();
         this.ImageURL = imageURL;
-        this.QRcode = QRcode;
+        this.FirebaseID = FirebaseID;
         this.capacity = capacity;
         this.Name = name;
         this.Location = location;
@@ -185,11 +179,11 @@ public class Event{
         this.checkGeo = checkGeo;
     }
 
-    public String getQRcode() {
-        return QRcode;
+    public String getFirebaseID() {
+        return this.FirebaseID;
     }
 
-    public void setQRcode(String QRcode) {
-        this.QRcode = QRcode;
+    public void setFirebaseID(String FirebaseID) {
+        this.FirebaseID = FirebaseID;
     }
 }

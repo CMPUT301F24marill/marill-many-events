@@ -4,7 +4,6 @@ package com.example.marill_many_events;
 import com.example.marill_many_events.models.Event;
 import com.example.marill_many_events.models.User;
 import com.example.marill_many_events.models.Entrant;
-import com.example.marill_many_events.models.QRcode;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -139,14 +138,14 @@ public class EventTest {
 
     @Test
     public void testGetEventQRcode() {
-        assertNotNull(event.getQRcode());
+        assertNotNull(event.getFirebaseID());
     }
 
     @Test
     public void testSetEventQRcode() {
         String newQRCode = "QRcode";
-        event.setQRcode(newQRCode);
-        assertEquals(newQRCode, event.getQRcode());
+        event.setFirebaseID(newQRCode);
+        assertEquals(newQRCode, event.getFirebaseID());
     }
 }
 
