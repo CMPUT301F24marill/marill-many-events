@@ -64,7 +64,7 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
         deviceId = getIntent().getStringExtra("deviceId"); // Retrieve deviceId
         firestore = FirebaseFirestore.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
-        firebaseUsers= new FirebaseUsers(firestore, null, deviceId, this);
+        firebaseUsers= new FirebaseUsers(firestore, firebaseStorage, deviceId, this);
         firebaseUsers.loadUserDetails();
 
         Log.d("HomePageActivity", "Fragment Container Visibility: " + findViewById(R.id.fragment_container).getVisibility());

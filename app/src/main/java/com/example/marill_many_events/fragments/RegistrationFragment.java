@@ -177,6 +177,11 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
             Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
         });
 
+        viewModel.isRegistrationComplete().observe(getViewLifecycleOwner(),isRegistrationComplete -> {
+            if(isRegistrationComplete)
+                getActivity().finish();
+        });
+
 
         profilePicture.setOnClickListener(v -> photoPicker.showPhotoOptions(null));
 

@@ -18,6 +18,7 @@ public class RegistrationViewModel extends ViewModel implements UserCallback {
     private final MutableLiveData<Uri> profilePictureUriLiveData = new MutableLiveData<>();
     private final MutableLiveData<String> profilePictureUrlLiveData = new MutableLiveData<>();
     private final MutableLiveData<String> messageLiveData = new MutableLiveData<>();
+    private MutableLiveData<Boolean> registrationComplete = new MutableLiveData<>();
 
     public RegistrationViewModel(FirebaseFirestore firestore, FirebaseStorage firebaseStorage, String deviceId) {
         this.firebaseUsers = new FirebaseUsers(firestore, firebaseStorage, deviceId, this);
@@ -61,6 +62,14 @@ public class RegistrationViewModel extends ViewModel implements UserCallback {
         firebaseUsers.updateUser(name, email, phone, profilePictureUri);
     }
 
+    public LiveData<Boolean> isRegistrationComplete() {
+        return registrationComplete;
+    }
+
+    public void completeRegistration() {
+        registrationComplete.setValue(true);
+    }
+
     public void onPhotoDeleted() {
         firebaseUsers.deleteProfilePicture();
         profilePictureUriLiveData.setValue(null);
@@ -92,5 +101,6 @@ public class RegistrationViewModel extends ViewModel implements UserCallback {
     @Override
     public void onRegistered() {
         messageLiveData.setValue("Registration successful.");
+        completeRegistration();
     }
 }
