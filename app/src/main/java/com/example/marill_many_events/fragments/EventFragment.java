@@ -97,7 +97,6 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
     @Override
     public void onResume() {
         super.onResume();
-        getUserEvents();
         Log.d("FragmentLifecycle", "Fragment is now visible.");
 
         //addToItemList( new Event("https://firebasestorage.googleapis.com/v0/b/marill-many-events.appspot.com/o/event_posters%2Feventposters%2Fimage_1730935799965_05ae8f93-85df-4308-aa48-cdd23874342a.jpg.jpg?alt=media&token=81e266fb-bc73-4489-9f10-8f893e3260ae"
@@ -142,6 +141,14 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
         eventAdapter = new EventyArrayAdapter(eventItemList, this);
         waitlistList.setAdapter(eventAdapter);
 
+        eventViewModel.getUserEvents();
+
+        eventViewModel.getUserEventList().observe(getViewLifecycleOwner(), updatedList -> {
+            eventItemList.clear(); // Clear the old list
+            eventItemList.addAll(updatedList); // Add the updated list
+            eventAdapter.notifyDataSetChanged(); // Notify the adapter of the changes
+        });
+
         return view;
     }
 
@@ -181,45 +188,6 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
 
 
 
-    /**
-     * Get all of the events that a user is registered in and populate the adapter
-     */
-    public void getUserEvents(){
-        eventItemList.clear();
-        userReference.get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        // Retrieve the array of DocumentReferences
-                        List<DocumentReference> docRefs = (List<DocumentReference>) documentSnapshot.get("waitList");
-
-                        if (docRefs != null) {
-                            // Iterate through the list of DocumentReferences
-                            for (DocumentReference reference : docRefs) {
-                                // Fetch each document using the DocumentReference
-                                reference.get()
-                                        .addOnSuccessListener(innerDoc -> {
-                                            if (innerDoc.exists()) {
-                                                Event eventIter = innerDoc.toObject(Event.class);
-                                                addToItemList(eventIter);
-                                            }
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            // Handle error in fetching the referenced document
-                                            Toast.makeText(getContext(), "Error fetching referenced document", Toast.LENGTH_SHORT).show();
-                                        });
-                            }
-                        }
-                    } else {
-                        // Document doesn't exist
-                        Toast.makeText(getContext(), "Document not found", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    // Handle error in retrieving the document
-                    Toast.makeText(getContext(), "Error getting document", Toast.LENGTH_SHORT).show();
-                });
-    }
-
 //    /**
 //     * Add en event to the list
 //     */
@@ -231,28 +199,8 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
 //    }
 
 
-    /**
-     * Add en event to the list
-     */
-    public void addToItemList(Event event){
-        eventViewModel.getEventList().observe(getViewLifecycleOwner(), updatedList -> {
-            eventItemList.clear();
-            eventItemList.addAll(updatedList);
-            eventAdapter.notifyDataSetChanged();
-        });
-    }
-
-
-
-
-    /**
-     * Remove an item from the list
-     */
-    public void removeItemfromList(Event event){
-        if (eventItemList.contains(event)) {
-            eventItemList.remove(event);
-        }
-        eventAdapter.notifyDataSetChanged();
+    public void onDeleteClick(Event event){
+        eventViewModel.deleteEvent(event);
     }
 
     public Event getCurrentEvent(){
@@ -269,35 +217,6 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
                 .commit();
     }
 
-    /**
-     * Leave an event as a user
-     */
-    public void onDeleteClick(Event event){
-            // Leave an event as a user
-            WriteBatch batch = firestore.batch();
-            DocumentReference eventUsers = firestore.collection("events").document(event.getFirebaseID());
-
-            batch.update(userReference, "waitList", FieldValue.arrayRemove(eventUsers));
-            batch.update(eventUsers, "waitList", FieldValue.arrayRemove(userReference));
-
-            batch.commit()
-                    .addOnSuccessListener(aVoid -> {
-                        firestore.collection("events").document(event.getFirebaseID()).get()
-                                .addOnSuccessListener(documentSnapshot -> {
-                                    if (documentSnapshot.exists()) {
-                                        Event newEvent = documentSnapshot.toObject(Event.class);
-                                        if (newEvent != null) {
-                                            removeItemfromList(newEvent); // Remove from list
-                                            getUserEvents();
-                                        }
-                                    }
-                                });
-                        Toast.makeText(getContext(), "Left the event!", Toast.LENGTH_SHORT).show();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(getContext(), "Error leaving the event", Toast.LENGTH_SHORT).show();
-                    });
-    }
 
 
     @Override

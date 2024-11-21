@@ -1,5 +1,7 @@
 package com.example.marill_many_events.models;
 
+import static androidx.test.InstrumentationRegistry.getContext;
+
 import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
@@ -25,12 +27,12 @@ public class EventViewModel extends ViewModel implements EventsCallback {
     private StorageReference eventStorageReference;
     private FirebaseStorage firebaseStorage;
     private DocumentReference userReference;
-    private final MutableLiveData<List<Event>> eventList = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<List<Event>> userEventList = new MutableLiveData<>(new ArrayList<>());
 
 
 
-    public LiveData<List<Event>> getEventList() {
-        return eventList;
+    public LiveData<List<Event>> getUserEventList() {
+        return userEventList;
     }
 
     /**
@@ -39,12 +41,27 @@ public class EventViewModel extends ViewModel implements EventsCallback {
      * @param event The event to add.
      */
     private void addToEventList(Event event) {
-        List<Event> currentList = eventList.getValue();
-        if (currentList != null) {
-            currentList.add(event);
-            eventList.setValue(currentList); // Trigger observers
+        List<Event> currentList = userEventList.getValue();
+        if (currentList == null) {
+            currentList = new ArrayList<>();
+        }
+        currentList.add(event);
+        userEventList.setValue(currentList); // Trigger observers
+    }
+
+    /**
+     * Remove an event from the current event list and updates the LiveData.
+     *
+     * @param event The event to remove.
+     */
+    private void removeFromEventList(Event event) {
+        List<Event> currentList = userEventList.getValue();
+        if (currentList != null && currentList.contains(event)) {
+            currentList.remove(event);
+            userEventList.setValue(currentList); // Trigger observers
         }
     }
+
     /**
      * Sets the currently selected event.
      *
@@ -53,6 +70,42 @@ public class EventViewModel extends ViewModel implements EventsCallback {
     public void setSelectedEvent(Event event) {
         selectedEvent.setValue(event);
     }
+
+    /**
+     * Fetch all events the user is registered in and update LiveData.
+     */
+    public void getUserEvents() {
+        userEventList.setValue(new ArrayList<>()); // Clear the current list
+        userReference.get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        List<DocumentReference> docRefs = (List<DocumentReference>) documentSnapshot.get("waitList");
+
+                        if (docRefs != null) {
+                            for (DocumentReference reference : docRefs) {
+                                reference.get()
+                                        .addOnSuccessListener(innerDoc -> {
+                                            if (innerDoc.exists()) {
+                                                Event event = innerDoc.toObject(Event.class);
+                                                addToEventList(event);
+                                            }
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            // Handle error fetching the event document
+                                            Toast.makeText(getContext(), "Error fetching referenced document", Toast.LENGTH_SHORT).show();
+                                        });
+                            }
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "Document not found", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Handle error retrieving the user document
+                    Toast.makeText(getContext(), "Error getting document", Toast.LENGTH_SHORT).show();
+                });
+    }
+
 
     /**
      * Retrieves the currently selected event as a LiveData object.
@@ -174,6 +227,35 @@ public class EventViewModel extends ViewModel implements EventsCallback {
                 });
     }
 
+
+    /**
+     * Leave an event as a user
+     */
+    public void deleteEvent(Event event){
+        // Leave an event as a user
+        WriteBatch batch = firebaseFirestore.batch();
+        DocumentReference eventUsers = firebaseFirestore.collection("events").document(event.getFirebaseID());
+
+        batch.update(userReference, "waitList", FieldValue.arrayRemove(eventUsers));
+        batch.update(eventUsers, "waitList", FieldValue.arrayRemove(userReference));
+
+        batch.commit()
+                .addOnSuccessListener(aVoid -> {
+                    firebaseFirestore.collection("events").document(event.getFirebaseID()).get()
+                            .addOnSuccessListener(documentSnapshot -> {
+                                if (documentSnapshot.exists()) {
+                                    Event newEvent = documentSnapshot.toObject(Event.class);
+                                    if (newEvent != null) {
+                                        removeFromEventList(newEvent); // Remove from list
+                                    }
+                                }
+                            });
+                    Toast.makeText(getContext(), "Left the event!", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Error leaving the event", Toast.LENGTH_SHORT).show();
+                });
+    }
 
     // Implemented EventsCallback methods
     public void onEventCreate(String documentID) {

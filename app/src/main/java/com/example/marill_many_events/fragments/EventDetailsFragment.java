@@ -24,8 +24,10 @@ import com.example.marill_many_events.models.Event;
 import com.example.marill_many_events.models.EventViewModel;
 import com.example.marill_many_events.models.GenerateQRcode;
 import com.example.marill_many_events.models.User;
+import com.google.firebase.firestore.DocumentReference;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -122,22 +124,34 @@ public class EventDetailsFragment extends Fragment {
     }
 
 
+
     public void setUI() {
-        if(this.user.getwaitList().contains(eventViewModel.getEventDocumentReference())){
-            createButton.setText("Leave Event");
+        if(user != null){
+            ArrayList<DocumentReference> waitList = user.getwaitList();
+            if (waitList != null){
+                if (waitList.contains(eventViewModel.getEventDocumentReference())) {
+                    createButton.setText("Leave Event");
+                }
+                else
+                    eventNotFound();
+            }
+            else
+                eventNotFound();
         }
-        else{
-            createButton.setText("Join Event");
-            createButton.setOnClickListener(v-> {
-                eventViewModel.registerUser();
-            });
-        }
+
 
         if (this.user.isOrganizer()) {
             deleteButton.setVisibility(View.VISIBLE);
         }
 
 
+    }
+
+    private void eventNotFound(){
+            createButton.setText("Join Event");
+            createButton.setOnClickListener(v-> {
+                eventViewModel.registerUser();
+            });
     }
 
     public void leaveEvent(){
