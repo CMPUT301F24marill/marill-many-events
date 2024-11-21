@@ -14,6 +14,7 @@
     <string name="Capacity_Prompt">Capacity (Optional)</string>
     <string name="Geolocation">Geolocation</string>
     <string name="Create">Create</string>
+    <string name="Delete">Delete</string>
     <string name="Facility_Name">Facility Name</string>
     <string name="lbl_my_events">My Events</string>
     <string name="lbl_my_waiting_list">My Waiting List</string>

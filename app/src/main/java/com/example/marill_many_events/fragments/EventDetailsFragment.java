@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
@@ -20,18 +21,25 @@ import com.bumptech.glide.request.transition.Transition;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Event;
+import com.example.marill_many_events.models.EventViewModel;
 import com.example.marill_many_events.models.GenerateQRcode;
+import com.example.marill_many_events.models.User;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 
 /**
  * Shows the details of any selected event object, invoked from either user's waitlist or organizers event list
  */
 public class EventDetailsFragment extends Fragment {
 
-    private TextView NameField, locationField ,capacityField, datePickerStart, datePickerEnd;
+    private TextView nameField, locationField ,capacityField, datePickerStart, datePickerEnd;
     private ImageView QRview, posterView;
     private GenerateQRcode generateQRcode;
+    private EventViewModel eventViewModel;
+    private Button createButton, deleteButton;
+    private Event event;
+    private User user;
 
     public EventDetailsFragment() {
         // Required empty public constructor
@@ -41,45 +49,47 @@ public class EventDetailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_create_event, container, false);
-        HomePageActivity parentActivity = (HomePageActivity) getActivity();
+        eventViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
         generateQRcode = new GenerateQRcode();
 
-        NameField = view.findViewById(R.id.NameField);
+        nameField = view.findViewById(R.id.NameField);
         datePickerStart = view.findViewById(R.id.Startdatefield);
         datePickerEnd = view.findViewById(R.id.DrawdateField);
         capacityField = view.findViewById(R.id.Capacityfield);
         locationField = view.findViewById(R.id.LocationField);
         QRview = view.findViewById(R.id.QRcode);
         posterView = view.findViewById(R.id.poster);
+        user = eventViewModel.getCurrentUser();
 
 
+        createButton = view.findViewById(R.id.create);
+        deleteButton = view.findViewById(R.id.delete);
 
-        Button createButton = view.findViewById(R.id.create);
-        createButton.setText("Leave Event");
-        createButton.setVisibility(View.INVISIBLE);
-        Event event = parentActivity.getCurrentEvent();
 
+        setUI(); // Change UI elements based on context
 
         SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
 
 
-        // Fill in all views as long as a valid event was passed
+        eventViewModel.getSelectedEvent().observe(getViewLifecycleOwner(), event -> {
+            this.event = event;
+            if (event != null) {
+                loadPoster(event.getImageURL());
+                nameField.setText(event.getName());
+                locationField.setText(event.getLocation());
+                datePickerStart.setText(formatter.format(event.getStartDate()));
+                datePickerEnd.setText(formatter.format(event.getDrawDate()));
+                capacityField.setText(String.valueOf(event.getCapacity()));
 
-        if(event != null) {
-            loadPoster(event.getImageURL());
-            NameField.setText(event.getName());
-            locationField.setText(event.getLocation());
-
-            datePickerStart.setText(formatter.format(event.getStartDate()));
-            datePickerEnd.setText(formatter.format(event.getDrawDate()));
-
-            if(event.getFirebaseID() != null){ // If a qr code string is available generate and display it
-                QRview.setVisibility(View.VISIBLE);
-                QRview.setImageBitmap(generateQRcode.generateQR(event.getFirebaseID()));
+                if (event.getFirebaseID() != null) {
+                    QRview.setVisibility(View.VISIBLE);
+                    QRview.setImageBitmap(generateQRcode.generateQR(event.getFirebaseID()));
+                }
             }
+        });
 
-            capacityField.setText(Integer.toString(event.getCapacity()));
-        }
+
+
 
         return view;
     }
@@ -111,6 +121,24 @@ public class EventDetailsFragment extends Fragment {
         });
     }
 
+
+    public void setUI() {
+        if(this.user.getwaitList().contains(eventViewModel.getEventDocumentReference())){
+            createButton.setText("Leave Event");
+        }
+        else{
+            createButton.setText("Join Event");
+            createButton.setOnClickListener(v-> {
+                eventViewModel.registerUser();
+            });
+        }
+
+        if (this.user.isOrganizer()) {
+            deleteButton.setVisibility(View.VISIBLE);
+        }
+
+
+    }
 
     public void leaveEvent(){
 

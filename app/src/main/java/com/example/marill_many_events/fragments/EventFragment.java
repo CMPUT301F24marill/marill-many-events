@@ -12,8 +12,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,7 +20,9 @@ import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Event;
+import com.example.marill_many_events.models.EventViewModel;
 import com.example.marill_many_events.models.FirebaseEvents;
+import com.example.marill_many_events.models.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -45,6 +46,8 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
     private EventyArrayAdapter eventAdapter;
     private List<Event> eventItemList;
     private HomePageActivity parentActivity;
+    private EventViewModel eventViewModel;
+    private User user;
 
     ScanOptions options = new ScanOptions();
 
@@ -54,7 +57,7 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
     private String deviceId;
     private StorageReference storageReference;
     private Identity identity;
-    DocumentReference user;
+    DocumentReference userReference;
     //private onLeaveListener listener;
 
     /**
@@ -105,13 +108,19 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {// Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_eventlist, container, false);
 
+        eventViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
         deviceId = identity.getdeviceID();
         firestore = identity.getFirestore();
-        user = firestore.collection("users").document(deviceId);
+        userReference = firestore.collection("users").document(deviceId);
 
+        eventViewModel.setUserReference(userReference);
+        eventViewModel.setFirebaseStorage(identity.getStorage());
+        eventViewModel.setFirebaseReference(firestore);
 
-        View view = inflater.inflate(R.layout.fragment_eventlist, container, false);
+        getUser();
+
 
         FloatingActionButton scanButton = view.findViewById(R.id.scan);
 
@@ -147,65 +156,37 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
                             Event event = document.toObject(Event.class);
-                            showDetails(event);
-                            registerUser(event.getFirebaseID());
-                        }
+                            eventViewModel.setSelectedEvent(event);
+                            Log.d("FragmentLifecycle", "Opening details.");
+                            showEventDetails();                        }
                     }
                 });
     }
 
-    private void showDetails(Event event) {
-        FragmentManager fragmentManager = getParentFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
+//    private void showDetails(Event event) {
+//        eventViewModel.setSelectedEvent(event);
+//
+//        FragmentManager fragmentManager = getParentFragmentManager();
+//        FragmentTransaction transaction = fragmentManager.beginTransaction();
+//
+//        EventDetailsFragment popupFragment = new EventDetailsFragment();
+//        transaction.add(R.id.event_details, popupFragment);
+//        transaction.addToBackStack(null);
+//        transaction.commit();
+//
+//        // Make the container visible
+//        View container = getView().findViewById(R.id.event_details);
+//        container.setVisibility(View.VISIBLE);
+//    }
 
-        // Replace with your fragment class
-        EventDetailsFragment popupFragment = new EventDetailsFragment();
 
-        parentActivity.setCurrentEvent(event);
-        transaction.add(R.id.event_details, popupFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
-
-        // Make the container visible
-        View container = getView().findViewById(R.id.event_details);
-        container.setVisibility(View.VISIBLE);
-    }
-
-    /**
-     * Register a user to an event by atomically adding user to event's waitlist and event to user's events
-     * @param eventID the document reference for the event in firebase
-     */
-    public void registerUser(String eventID){ // Register the current deviceID (user) to the given event by writing to the user and event a reference to each other
-        WriteBatch batch = firestore.batch();
-        DocumentReference eventUsers = firestore.collection("events").document(eventID);
-
-        batch.update(user, "waitList", FieldValue.arrayUnion(eventUsers));
-        batch.update(eventUsers, "waitList", FieldValue.arrayUnion(user));
-
-        batch.commit()
-                .addOnSuccessListener(aVoid -> {
-                    firestore.collection("events").document(eventID).get()
-                            .addOnSuccessListener(documentSnapshot -> {
-                                if (documentSnapshot.exists()) {
-                                    Event newEvent = documentSnapshot.toObject(Event.class);
-                                    if (newEvent != null) {
-                                        addToItemList(newEvent); // Add directly to the list
-                                    }
-                                }
-                            });
-                    Toast.makeText(getContext(), "Item added to the list!", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Error adding item to the list", Toast.LENGTH_SHORT).show();
-                });
-    }
 
     /**
      * Get all of the events that a user is registered in and populate the adapter
      */
     public void getUserEvents(){
         eventItemList.clear();
-        user.get()
+        userReference.get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         // Retrieve the array of DocumentReferences
@@ -239,15 +220,30 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
                 });
     }
 
+//    /**
+//     * Add en event to the list
+//     */
+//    public void addToItemList(Event event){
+//        if (!eventItemList.contains(event)) {
+//            eventItemList.add(event);
+//        }
+//        eventAdapter.notifyDataSetChanged();
+//    }
+
+
     /**
      * Add en event to the list
      */
     public void addToItemList(Event event){
-        if (!eventItemList.contains(event)) {
-            eventItemList.add(event);
-        }
-        eventAdapter.notifyDataSetChanged();
+        eventViewModel.getEventList().observe(getViewLifecycleOwner(), updatedList -> {
+            eventItemList.clear();
+            eventItemList.addAll(updatedList);
+            eventAdapter.notifyDataSetChanged();
+        });
     }
+
+
+
 
     /**
      * Remove an item from the list
@@ -268,7 +264,7 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
 
         // Replace the current fragment with the child fragment
         getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, eventDetailsFragment)
+                .add(R.id.fragment_container, eventDetailsFragment)
                 .addToBackStack(null)
                 .commit();
     }
@@ -281,8 +277,8 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
             WriteBatch batch = firestore.batch();
             DocumentReference eventUsers = firestore.collection("events").document(event.getFirebaseID());
 
-            batch.update(user, "waitList", FieldValue.arrayRemove(eventUsers));
-            batch.update(eventUsers, "waitList", FieldValue.arrayRemove(user));
+            batch.update(userReference, "waitList", FieldValue.arrayRemove(eventUsers));
+            batch.update(eventUsers, "waitList", FieldValue.arrayRemove(userReference));
 
             batch.commit()
                     .addOnSuccessListener(aVoid -> {
@@ -306,8 +302,22 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
 
     @Override
     public void onItemClick(Event event) {
-        parentActivity.setCurrentEvent(event);
+        eventViewModel.setSelectedEvent(event);
         Log.d("FragmentLifecycle", "Opening details.");
         showEventDetails();
+    }
+
+
+    public void getUser(){
+        userReference.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                user = documentSnapshot.toObject(User.class);
+                eventViewModel.setCurrentUser(user);
+            } else {
+                Log.d("Firestore", "No such user");
+            }
+        }).addOnFailureListener(e -> {
+            Log.d("Firestore", "Error getting user: ", e);
+        });
     }
 }

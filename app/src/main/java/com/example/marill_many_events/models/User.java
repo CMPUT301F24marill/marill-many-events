@@ -1,15 +1,21 @@
 package com.example.marill_many_events.models;
 
+import com.google.firebase.firestore.DocumentReference;
+
+import java.util.ArrayList;
+
 /**
  * User represents a user profile with basic details such as name, email, phone number,
  * and a URL for the profile picture.
  */
 public class User {
-    public String name;
-    public String email;
-    public String phone;
-    public String profilePictureUrl;
-    public String[] events;
+    private String name;
+    private String email;
+    private String phone;
+    private String profilePictureUrl;
+    private ArrayList<String> events;
+    private ArrayList<DocumentReference> waitList;
+    private boolean isOrganizer;
 
     /**
      * Default constructor for User.
@@ -18,13 +24,13 @@ public class User {
         // Default constructor
     }
 
-    public User(String name, String email, String phone, String profilePictureUrl, String[] events) {
+    public User(String name, String email, String phone, String profilePictureUrl, ArrayList<DocumentReference> waitList) {
         // Initialize user profile
         this.name = name;
         this.email = email;
         this.phone = phone;
         this.profilePictureUrl = profilePictureUrl;
-        this.events = events;
+        this.waitList = waitList;
     }
 
     /**
@@ -98,4 +104,30 @@ public class User {
     public void setProfilePictureUrl(String profilePictureUrl) {
         this.profilePictureUrl = profilePictureUrl;
     }
+
+    public boolean isOrganizer() {
+        return isOrganizer;
+    }
+
+    public void setOrganizer(boolean organizer) {
+        isOrganizer = organizer;
+    }
+
+
+    public ArrayList<String> getEvents() {
+        return events;
+    }
+
+    public void addEvent(String event) {
+        this.events.add(event);
+    }
+
+    public ArrayList<DocumentReference> getwaitList() {
+        return waitList;
+    }
+
+    public void addToWaitList(DocumentReference event) {
+        this.waitList.add(event);
+    }
+
 }
