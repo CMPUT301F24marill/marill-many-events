@@ -250,10 +250,10 @@ public class EventViewModel extends ViewModel implements EventsCallback {
                                     }
                                 }
                             });
-                    Toast.makeText(getContext(), "Left the event!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getContext(), "Left the event!", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Error leaving the event", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getContext(), "Error leaving the event", Toast.LENGTH_SHORT).show();
                 });
     }
 
