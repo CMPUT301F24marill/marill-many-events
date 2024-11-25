@@ -108,9 +108,9 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
     }
 
     public void openFacilityProfile() {
-        FacilityProfileFragment facilityProfileFragment = new FacilityProfileFragment();
+        CreateFacilityFragment createFacilityFragment = new CreateFacilityFragment();
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, facilityProfileFragment)
+                .replace(R.id.fragment_container, createFacilityFragment)
                 .addToBackStack(null)
                 .commit();
     }

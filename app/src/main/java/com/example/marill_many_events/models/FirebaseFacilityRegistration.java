@@ -5,6 +5,9 @@ import com.example.marill_many_events.fragments.CreateFacilityFragment;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class FirebaseFacilityRegistration {
 
     private FirebaseFirestore firestore;
@@ -28,13 +31,37 @@ public class FirebaseFacilityRegistration {
                 });
     }
 
-    public void loadFacilityDetails(){
+    public void updateFacility(String name, String location) {
+        Map<String, Object> userUpdates = new HashMap<>();
+        userUpdates.put("name", name);
+        userUpdates.put("location", location);
+
         firestore.collection("facilities").document(facilityId)
-                .get()
-                .addOnSuccessListener(v->{
-                    callback.onFacilityLoaded(v.toObject(Facility.class));
+                .update(userUpdates)
+                .addOnSuccessListener(aVoid -> {
+                    callback.onFacilityUpdated();
+                    //Toast.makeText(getActivity(), "facility details updated successfully!", Toast.LENGTH_SHORT).show();
                 });
     }
+
+    public void loadFacilityDetails() {
+        firestore.collection("facilities")
+                .document(facilityId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // Get the facility object from the document
+                        Facility facility = documentSnapshot.toObject(Facility.class);
+
+                        // Pass the facility object to the callback
+                        callback.onFacilityLoaded(facility);
+                    } else {
+                        // Handle the case where the document doesn't exist
+                        callback.onFacilityLoaded(null);
+                    }
+                });
+    }
+
 
 
 }

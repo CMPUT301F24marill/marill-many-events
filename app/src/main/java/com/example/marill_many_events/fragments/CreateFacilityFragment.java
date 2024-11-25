@@ -1,14 +1,13 @@
 package com.example.marill_many_events.fragments;
 
 import android.content.Context;
-import android.graphics.text.TextRunShaper;
 import android.os.Bundle;
-import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,7 +16,6 @@ import androidx.fragment.app.Fragment;
 import com.example.marill_many_events.FacilityCallback;
 import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
-import com.example.marill_many_events.UserCallback;
 import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Facility;
 import com.example.marill_many_events.models.FirebaseFacilityRegistration;
@@ -37,6 +35,9 @@ public class CreateFacilityFragment extends Fragment implements FacilityCallback
     private FirebaseFirestore firestore;
 
     private String facilityId;
+    private boolean isEditMode = false;
+
+    private Facility facility;
 
     FirebaseFacilityRegistration firebaseFacilityRegistration;
 
@@ -69,24 +70,35 @@ public class CreateFacilityFragment extends Fragment implements FacilityCallback
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_create_facility, container, false);  // inflate the layout
+        return inflater.inflate(R.layout.fragment_create_facility, container, false);  // Inflate the layout
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        // initialize the views
+        // Initialize the views
         editTextName = view.findViewById(R.id.editTextFacilityName);
         editTextLocation = view.findViewById(R.id.editTextFacilityLocation);
         buttonCreate = view.findViewById(R.id.buttonCreateFacility);
 
-        // set up buttonCreate onclick listener
+        // Attempt to load existing facility details (if any)
+        firebaseFacilityRegistration.loadFacilityDetails();
+
+        // Set up buttonCreate onclick listener
         buttonCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (validateInputs()) {
-                    firebaseFacilityRegistration.registerFacility(
-                            editTextName.getText().toString().trim(),
-                            editTextLocation.getText().toString().trim());
+                    if (isEditMode) {
+                        // Update the existing facility
+                        firebaseFacilityRegistration.updateFacility(
+                                editTextName.getText().toString().trim(),
+                                editTextLocation.getText().toString().trim());
+                    } else {
+                        // Register a new facility
+                        firebaseFacilityRegistration.registerFacility(
+                                editTextName.getText().toString().trim(),
+                                editTextLocation.getText().toString().trim());
+                    }
                 }
             }
         });
@@ -119,23 +131,39 @@ public class CreateFacilityFragment extends Fragment implements FacilityCallback
     }
 
     /**
-     * @param facility
+     * This callback is triggered when the facility data is loaded from Firestore.
+     *
+     * @param returnedFacility The facility object retrieved from Firestore.
      */
     @Override
-    public void onFacilityLoaded(Facility facility) {
+    public void onFacilityLoaded(Facility returnedFacility) {
+        if (returnedFacility != null) {
+            facility = returnedFacility;
+            isEditMode = true;
 
+            // Set the edit mode UI
+            editTextName.setText(facility.getFacilityName());
+            editTextLocation.setText(facility.getLocation());
+            buttonCreate.setText("Save"); // Change button text to "Save"
+        } else {
+            // If no facility exists, show a message and continue to registration
+            Toast.makeText(getActivity(), "Facility not found. You can register.", Toast.LENGTH_SHORT).show();
+            isEditMode = false;
+            buttonCreate.setText("Create"); // Change button text to "Create"
+        }
     }
 
     /**
-     *
+     * Callback when a facility has been updated successfully.
      */
     @Override
     public void onFacilityUpdated() {
-
+        // Reload the facility details after updating
+        firebaseFacilityRegistration.loadFacilityDetails();
     }
 
     /**
-     * Once a facility is registered the organizer event list is opened through the parent activity
+     * Once a facility is registered, navigate to the home page activity.
      */
     @Override
     public void onFacilityRegistered() {

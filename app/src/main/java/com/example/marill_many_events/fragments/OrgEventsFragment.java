@@ -37,7 +37,7 @@ import java.util.List;
 /**
  * Displays all events as a list, events can either be user's waitlist or organizer's created events
  */
-public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener, FacilityCallback {
+public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener {
 
 
     private Event currentEvent;
@@ -218,20 +218,4 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
 
     }
 
-
-    @Override
-    public void onFacilityLoaded(Facility facility) {
-        this.facility = facility;
-    }
-
-
-    @Override
-    public void onFacilityRegistered() {
-
-    }
-
-    @Override
-    public void onFacilityUpdated() {
-
-    }
 }
