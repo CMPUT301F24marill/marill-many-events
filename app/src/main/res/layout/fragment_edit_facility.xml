@@ -14,7 +14,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/lbl_create_facility_top_label"
+            android:text="@string/lbl_edit_facility_top_label"
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="@color/white"
@@ -49,8 +49,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:backgroundTint="@color/material_dynamic_primary0"
-            android:text="@string/lbl_create_facility"
+            android:backgroundTint="@color/delete_red"
+            android:text="@string/lbl_delete_facility"
             android:textColor="@android:color/white" />
 
     </LinearLayout>
