@@ -28,9 +28,10 @@ public class FirebaseFacilityRegistration {
                 });
     }
 
-    public void getFacility(String documentID){
-        firestore.collection("facilities").document(documentID)
-                .get().addOnSuccessListener(v->{
+    public void loadFacilityDetails(){
+        firestore.collection("facilities").document(facilityId)
+                .get()
+                .addOnSuccessListener(v->{
                     callback.onFacilityLoaded(v.toObject(Facility.class));
                 });
     }

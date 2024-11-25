@@ -26,6 +26,7 @@ import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
 
 import com.example.marill_many_events.UserCallback;
+import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.PhotoPicker;
 import com.example.marill_many_events.models.ProfilePictureGenerator;
 import com.example.marill_many_events.models.User;
@@ -182,12 +183,11 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
 
         // Set click listener for the Facility Profile button
         buttonFacilityProfile.setOnClickListener(v -> {
-            FacilityProfileFragment facilityProfileFragment = new FacilityProfileFragment();
+            HomePageActivity parentActivity = (HomePageActivity) getActivity();
 
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, facilityProfileFragment) // replace the fragment already in fragment_container
-                    .addToBackStack(null) // add to back stack
-                    .commit();
+            if (parentActivity != null) {
+                parentActivity.openFacilityProfile();
+            }
         });
     }
 

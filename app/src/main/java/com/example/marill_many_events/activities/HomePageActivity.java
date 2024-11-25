@@ -9,6 +9,7 @@ import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.fragments.CreateFacilityFragment;
 import com.example.marill_many_events.fragments.EventFragment;
 import com.example.marill_many_events.fragments.CreateEventFragment;
+import com.example.marill_many_events.fragments.FacilityProfileFragment;
 import com.example.marill_many_events.fragments.NavbarFragment;
 import com.example.marill_many_events.NavbarListener;
 import com.example.marill_many_events.R;
@@ -104,6 +105,14 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
                         }
                     }
                 });
+    }
+
+    public void openFacilityProfile() {
+        FacilityProfileFragment facilityProfileFragment = new FacilityProfileFragment();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, facilityProfileFragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     /**

@@ -23,7 +23,7 @@
 
         <!-- Name Field -->
         <EditText
-            android:id="@+id/editTextFacilityName"
+            android:id="@+id/editTextFacilityNameEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/lbl_enter_facility_name"
@@ -34,7 +34,7 @@
 
         <!-- Location Input -->
         <EditText
-            android:id="@+id/editTextFacilityLocation"
+            android:id="@+id/editTextFacilityLocationEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/lbl_enter_facility_location"
@@ -43,9 +43,19 @@
             android:padding="12dp"
             android:backgroundTint="@color/white" />
 
-        <!-- Create Account Button -->
+        <!-- Save Account Button -->
         <Button
-            android:id="@+id/buttonCreateFacility"
+            android:id="@+id/buttonSaveFacility"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/material_dynamic_primary0"
+            android:text="Save Changes"
+            android:textColor="@android:color/white" />
+
+        <!-- Delete Account Button -->
+        <Button
+            android:id="@+id/buttonDeleteFacility"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"

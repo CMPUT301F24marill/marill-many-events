@@ -109,7 +109,7 @@ public class CreateFacilityFragment extends Fragment implements FacilityCallback
         }
 
         if (location.isEmpty()) {
-            editTextLocation.setError("Valid email is required");
+            editTextLocation.setError("Valid location is required");
             return false;
         } else {
             editTextLocation.setError(null); // Clear error
