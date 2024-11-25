@@ -1,7 +1,10 @@
 package com.example.marill_many_events.fragments;
 
+import static com.google.firebase.appcheck.internal.util.Logger.TAG;
+
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +22,12 @@ import com.example.marill_many_events.R;
 import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Facility;
 import com.example.marill_many_events.models.FirebaseFacilityRegistration;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
 
 /**
  * CreateFacilityFragment represents a fragment that allow non-organizer users
@@ -30,11 +38,12 @@ public class CreateFacilityFragment extends Fragment implements FacilityCallback
     private EditText editTextName;
     private EditText editTextLocation;
     private Button buttonCreate;
+    private Button buttonDelete;
 
     private Identity identity;
-    private FirebaseFirestore firestore;
+    public FirebaseFirestore firestore;
 
-    private String facilityId;
+    public String facilityId;
     private boolean isEditMode = false;
 
     private Facility facility;
@@ -80,6 +89,22 @@ public class CreateFacilityFragment extends Fragment implements FacilityCallback
         editTextLocation = view.findViewById(R.id.editTextFacilityLocation);
         buttonCreate = view.findViewById(R.id.buttonCreateFacility);
 
+        buttonDelete = view.findViewById(R.id.buttonDeleteFacility);
+        // show if facility registered, hide if not
+        firestore.collection("facilities").document(facilityId).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful() && task.getResult().exists()) {
+                            Log.d(TAG, "Device ID exists in facilities. Showing facility deletion button.");
+                            buttonDelete.setVisibility(View.VISIBLE);
+                        } else {
+                            Log.d(TAG, "Device ID does not exist in facilities. Hiding facility deletion button.");
+                            buttonDelete.setVisibility(View.GONE);
+                        }
+                    }
+                });
+
         // Attempt to load existing facility details (if any)
         firebaseFacilityRegistration.loadFacilityDetails();
 
@@ -100,6 +125,19 @@ public class CreateFacilityFragment extends Fragment implements FacilityCallback
                                 editTextLocation.getText().toString().trim());
                     }
                 }
+            }
+        });
+
+        buttonDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Confirm deletion before proceeding
+                new android.app.AlertDialog.Builder(requireContext())
+                        .setTitle("Delete Facility")
+                        .setMessage("Are you sure you want to delete this facility and all its events?")
+                        .setPositiveButton("Yes", (dialog, which) -> deleteFacility())
+                        .setNegativeButton("No", null)
+                        .show();
             }
         });
     }
@@ -129,6 +167,47 @@ public class CreateFacilityFragment extends Fragment implements FacilityCallback
 
         return true;
     }
+
+    public void deleteFacility() {
+        firestore.collection("facilities").document(facilityId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // Get the list of events associated with the facility as an ArrayList
+                        ArrayList<String> eventIds = (ArrayList<String>) documentSnapshot.get("events");
+
+                        if (eventIds != null && !eventIds.isEmpty()) {
+                            // Delete all events associated with this facility
+                            for (String eventId : eventIds) {
+                                firestore.collection("events").document(eventId)
+                                        .delete()
+                                        .addOnSuccessListener(aVoid -> Log.d(TAG, "Event " + eventId + " deleted successfully"))
+                                        .addOnFailureListener(e -> Log.e(TAG, "Error deleting event " + eventId, e));
+                            }
+                        }
+
+                        // Delete the facility document after events are deleted
+                        firestore.collection("facilities").document(facilityId)
+                                .delete()
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(getActivity(), "Facility deleted successfully", Toast.LENGTH_SHORT).show();
+
+                                    // redirect to personal profile
+                                    HomePageActivity parentActivity = (HomePageActivity) getActivity();
+
+                                    if (parentActivity != null) {
+                                        parentActivity.onProfileSelected();
+                                    }
+                                })
+                                .addOnFailureListener(e -> Log.e(TAG, "Error deleting facility", e));
+                    } else {
+                        Toast.makeText(getActivity(), "Facility does not exist.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "Error fetching facility details", e));
+    }
+
+
 
     /**
      * This callback is triggered when the facility data is loaded from Firestore.
