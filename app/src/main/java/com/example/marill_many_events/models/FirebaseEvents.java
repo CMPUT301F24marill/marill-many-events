@@ -8,6 +8,7 @@ import android.util.Log;
 import com.example.marill_many_events.EventsCallback;
 import com.example.marill_many_events.UserCallback;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.StorageReference;
 import com.google.zxing.BarcodeFormat;
@@ -62,6 +63,7 @@ public class FirebaseEvents {
                     Log.d("Firestore", "Event added with ID: " + documentReference.getId());
                     updateQR(documentReference.getId());
 
+                    addEventToFacility(documentReference.getId());
                 })
                 .addOnFailureListener(e -> {
                     Log.w("Firestore", "Error adding event", e);
@@ -82,6 +84,23 @@ public class FirebaseEvents {
                 })
                 .addOnFailureListener(e -> {
                     Log.w("Firestore", "Error adding event", e);
+                });
+    }
+
+    /**
+     * Adds the event ID to the facility's event list.
+     *
+     * @param eventId The ID of the newly created event.
+     */
+    private void addEventToFacility(String eventId) {
+        firestore.collection("facilities") // "facilities" is the name of your facilities collection
+                .document(deviceId) // Replace facilityId with the current facility's document ID
+                .update("events", FieldValue.arrayUnion(eventId)) // Add the eventId to the eventList array
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firestore", "Event added to facility's event list successfully.");
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("Firestore", "Error updating facility's event list", e);
                 });
     }
 
