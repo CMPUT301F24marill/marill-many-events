@@ -53,5 +53,16 @@
             android:text="@string/lbl_create_facility"
             android:textColor="@android:color/white" />
 
+        <!-- Delete Account Button -->
+        <Button
+            android:id="@+id/buttonDeleteFacility"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/delete_red"
+            android:text="@string/lbl_delete_facility"
+            android:visibility="gone"
+            android:textColor="@android:color/white" />
+
     </LinearLayout>
 </ScrollView>

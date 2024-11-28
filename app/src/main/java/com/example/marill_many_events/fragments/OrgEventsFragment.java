@@ -25,6 +25,7 @@ import com.example.marill_many_events.models.FirebaseFacilityRegistration;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.StorageReference;
@@ -36,7 +37,7 @@ import java.util.List;
 /**
  * Displays all events as a list, events can either be user's waitlist or organizer's created events
  */
-public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener, FacilityCallback {
+public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener {
 
 
     private Event currentEvent;
@@ -121,24 +122,60 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
         return view;
     }
 
-    public void getUserEvents(){
+    public void getUserEvents() {
         eventItemList.clear();
-        events.get()
+
+        // Fetch the facility document using the deviceId
+        firestore.collection("facilities")
+                .document(deviceId) // Use the deviceId to get the specific facility document
+                .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        // Retrieve the array of DocumentReferences
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                                addToItemList(document.toObject(Event.class));
-                            }
+                        DocumentSnapshot facilityDoc = task.getResult();
+                        if (facilityDoc.exists()) {
+                            // Extract event IDs from the 'events' field
+                            List<String> eventIds = (List<String>) facilityDoc.get("events");
 
+                            if (eventIds != null) {
+                                // Loop through the event IDs and fetch the corresponding events from the "events" collection
+                                for (String eventId : eventIds) {
+                                    fetchEventDetails(eventId);
+                                }
+                            } else {
+                                Toast.makeText(getContext(), "No events found in the facility", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(getContext(), "Facility document not found", Toast.LENGTH_SHORT).show();
+                        }
                     } else {
-                        // Document doesn't exist
-                        Toast.makeText(getContext(), "Document not found", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Error retrieving facility", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e -> {
-                    // Handle error in retrieving the document
-                    Toast.makeText(getContext(), "Error getting document", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Error getting facility", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    public void fetchEventDetails(String eventId) {
+        // Fetch the event document from the "events" collection using the eventId
+        events.document(eventId).get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot eventDoc = task.getResult();
+                        if (eventDoc.exists()) {
+                            Event event = eventDoc.toObject(Event.class);
+                            if (event != null) {
+                                addToItemList(event);
+                            }
+                        } else {
+                            Log.d("Event Fetch", "Event not found: " + eventId);
+                        }
+                    } else {
+                        Log.d("Event Fetch", "Error fetching event: " + eventId);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.d("Event Fetch", "Error getting event document: " + e.getMessage());
                 });
     }
 
@@ -181,20 +218,4 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
 
     }
 
-
-    @Override
-    public void onFacilityLoaded(Facility facility) {
-        this.facility = facility;
-    }
-
-
-    @Override
-    public void onFacilityRegistered() {
-
-    }
-
-    @Override
-    public void onFacilityUpdated() {
-
-    }
 }
