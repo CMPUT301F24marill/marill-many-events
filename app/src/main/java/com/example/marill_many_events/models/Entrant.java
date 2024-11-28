@@ -16,6 +16,12 @@ public class Entrant {
     private List<Event> Events = new ArrayList<>();
     User user;
 
+    // No-argument constructor
+    public Entrant() {
+        // Initialize default values if necessary
+        this.Geo = new Geolocation(null, null);
+    }
+
     /**
      * Constructs an Entrant with a specified status and user profile.
      *
