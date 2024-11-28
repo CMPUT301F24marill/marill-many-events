@@ -33,4 +33,13 @@
     <string name="lbl_enter_facility_location">Enter Facility Location</string>
     <string name="lbl_create_facility">Create Facility</string>
     <string name="lbl_delete_facility">Delete Facility</string>
+    <string name="lbl_images">Images</string>
+    <string name="lbl_avatars">Avatars</string>
+    <string name="lbl_posters">Posters</string>
+    <string name="lbl_Facilities">Facilities</string>
+    <string name="lbl_Profiles">Profiles</string>
+    <string name="lbl_Profile">Profile</string>
+    <string name="lbl_Events">Events</string>
+    <string name="lbl_Home">Home</string>
+    <string name="lbl_Facility">Facility</string>
 </resources>

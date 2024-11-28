@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -36,12 +37,13 @@ import java.util.List;
 /**
  * Displays all events as a list, events can either be user's waitlist or organizer's created events
  */
-public class EventFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener{
+public class EventAdminFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener{
 
     private Event currentEvent;
     private RecyclerView waitlistList;
     private EventyArrayAdapter eventAdapter;
     private List<Event> eventItemList;
+
 
     ScanOptions options = new ScanOptions();
 
@@ -57,7 +59,7 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
      * Default constructor for EventFragment.
      * Required to ensure proper fragment instantiation.
      */
-    public EventFragment() {
+    public EventAdminFragment() {
         // Required empty public constructor
     }
 
@@ -109,6 +111,8 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
 
         FloatingActionButton scanButton = view.findViewById(R.id.scan);
 
+        TextView title = view.findViewById(R.id.waitlist_label);
+        title.setText("@string/lbl_Events");
 
         scanButton.setOnClickListener(v -> {
             // Launch the QR scanner using the ActivityResultLauncher

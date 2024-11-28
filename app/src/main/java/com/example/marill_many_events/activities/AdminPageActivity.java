@@ -6,26 +6,25 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.example.marill_many_events.Identity;
-import com.example.marill_many_events.fragments.CreateFacilityFragment;
-import com.example.marill_many_events.fragments.EventFragment;
-import com.example.marill_many_events.fragments.NavbarFragment;
-import com.example.marill_many_events.NavbarListener;
-import com.example.marill_many_events.R;
-import com.example.marill_many_events.fragments.OrgEventsFragment;
-import com.example.marill_many_events.fragments.RegistrationFragment;
-
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.marill_many_events.Identity;
+import com.example.marill_many_events.NavbarListener;
+import com.example.marill_many_events.R;
+import com.example.marill_many_events.fragments.AdminNavbarFragment;
+import com.example.marill_many_events.fragments.CreateFacilityFragment;
+import com.example.marill_many_events.fragments.EventFragment;
+import com.example.marill_many_events.fragments.NavbarFragment;
+import com.example.marill_many_events.fragments.OrgEventsFragment;
+import com.example.marill_many_events.fragments.RegistrationFragment;
 import com.example.marill_many_events.models.Event;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-
-import androidx.annotation.NonNull;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
 
 
 /**
@@ -33,7 +32,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
  * display of the navigation bar and handling user profile interactions.
  * It implements the {@link NavbarListener} interface to respond to navigation events.
  */
-public class HomePageActivity extends AppCompatActivity implements NavbarListener, Identity{
+public class AdminPageActivity extends AppCompatActivity implements NavbarListener, Identity{
 
     private FirebaseFirestore firestore; // Firestore instance
     private String deviceId; // Store deviceId here
@@ -59,10 +58,10 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
         firestore = FirebaseFirestore.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
 
-        Log.d("HomePageActivity", "Fragment Container Visibility: " + findViewById(R.id.fragment_container).getVisibility());
+        Log.d("AdminPageActivity", "Fragment Container Visibility: " + findViewById(R.id.fragment_container).getVisibility());
 
         // Set up NavbarFragment
-        NavbarFragment navbarFragment = new NavbarFragment();
+        AdminNavbarFragment navbarFragment = new AdminNavbarFragment();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.navbar_container, navbarFragment)
                 .commit();
@@ -107,21 +106,10 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
     }
 
     /**
-     * Called when the facility management button is pressed. Opens the respective fragment
-     */
-    public void openFacilityProfile() {
-        CreateFacilityFragment createFacilityFragment = new CreateFacilityFragment();
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, createFacilityFragment)
-                .addToBackStack(null)
-                .commit();
-    }
-
-    /**
-     * Called when the gear icon is pressed. Opens the admin activity
+     * Called when the gear icon is pressed. returns to HomePageActivity
      */
     public void openAdmin() {
-        Intent intent = new Intent(HomePageActivity.this, AdminPageActivity.class);
+        Intent intent = new Intent(AdminPageActivity.this, HomePageActivity.class);
         intent.putExtra("deviceId", deviceId);
         startActivity(intent);
     }
@@ -130,12 +118,12 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
      * Called when the home navigation item is selected. Replaces the current fragment with
      * {@link EventFragment} and passes the device ID as an argument.
      */
-    public void onHomeSelected(){
+    public void onFacilitiesSelected(){
         // Open the eventfragment when profile is selected
         deviceId = getIntent().getStringExtra("deviceId"); // Retrieve deviceId
 
         EventFragment eventFragment = new EventFragment();
-        Log.d(TAG, "onHomeSelected called with deviceId: " + deviceId);
+        Log.d(TAG, "onFacilitiesSelected called);
         isOrgList = false;
 
         getSupportFragmentManager().beginTransaction()
@@ -147,7 +135,7 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
     /**
      * Called when the menu navigation item is selected. Calls checkAndOpenFragment()
      */
-    public void onMenuSelected(){
+    public void onImagesSelected(){
         // Log the event for debugging purposes
         Log.d(TAG, "onMenuSelected called");
 
@@ -155,11 +143,30 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
     }
 
     /**
-     * Called when the profile navigation item is selected. Replaces the current fragment with
+     * Called when the profiles navigation item is selected. Replaces the current fragment with
      * {@link RegistrationFragment} and passes the device ID as an argument.
      */
     @Override
-    public void onProfileSelected() {
+    public void onEventsSelected() {
+        // Open the RegistrationFragment when profile is selected
+        RegistrationFragment registrationFragment = new RegistrationFragment();
+
+
+        Log.d(TAG, "onProfileSelected called with deviceId: " + deviceId);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, registrationFragment) // replace the fragment already in fragment_container
+                .addToBackStack(null) // add to back stack
+                .commit();
+
+    }
+
+    /**
+     * Called when the profiles navigation item is selected. Replaces the current fragment with
+     * {@link RegistrationFragment} and passes the device ID as an argument.
+     */
+    @Override
+    public void onProfilesSelected() {
         // Open the RegistrationFragment when profile is selected
         RegistrationFragment registrationFragment = new RegistrationFragment();
 

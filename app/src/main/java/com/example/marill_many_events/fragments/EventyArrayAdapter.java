@@ -18,7 +18,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
-//EventyArrayAdapter contains Events in list and retrieves a books information for the view
+//EventyArrayAdapter contains Events in list and retrieves a events information for the view
 public class EventyArrayAdapter extends RecyclerView.Adapter<EventyArrayAdapter.EventViewHolder> {
     private List<Event> eventList;
     private OnItemClickListener listener; // Listener for item clicks
