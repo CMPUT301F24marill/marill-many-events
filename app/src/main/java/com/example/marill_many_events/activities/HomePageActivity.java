@@ -195,4 +195,13 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
     public void setCurrentEvent(Event event){
         currentEvent = event;
     }
+
+    @Override
+    public void onFacilitiesSelected() {}
+    @Override
+    public void onImagesSelected() {}
+    @Override
+    public void onEventsSelected() {}
+    @Override
+    public void onProfilesSelected() {}
 }

@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
+import com.example.marill_many_events.activities.AdminPageActivity;
 import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Event;
 import com.example.marill_many_events.models.FirebaseEvents;
@@ -107,17 +109,19 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
         user = firestore.collection("users").document(deviceId);
 
 
-        View view = inflater.inflate(R.layout.fragment_eventlist, container, false);
+        View view = inflater.inflate(R.layout.fragment_eventlist_admin, container, false);
 
-        FloatingActionButton scanButton = view.findViewById(R.id.scan);
+        ImageView gearButton = view.findViewById(R.id.admin_gear);
 
         TextView title = view.findViewById(R.id.waitlist_label);
-        title.setText("@string/lbl_Events");
+        title.setText(getString(R.string.lbl_all_Events));
 
-        scanButton.setOnClickListener(v -> {
-            // Launch the QR scanner using the ActivityResultLauncher
-            Intent intent = new Intent(getActivity(), com.journeyapps.barcodescanner.CaptureActivity.class);
-            qrCodeLauncher.launch(options);
+        gearButton.setOnClickListener(v -> {
+            AdminPageActivity parentActivity = (AdminPageActivity) getActivity();
+            if (parentActivity != null) {
+                // navigate to AdminPageActivity
+                parentActivity.openAdmin();
+            }
         });
 
         // Initialize RecyclerView and CardAdapter
@@ -128,7 +132,7 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
         eventItemList = new ArrayList<Event>();
 
         // Initialize the adapter and set it to RecyclerView
-        eventAdapter = new EventyArrayAdapter(eventItemList, this);
+        eventAdapter = new EventyArrayAdapter(eventItemList, this, true);
         waitlistList.setAdapter(eventAdapter);
 
         return view;

@@ -23,6 +23,7 @@ public class EventyArrayAdapter extends RecyclerView.Adapter<EventyArrayAdapter.
     private List<Event> eventList;
     private OnItemClickListener listener; // Listener for item clicks
     private FloatingActionButton leaveButton;
+    private boolean set_Garbage;
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
         public ImageView poster;
@@ -35,9 +36,11 @@ public class EventyArrayAdapter extends RecyclerView.Adapter<EventyArrayAdapter.
         }
     }
 
-    public EventyArrayAdapter(List<Event> eventItemList, OnItemClickListener listener) {
+    public EventyArrayAdapter(List<Event> eventItemList, OnItemClickListener listener, boolean set_Garbage_value) {
         this.eventList = eventItemList;
         this.listener = listener;
+
+        set_Garbage = set_Garbage_value;
     }
 
     @Override
@@ -74,6 +77,9 @@ public class EventyArrayAdapter extends RecyclerView.Adapter<EventyArrayAdapter.
 
         });
 
+        if(set_Garbage){
+            leaveButton.setImageResource(R.id.delete);
+        }
     }
 
     // Define an interface for item click listener

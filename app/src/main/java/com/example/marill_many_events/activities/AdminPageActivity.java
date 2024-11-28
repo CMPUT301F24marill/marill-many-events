@@ -15,9 +15,13 @@ import com.example.marill_many_events.NavbarListener;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.fragments.AdminNavbarFragment;
 import com.example.marill_many_events.fragments.CreateFacilityFragment;
+import com.example.marill_many_events.fragments.EventAdminFragment;
 import com.example.marill_many_events.fragments.EventFragment;
+import com.example.marill_many_events.fragments.FacilitiesAdminFragment;
+import com.example.marill_many_events.fragments.ImagesAdminFragment;
 import com.example.marill_many_events.fragments.NavbarFragment;
 import com.example.marill_many_events.fragments.OrgEventsFragment;
+import com.example.marill_many_events.fragments.ProfilesAdminFragment;
 import com.example.marill_many_events.fragments.RegistrationFragment;
 import com.example.marill_many_events.models.Event;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -66,7 +70,7 @@ public class AdminPageActivity extends AppCompatActivity implements NavbarListen
                 .replace(R.id.navbar_container, navbarFragment)
                 .commit();
 
-        EventFragment eventFragment = new EventFragment();
+        EventAdminFragment eventFragment = new EventAdminFragment();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, eventFragment) // replace the fragment already in fragment_container
                 .addToBackStack(null) // add to back stack
@@ -119,15 +123,13 @@ public class AdminPageActivity extends AppCompatActivity implements NavbarListen
      * {@link EventFragment} and passes the device ID as an argument.
      */
     public void onFacilitiesSelected(){
-        // Open the eventfragment when profile is selected
-        deviceId = getIntent().getStringExtra("deviceId"); // Retrieve deviceId
+        // Open the RegistrationFragment when profile is selected
+        FacilitiesAdminFragment eventsFragment = new FacilitiesAdminFragment();
 
-        EventFragment eventFragment = new EventFragment();
-        Log.d(TAG, "onFacilitiesSelected called);
-        isOrgList = false;
+        Log.d(TAG, "onImageselected called with deviceId: " + deviceId);
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, eventFragment, "user events") // replace the fragment already in fragment_container
+                .replace(R.id.fragment_container, eventsFragment) // replace the fragment already in fragment_container
                 .addToBackStack(null) // add to back stack
                 .commit();
     }
@@ -136,10 +138,15 @@ public class AdminPageActivity extends AppCompatActivity implements NavbarListen
      * Called when the menu navigation item is selected. Calls checkAndOpenFragment()
      */
     public void onImagesSelected(){
-        // Log the event for debugging purposes
-        Log.d(TAG, "onMenuSelected called");
+        // Open the RegistrationFragment when profile is selected
+        ImagesAdminFragment eventsFragment = new ImagesAdminFragment();
 
-        checkAndOpenFragment();
+        Log.d(TAG, "onImageselected called with deviceId: " + deviceId);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, eventsFragment) // replace the fragment already in fragment_container
+                .addToBackStack(null) // add to back stack
+                .commit();
     }
 
     /**
@@ -149,13 +156,12 @@ public class AdminPageActivity extends AppCompatActivity implements NavbarListen
     @Override
     public void onEventsSelected() {
         // Open the RegistrationFragment when profile is selected
-        RegistrationFragment registrationFragment = new RegistrationFragment();
+        EventAdminFragment eventsFragment = new EventAdminFragment();
 
-
-        Log.d(TAG, "onProfileSelected called with deviceId: " + deviceId);
+        Log.d(TAG, "onEventselected called with deviceId: " + deviceId);
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, registrationFragment) // replace the fragment already in fragment_container
+                .replace(R.id.fragment_container, eventsFragment) // replace the fragment already in fragment_container
                 .addToBackStack(null) // add to back stack
                 .commit();
 
@@ -168,16 +174,14 @@ public class AdminPageActivity extends AppCompatActivity implements NavbarListen
     @Override
     public void onProfilesSelected() {
         // Open the RegistrationFragment when profile is selected
-        RegistrationFragment registrationFragment = new RegistrationFragment();
+        ProfilesAdminFragment profilesFragment = new ProfilesAdminFragment();
 
-
-        Log.d(TAG, "onProfileSelected called with deviceId: " + deviceId);
+        Log.d(TAG, "onProfilesSelected called with deviceId: " + deviceId);
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, registrationFragment) // replace the fragment already in fragment_container
+                .replace(R.id.fragment_container, profilesFragment) // replace the fragment already in fragment_container
                 .addToBackStack(null) // add to back stack
                 .commit();
-
     }
 
     @Override
@@ -202,4 +206,11 @@ public class AdminPageActivity extends AppCompatActivity implements NavbarListen
     public void setCurrentEvent(Event event){
         currentEvent = event;
     }
+
+    @Override
+    public void onProfileSelected() {}
+    @Override
+    public void onHomeSelected() {}
+    @Override
+    public void onMenuSelected() {}
 }
