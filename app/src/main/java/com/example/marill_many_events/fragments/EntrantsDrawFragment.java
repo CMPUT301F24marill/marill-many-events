@@ -94,6 +94,7 @@ public class EntrantsDrawFragment extends Fragment {
 
     private void fetchAndDisplayEntrantsDemo() {
         // If the passed eventDocumentId is null or empty, try getting it from fragment arguments
+        db = FirebaseFirestore.getInstance();
         if (eventDocumentId == null || eventDocumentId.isEmpty()) {
             Bundle args = getArguments();
             if (args != null) {
@@ -103,79 +104,85 @@ public class EntrantsDrawFragment extends Fragment {
 
         // Reference to the event document
         assert eventDocumentId != null;
-        DocumentReference eventDocRef = db.collection("events").document("AzDkEpWtLwsORIx06bi");
+        DocumentReference eventDocRef = db.collection("events").document("XorSM4hvc6dtYe2rF1gN");
         Log.d(TAG, "DocumentReference path: " + eventDocRef.getPath());
+
 
         // Fetch the event document from Firestore
         eventDocRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
                 Log.d(TAG, "Successfully retrieved event document.");
 
-                // You can use event details here if needed, for example:
+                // Use event details here if needed
                 DocumentSnapshot eventSnapshot = task.getResult();
                 String eventName = eventSnapshot.getString("name");
                 Log.d(TAG, "Event Name: " + eventName);
 
-                // Proceed to get the waitList collection within the event document
-                CollectionReference userInWaitList = eventDocRef.collection("waitList");
+                // Get the waitList field from the event document
+                Object waitListRefsObj = eventSnapshot.get("waitList");
+                List<?> waitListRefs = null;
 
-                // Fetch document references from waitList
-                userInWaitList.get().addOnCompleteListener(waitListTask -> {
-                    if (waitListTask.isSuccessful()) {
-                        Log.d("WaitListDebug", "Successfully retrieved waitList collection.");
-                        List<Task<DocumentSnapshot>> userFetchTasks = new ArrayList<>();
+                if (waitListRefsObj != null && waitListRefsObj instanceof List) {
+                    waitListRefs = (List<?>) waitListRefsObj;
+                }
 
-                        // Check if there are any documents in the waitList
-                        int documentCount = waitListTask.getResult().size();
-                        Log.d("WaitListDebug", "Number of documents in waitList: " + documentCount);
+                if (waitListRefs != null && !waitListRefs.isEmpty()) {
+                    Log.d("WaitListDebug", "Number of references in waitList: " + waitListRefs.size());
 
-                        // Loop through waitList documents
-                        for (QueryDocumentSnapshot document : waitListTask.getResult()) {
-                            // Get the document ID (user reference path)
-                            String userRefPath = document.getString("userRef"); // Assuming "userRef" contains the path
-                            Log.d("WaitListDebug", "User reference path found: " + userRefPath);
+                    // Pass the list of references to a method that will retrieve the user details
+                    fetchUserDetails(waitListRefs);
+                } else {
+                    Log.d("WaitListDebug", "WaitList is empty or null.");
+                }
 
-                            if (userRefPath != null) {
-                                DocumentReference userRef = db.document(userRefPath);
-                                userFetchTasks.add(userRef.get());
-                            }
-                        }
-
-                        // Wait for all user data fetch tasks to complete
-                        Tasks.whenAllSuccess(userFetchTasks)
-                                .addOnSuccessListener(results -> {
-                                    List<Entrant> entrantList = new ArrayList<>();
-
-                                    for (Object obj : results) {
-                                        DocumentSnapshot userDoc = (DocumentSnapshot) obj;
-                                        if (userDoc.exists()) {
-                                            User user = userDoc.toObject(User.class);
-
-                                            // Create an Entrant object and set its user and other details
-                                            Entrant entrant = new Entrant();
-                                            entrant.setUser(user);
-                                            entrant.setStatus("waitlisted"); // Default status
-                                            entrantList.add(entrant);
-                                        }
-                                    }
-
-                                    Log.d(TAG, "Fetched " + entrantList.size() + " users from references.");
-
-                                    // Proceed with processing the fetched entrants
-                                    getEventCapacityAndSelectEntrants(entrantList);
-                                })
-                                .addOnFailureListener(e -> {
-                                    Log.w(TAG, "Error fetching user documents", e);
-                                });
-                    } else {
-                        Log.w(TAG, "Error getting waitList documents.", waitListTask.getException());
-                    }
-                });
             } else {
                 Log.w(TAG, "Error retrieving event document or document does not exist.", task.getException());
             }
         });
     }
+
+    private void fetchUserDetails(List<?> waitListRefs) {
+        List<Task<DocumentSnapshot>> userFetchTasks = new ArrayList<>();
+
+        for (Object userRefObj : waitListRefs) {
+            if (userRefObj instanceof String) {
+                String userRefPath = (String) userRefObj;
+                DocumentReference userRef = db.document(userRefPath);
+                userFetchTasks.add(userRef.get());
+            } else if (userRefObj instanceof DocumentReference) {
+                DocumentReference userRef = (DocumentReference) userRefObj;
+                userFetchTasks.add(userRef.get());
+            }
+        }
+
+        // Wait for all user data fetch tasks to complete
+        Tasks.whenAllSuccess(userFetchTasks)
+                .addOnSuccessListener(results -> {
+                    List<Entrant> entrantList = new ArrayList<>();
+
+                    for (Object obj : results) {
+                        DocumentSnapshot userDoc = (DocumentSnapshot) obj;
+                        if (userDoc.exists()) {
+                            User user = userDoc.toObject(User.class);
+
+                            // Create an Entrant object and set its user and other details
+                            Entrant entrant = new Entrant();
+                            entrant.setUser(user);
+                            entrant.setStatus("waitlisted"); // Default status
+                            entrantList.add(entrant);
+                        }
+                    }
+
+                    Log.d(TAG, "Fetched " + entrantList.size() + " users from references.");
+
+                    // Proceed with processing the fetched entrants
+                    getEventCapacityAndSelectEntrants(entrantList);
+                })
+                .addOnFailureListener(e -> {
+                    Log.w(TAG, "Error fetching user documents", e);
+                });
+    }
+
 
 
     private void fetchAndDisplayEntrants(String eventDocumentId) {
