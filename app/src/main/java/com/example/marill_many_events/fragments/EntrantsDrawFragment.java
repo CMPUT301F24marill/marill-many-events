@@ -79,19 +79,6 @@ public class EntrantsDrawFragment extends Fragment {
         return view;
     }
 
-    private void fetchWishList() {
-        db = FirebaseFirestore.getInstance();
-        if (eventDocumentId == null || eventDocumentId.isEmpty()) {
-            Log.e(TAG, "Event Document ID is null or empty");
-            return;
-        }
-        // Fetch entrants from waitlist
-        CollectionReference userInWaitList = db.collection("events")
-                .document(eventDocumentId)
-                .collection("waitList");
-
-    }
-
     private void fetchAndDisplayEntrantsDemo() {
         // If the passed eventDocumentId is null or empty, try getting it from fragment arguments
         db = FirebaseFirestore.getInstance();
@@ -252,65 +239,6 @@ public class EntrantsDrawFragment extends Fragment {
             }
         });
     }
-
-
-//    private void fetchAndDisplayEntrants() {
-//        db = FirebaseFirestore.getInstance();
-//
-//        if (eventDocumentId == null || eventDocumentId.isEmpty()) {
-//            Log.e(TAG, "Event Document ID is null or empty");
-//            return;
-//        }
-//
-//        // Fetch the event document to get the waitList field
-//        db.collection("events").document(eventDocumentId).get()
-//                .addOnSuccessListener(documentSnapshot -> {
-//                    if (documentSnapshot.exists()) {
-//                        List<String> waitListRefs = (List<String>) documentSnapshot.get("waitList");
-//                        if (waitListRefs != null && !waitListRefs.isEmpty()) {
-//                            List<Task<DocumentSnapshot>> tasks = new ArrayList<>();
-//
-//                            for (String userRefPath : waitListRefs) {
-//                                DocumentReference userRef = db.document(userRefPath);
-//                                tasks.add(userRef.get());
-//                            }
-//
-//                            // Wait for all user data to be fetched
-//                            Tasks.whenAllSuccess(tasks)
-//                                    .addOnSuccessListener(objects -> {
-//                                        List<Entrant> entrantList = new ArrayList<>();
-//
-//                                        for (Object obj : objects) {
-//                                            DocumentSnapshot userDoc = (DocumentSnapshot) obj;
-//                                            if (userDoc.exists()) {
-//                                                User user = userDoc.toObject(User.class);
-//                                                Entrant entrant = new Entrant();
-//                                                entrant.setUser(user);
-//                                                entrant.setStatus("waitlisted"); // or any default status
-//                                                entrantList.add(entrant);
-//                                            }
-//                                        }
-//
-//                                        Log.d(TAG, "Fetched " + entrantList.size() + " entrants.");
-//
-//                                        // Proceed to select entrants based on capacity
-//                                        getEventCapacityAndSelectEntrants(entrantList);
-//
-//                                    })
-//                                    .addOnFailureListener(e -> {
-//                                        Log.w(TAG, "Error getting user documents", e);
-//                                    });
-//                        } else {
-//                            Log.d(TAG, "Waitlist is empty or null");
-//                        }
-//                    } else {
-//                        Log.d(TAG, "No such event document");
-//                    }
-//                })
-//                .addOnFailureListener(e -> {
-//                    Log.w(TAG, "Error getting event document", e);
-//                });
-//    }
 
 
     private void getEventCapacityAndSelectEntrants(List<Entrant> entrantList) {
