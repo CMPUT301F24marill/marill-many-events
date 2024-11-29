@@ -56,16 +56,16 @@ public class EntrantsAdapter extends RecyclerView.Adapter<EntrantsAdapter.Entran
         EntrantViewHolder(@NonNull View itemView) {
             super(itemView);
             nameTextView = itemView.findViewById(R.id.entrant_name);
-            statusTextView = itemView.findViewById(R.id.entrant_status);
+            //statusTextView = itemView.findViewById(R.id.entrant_status);
         }
 
         void bind(Entrant entrant) {
             if (entrant.getUser() != null) {
                 nameTextView.setText(entrant.getUser().getName());
-                statusTextView.setText(entrant.getStatus());
+                //statusTextView.setText(entrant.getStatus());
             } else {
                 nameTextView.setText("Unknown");
-                statusTextView.setText("No Status");
+                //statusTextView.setText("No Status");
             }
         }
     }
