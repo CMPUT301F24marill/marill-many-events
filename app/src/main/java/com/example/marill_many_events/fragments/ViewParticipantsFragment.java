@@ -75,8 +75,9 @@ public class ViewParticipantsFragment extends Fragment {
         }
 
         //hard code to pass id
-        eventDocumentId = "ShcEvw5fLTiqrBJedY47";
-        Log.d(TAG, "Using hardcoded Event Document ID: " + eventDocumentId);
+        //eventDocumentId = "ShcEvw5fLTiqrBJedY47";
+        //Log.d(TAG, "Using hardcoded Event Document ID: " + eventDocumentId);
+        //eventDocumentId = event.getQRcode();
 
         // Reference to the event document
         DocumentReference eventDocRef = db.collection("events").document(eventDocumentId);
