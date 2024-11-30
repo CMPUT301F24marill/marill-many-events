@@ -85,6 +85,22 @@ public class FirebaseEvents {
                 });
     }
 
+//
+//    /**
+//     * Registers a new user and uploads the profile picture to Firebase Storage if provided.
+//     */
+//
+//    public void updateEventDocumentId(String documentID) {
+//        firestore.collection("events") // "events" is the name of your collection
+//                .document(documentID) // This automatically generates a document ID
+//                .update("EventDocumentId", documentID)
+//                .addOnSuccessListener(documentReference -> {
+//                    eventsCallback.onEventCreate(documentID);
+//                })
+//                .addOnFailureListener(e -> {
+//                    Log.w("Firestore", "Error adding event", e);
+//                });
+//    }
 
     /**
      * Deletes the current profile picture from Firebase Storage and removes the download link reference from Firestore.

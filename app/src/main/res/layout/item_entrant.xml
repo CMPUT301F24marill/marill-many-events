@@ -12,11 +12,4 @@
         android:text="Entrant Name"
         android:textSize="16sp" />
 
-    <TextView
-        android:id="@+id/entrant_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Entrant Status"
-        android:textSize="14sp" />
-
 </LinearLayout>
