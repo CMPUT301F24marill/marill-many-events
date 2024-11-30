@@ -104,11 +104,9 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
         firestore = identity.getFirestore();
         user = firestore.collection("users").document(deviceId);
 
-
         View view = inflater.inflate(R.layout.fragment_eventlist, container, false);
 
         FloatingActionButton scanButton = view.findViewById(R.id.scan);
-
 
         scanButton.setOnClickListener(v -> {
             // Launch the QR scanner using the ActivityResultLauncher

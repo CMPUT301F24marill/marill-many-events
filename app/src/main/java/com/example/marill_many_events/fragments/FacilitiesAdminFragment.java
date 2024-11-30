@@ -285,6 +285,7 @@ public class FacilitiesAdminFragment extends Fragment implements EventyArrayAdap
     }
 
 
+
     @Override
     public void onItemClick(Event event) {
         HomePageActivity parentActivity = (HomePageActivity) getActivity();
