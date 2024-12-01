@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,9 +20,11 @@ import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Event;
+import com.example.marill_many_events.models.EventViewModel;
 import com.example.marill_many_events.models.Facility;
 import com.example.marill_many_events.models.FirebaseEvents;
 import com.example.marill_many_events.models.FirebaseFacilityRegistration;
+import com.example.marill_many_events.models.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -46,7 +49,9 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
     private EventyArrayAdapter eventAdapter;
     private List<Event> eventItemList;
     FirebaseFacilityRegistration firebaseFacilityRegistration;
-
+    private EventViewModel eventViewModel;
+    DocumentReference userReference;
+    private User user;
 
     ScanOptions options = new ScanOptions();
 
@@ -91,11 +96,19 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {// Inflate the layout for this fragment
+        eventViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
 
         deviceId = identity.getdeviceID();
         firestore = identity.getFirestore();
         events = firestore.collection("events");
         facility = firestore.collection("facilities");
+        userReference = firestore.collection("users").document(deviceId);
+
+        eventViewModel.setUserReference(userReference);
+        eventViewModel.setFirebaseStorage(identity.getStorage());
+        eventViewModel.setFirebaseReference(firestore);
+        getUser();
+
 
 
         //firebaseFacilityRegistration.getFacility(deviceId);
@@ -105,10 +118,9 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
         TextView titleView = view.findViewById(R.id.waitlist_label);
         //titleView.setText(facility.getName());
         titleView.setText("My Events");
+
         FloatingActionButton createEvent = view.findViewById(R.id.scan);
         createEvent.setImageResource(R.drawable.plus);
-
-
         createEvent.setOnClickListener(v-> createEvent());
 
         // Initialize RecyclerView and CardAdapter
@@ -123,75 +135,32 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
         waitlistList.setAdapter(eventAdapter);
         //eventAdapter.hideLeaveButton();
 
+        eventViewModel.getUserOwnedEvents();
+
+        eventViewModel.getUserOwnedList().observe(getViewLifecycleOwner(), updatedList -> {
+            eventItemList.clear();
+            eventItemList.addAll(updatedList); // Add the updated list
+            eventAdapter.notifyDataSetChanged(); // Notify the adapter of the changes
+        });
+
         return view;
     }
 
 
     public void getUserEvents() {
-        eventItemList.clear();
 
-        // Fetch the facility document using the deviceId
-        firestore.collection("facilities")
-                .document(deviceId) // Use the deviceId to get the specific facility document
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot facilityDoc = task.getResult();
-                        if (facilityDoc.exists()) {
-                            // Extract event IDs from the 'events' field
-                            List<String> eventIds = (List<String>) facilityDoc.get("events");
-
-                            if (eventIds != null) {
-                                // Loop through the event IDs and fetch the corresponding events from the "events" collection
-                                for (String eventId : eventIds) {
-                                    fetchEventDetails(eventId);
-                                }
-                            } else {
-                                Toast.makeText(getContext(), "No events found in the facility", Toast.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            Toast.makeText(getContext(), "Facility document not found", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Toast.makeText(getContext(), "Error retrieving facility", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Error getting facility", Toast.LENGTH_SHORT).show();
-                });
     }
 
-    public void fetchEventDetails(String eventId) {
-        // Fetch the event document from the "events" collection using the eventId
-        events.document(eventId).get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot eventDoc = task.getResult();
-                        if (eventDoc.exists()) {
-                            Event event = eventDoc.toObject(Event.class);
-                            if (event != null) {
-                                addToItemList(event);
-                            }
-                        } else {
-                            Log.d("Event Fetch", "Event not found: " + eventId);
-                        }
-                    } else {
-                        Log.d("Event Fetch", "Error fetching event: " + eventId);
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.d("Event Fetch", "Error getting event document: " + e.getMessage());
-                });
-    }
 
-    public void addToItemList(Event event){
-        if (!eventItemList.contains(event)) {
-            eventItemList.add(event);
-            Log.d("FragmentLifecycle", event.getFirebaseID());
 
-        }
-        eventAdapter.notifyDataSetChanged();
-    }
+//    public void addToItemList(Event event){
+//        if (!eventItemList.contains(event)) {
+//            eventItemList.add(event);
+//            Log.d("FragmentLifecycle", event.getFirebaseID());
+//
+//        }
+//        eventAdapter.notifyDataSetChanged();
+//    }
 
     public void createEvent(){
         CreateEventFragment createEventFragment = new CreateEventFragment();
@@ -208,18 +177,27 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
 
         // Replace the current fragment with the child fragment
         getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, eventDetailsFragment)
+                .add(R.id.fragment_container, eventDetailsFragment)
                 .addToBackStack(null)
                 .commit();
     }
 
+//    @Override
+//    public void onItemClick(Event event) {
+//        HomePageActivity parentActivity = (HomePageActivity) getActivity();
+//        parentActivity.setCurrentEvent(event);
+//        Log.d("FragmentLifecycle", "Opening details.");
+//        showEventDetails();
+//    }
+
     @Override
     public void onItemClick(Event event) {
-        HomePageActivity parentActivity = (HomePageActivity) getActivity();
-        parentActivity.setCurrentEvent(event);
+        eventViewModel.setSelectedEvent(event);
         Log.d("FragmentLifecycle", "Opening details.");
         showEventDetails();
     }
+
+
 
     public void onDeleteClick(Event event){
         if(event != null) {
@@ -257,5 +235,18 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
     @Override
     public void onFacilityUpdated() {
 
+    }
+
+    public void getUser(){
+        userReference.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                user = documentSnapshot.toObject(User.class);
+                eventViewModel.setCurrentUser(user);
+            } else {
+                Log.d("Firestore", "No such user");
+            }
+        }).addOnFailureListener(e -> {
+            Log.d("Firestore", "Error getting user: ", e);
+        });
     }
 }

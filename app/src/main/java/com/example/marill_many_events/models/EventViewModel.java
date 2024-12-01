@@ -2,6 +2,7 @@ package com.example.marill_many_events.models;
 
 import static androidx.test.InstrumentationRegistry.getContext;
 
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
@@ -10,6 +11,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.marill_many_events.EventsCallback;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
@@ -28,11 +30,15 @@ public class EventViewModel extends ViewModel implements EventsCallback {
     private FirebaseStorage firebaseStorage;
     private DocumentReference userReference;
     private final MutableLiveData<List<Event>> userEventList = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<List<Event>> userOwnedList = new MutableLiveData<>(new ArrayList<>());
 
 
 
     public LiveData<List<Event>> getUserEventList() {
         return userEventList;
+    }
+    public LiveData<List<Event>> getUserOwnedList() {
+        return userOwnedList;
     }
 
     /**
@@ -59,6 +65,33 @@ public class EventViewModel extends ViewModel implements EventsCallback {
         if (currentList != null && currentList.contains(event)) {
             currentList.remove(event);
             userEventList.setValue(currentList); // Trigger observers
+        }
+    }
+
+    /**
+     * Adds a new event to the current event list and updates the LiveData.
+     *
+     * @param event The event to add.
+     */
+    private void addToOwnedList(Event event) {
+        List<Event> currentList = userOwnedList.getValue();
+        if (currentList == null) {
+            currentList = new ArrayList<>();
+        }
+        currentList.add(event);
+        userOwnedList.setValue(currentList); // Trigger observers
+    }
+
+    /**
+     * Remove an event from the current event list and updates the LiveData.
+     *
+     * @param event The event to remove.
+     */
+    private void removeFromOwnedList(Event event) {
+        List<Event> currentList = userOwnedList.getValue();
+        if (currentList != null && currentList.contains(event)) {
+            currentList.remove(event);
+            userOwnedList.setValue(currentList); // Trigger observers
         }
     }
 
@@ -105,6 +138,65 @@ public class EventViewModel extends ViewModel implements EventsCallback {
                     Toast.makeText(getContext(), "Error getting document", Toast.LENGTH_SHORT).show();
                 });
     }
+
+    public void getUserOwnedEvents() {
+        userOwnedList.setValue(new ArrayList<>()); // Clear the current list
+
+        // Fetch the facility document using the deviceId
+        firebaseFirestore.collection("facilities")
+                .document(userReference.getId()) // Use the deviceId to get the specific facility document
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot facilityDoc = task.getResult();
+                        if (facilityDoc.exists()) {
+                            // Extract event IDs from the 'events' field
+                            List<String> eventIds = (List<String>) facilityDoc.get("events");
+
+                            if (eventIds != null) {
+                                // Loop through the event IDs and fetch the corresponding events from the "events" collection
+                                for (String eventId : eventIds) {
+                                    fetchEventDetails(eventId);
+                                }
+                            } else {
+                                Toast.makeText(getContext(), "No events found in the facility", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(getContext(), "Facility document not found", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "Error retrieving facility", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Error getting facility", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+
+    public void fetchEventDetails(String eventId) {
+        // Fetch the event document from the "events" collection using the eventId
+        firebaseFirestore.collection("events").document(eventId).get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot eventDoc = task.getResult();
+                        if (eventDoc.exists()) {
+                            Event event = eventDoc.toObject(Event.class);
+                            if (event != null) {
+                                addToOwnedList(event);
+                            }
+                        } else {
+                            Log.d("Event Fetch", "Event not found: " + eventId);
+                        }
+                    } else {
+                        Log.d("Event Fetch", "Error fetching event: " + eventId);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.d("Event Fetch", "Error getting event document: " + e.getMessage());
+                });
+    }
+
 
 
     /**
