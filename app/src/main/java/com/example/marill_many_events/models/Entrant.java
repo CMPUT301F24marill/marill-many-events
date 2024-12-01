@@ -12,9 +12,16 @@ import java.util.List;
 public class Entrant {
     String status;
     Geolocation Geo;
+    //private String deviceId;
 
     private List<Event> Events = new ArrayList<>();
     User user;
+
+    // No-argument constructor
+    public Entrant() {
+        // Initialize default values if necessary
+        this.Geo = new Geolocation(null, null);
+    }
 
     /**
      * Constructs an Entrant with a specified status and user profile.
@@ -93,4 +100,22 @@ public class Entrant {
     public void addEvents(Event event){
         this.Events.add(event);
     }
+//
+//    /**
+//     * Retrieves the deviceId of the entrant.
+//     *
+//     * @return The deviceId of the entrant.
+//     */
+//    public String getDeviceId() {
+//        return deviceId;
+//    }
+//
+//    /**
+//     * Sets the deviceId of the entrant.
+//     *
+//     * @param deviceId The new deviceId of the entrant.
+//     */
+//    public void setDeviceId(String deviceId) {
+//        this.deviceId = deviceId;
+//    }
 }

@@ -68,8 +68,8 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation("androidx.test:core:1.5.0") // Make sure core is included
 
-    testImplementation("org.mockito:mockito-core:5.0.0")
-    androidTestImplementation("org.mockito:mockito-android:5.0.0")
+    testImplementation("org.mockito:mockito-core:5.4.0")
+    androidTestImplementation("org.mockito:mockito-android:5.4.0")
 
     implementation(libs.appcompat)
     implementation(libs.material)

@@ -288,7 +288,20 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
      * Create an event object.
      */
     public Event createEvent(){
-        capacity = Integer.parseInt(capacityField.getText().toString().trim());
+        String capacityInput = capacityField.getText().toString().trim();
+
+        if (capacityInput.isEmpty()) {
+            // If empty, set the default value to 1000
+            capacity = 10000;
+        } else {
+            // If not empty, try to parse it as an integer
+            try {
+                capacity = Integer.parseInt(capacityInput);
+            } catch (NumberFormatException e) {
+                // In case of invalid number format, set capacity to default value (1000)
+                capacity = 10000;
+            }
+        }
         eventName = NameField.getText().toString().trim();
         location = locationField.getText().toString().trim();
         event = new Event(posterUrl, eventName, location, startDate, endDate, capacity, geolocation, null, null);

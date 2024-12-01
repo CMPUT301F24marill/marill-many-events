@@ -57,12 +57,14 @@ public class FirebaseUsers {
      * @param email             The email of the user.
      * @param phone             The phone number of the user.
      * @param profilePictureUri The URI of the new profile picture.
+     * @param Admin              The admin status of the user.
      */
-    public void updateUser(String name, String email,String phone, Uri profilePictureUri) {
+    public void updateUser(String name, String email,String phone, Uri profilePictureUri, boolean Admin) {
         Map<String, Object> userUpdates = new HashMap<>();
         userUpdates.put("name", name);
         userUpdates.put("email", email);
         userUpdates.put("phone", phone);
+        userUpdates.put("admin", Admin);
 
         firestore.collection("users").document(deviceId)
                 .update(userUpdates)

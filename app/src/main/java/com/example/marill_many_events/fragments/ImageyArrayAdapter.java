@@ -1,13 +1,9 @@
 package com.example.marill_many_events.fragments;
 
-import static androidx.test.InstrumentationRegistry.getContext;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,49 +14,42 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
-//EventyArrayAdapter contains Events in list and retrieves a events information for the view
-public class EventyArrayAdapter extends RecyclerView.Adapter<EventyArrayAdapter.EventViewHolder> {
-    private List<Event> eventList;
+//ImageyArrayAdapter contains images in list and retrieves a images information for the view
+public class ImageyArrayAdapter extends RecyclerView.Adapter<ImageyArrayAdapter.ImageViewHolder> {
+    private List<String> imageList;
     private OnItemClickListener listener; // Listener for item clicks
     private FloatingActionButton leaveButton;
-    private boolean set_Garbage;
 
-    public static class EventViewHolder extends RecyclerView.ViewHolder {
+    public static class ImageViewHolder extends RecyclerView.ViewHolder {
         public ImageView poster;
-        public TextView eventName;
 
-        public EventViewHolder(View itemView) {
+        public ImageViewHolder(View itemView) {
             super(itemView);
-            poster = itemView.findViewById(R.id.event_poster);
-            eventName = itemView.findViewById(R.id.event_name);
+            poster = itemView.findViewById(R.id.image);
         }
     }
 
-    public EventyArrayAdapter(List<Event> eventItemList, OnItemClickListener listener, boolean set_Garbage_value) {
-        this.eventList = eventItemList;
+    public ImageyArrayAdapter(List<String> imageItemList, OnItemClickListener listener) {
+        this.imageList = imageItemList;
         this.listener = listener;
-
-        set_Garbage = set_Garbage_value;
     }
 
     @Override
-    public EventViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ImageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.event_list, parent, false);
-        return new EventViewHolder(itemView);
+                .inflate(R.layout.image_list, parent, false);
+        return new ImageViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(EventViewHolder holder, int position) {
-        Event currentItem = eventList.get(position);
-        String imageURL = currentItem.getImageURL();
+    public void onBindViewHolder(ImageViewHolder holder, int position) {
+        String currentItem = imageList.get(position);
         leaveButton = holder.itemView.findViewById(R.id.leave);
 
         // Load the image into the ImageView using Glide
         Glide.with(holder.itemView.getContext())  // 'getContext()' is used to specify the context
-                .load(imageURL)       // URL of the image
+                .load(currentItem)       // URL of the image
                 .into(holder.poster);  // The ImageView to load the image into
-        holder.eventName.setText(currentItem.getName());
 
         // Set click listener on the CardView
         holder.itemView.setOnClickListener(v -> {
@@ -76,21 +65,17 @@ public class EventyArrayAdapter extends RecyclerView.Adapter<EventyArrayAdapter.
             }
 
         });
-
-        if(set_Garbage){
-            leaveButton.setImageResource(R.id.delete);
-        }
     }
 
     // Define an interface for item click listener
     public interface OnItemClickListener {
-        void onItemClick(Event event);  // Pass a single Event object on click
-        void onDeleteClick(Event event);
+        void onItemClick(String event);  // Pass a single Event object on click
+        void onDeleteClick(String event);
     }
 
     @Override
     public int getItemCount() {
-        return eventList.size();
+        return imageList.size();
     }
 
     public void hideLeaveButton(){

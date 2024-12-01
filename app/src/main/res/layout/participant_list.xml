@@ -9,7 +9,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
         android:layout_width="419dp"
-        android:layout_height="132dp"
+        android:layout_height="64dp"
         android:layout_margin="0dp"
         android:padding="0dp"
         app:cardCornerRadius="16dp"
@@ -27,51 +27,54 @@
 
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/leave"
+                android:id="@+id/cancel_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|end"
                 android:backgroundTint="@color/delete_red"
                 android:contentDescription="fab_content_desc"
-                app:borderWidth="0dp"
                 app:fabSize="mini"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/leave"
                 app:tint="@color/white" />
 
 
-
-            <ImageView
-                android:id="@+id/event_poster"
-                android:layout_width="223dp"
-                android:layout_height="124dp"
-                android:scaleType="centerCrop"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/walterdog" />
-
             <TextView
-                android:id="@+id/event_name"
+                android:id="@+id/participant_name"
                 style="@style/TextAppearance.MaterialComponents.Headline3"
-                android:layout_width="298dp"
-                android:layout_height="55dp"
-                android:layout_marginStart="60dp"
-                android:text="@string/Event_Name"
-                android:textAlignment="textEnd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Participant Name"
+                android:textAlignment="textStart"
                 android:textColor="@color/light_blue"
-                android:textSize="34sp"
+                android:textSize="24sp"
                 android:textStyle="normal|bold|italic"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/status"
+                style="@style/TextAppearance.MaterialComponents.Headline3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Status"
+                android:textAlignment="textStart"
+                android:textColor="@color/light_blue"
+                android:textSize="18sp"
+                android:textStyle="normal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/cancel_button"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/WhiteBar"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="-14dp"
+                android:layout_height="64dp"
+                android:layout_marginStart="-16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

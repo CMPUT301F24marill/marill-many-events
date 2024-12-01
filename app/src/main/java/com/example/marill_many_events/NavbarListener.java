@@ -17,4 +17,20 @@ public interface NavbarListener {
      * Called when the menu option is selected in the navigation bar.
      */
     void onMenuSelected();
+    /**
+     * Called when the facilities option is selected in the navigation bar FOR ADMINS.
+     */
+    void onFacilitiesSelected();
+    /**
+     * Called when the images option is selected in the navigation bar FOR ADMINS.
+     */// Method to handle profile selection
+    void onImagesSelected();
+    /**
+     * Called when the events option is selected in the navigation bar FOR ADMINS.
+     */// Method to handle profile selection
+    void onEventsSelected();
+    /**
+     * Called when the profiles option is selected in the navigation bar FOR ADMINS.
+     */
+    void onProfilesSelected();
 }

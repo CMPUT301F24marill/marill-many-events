@@ -24,4 +24,26 @@
     <string name="waitlist_confirmation">You are now waitlisted in this event!</string>
     <string name="registration_confirmation">You are now registered in this event!</string>
     <string name="Return">Return</string>
+    <string name="lbl_participants">Participants</string>
+    <string name="lbl_view_participants">View Participants</string>
+
+    <string name="lbl_create_facility_top_label">Create Your Facility Profile</string>
+    <string name="lbl_edit_facility_top_label">Edit Your Facility Profile</string>
+    <string name="lbl_enter_facility_name">Enter Facility Name</string>
+    <string name="lbl_enter_facility_location">Enter Facility Location</string>
+    <string name="lbl_create_facility">Create Facility</string>
+    <string name="lbl_delete_facility">Delete Facility</string>
+    <string name="lbl_all_images">All Images</string>
+    <string name="lbl_images">Images</string>
+    <string name="lbl_avatars">Avatars</string>
+    <string name="lbl_posters">Posters</string>
+    <string name="lbl_all_facilities">All Facilities</string>
+    <string name="lbl_Facilities">Facilities</string>
+    <string name="lbl_all_Profiles">All Profiles</string>
+    <string name="lbl_Profiles">Profiles</string>
+    <string name="lbl_Profile">Profile</string>
+    <string name="lbl_all_Events">All Events</string>
+    <string name="lbl_Events">Events</string>
+    <string name="lbl_Home">Home</string>
+    <string name="lbl_Facility">Facility</string>
 </resources>

@@ -51,7 +51,6 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
 
     ScanOptions options = new ScanOptions();
 
-
     private FirebaseEvents firebaseEvents;
     private FirebaseFirestore firestore;
     private String deviceId;
@@ -67,7 +66,6 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
     public EventFragment() {
         // Required empty public constructor
     }
-
 
     final ActivityResultLauncher<ScanOptions> qrCodeLauncher = registerForActivityResult(
             new ScanContract(),
@@ -123,7 +121,6 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
 
         FloatingActionButton scanButton = view.findViewById(R.id.scan);
 
-
         scanButton.setOnClickListener(v -> {
             // Launch the QR scanner using the ActivityResultLauncher
             Intent intent = new Intent(getActivity(), com.journeyapps.barcodescanner.CaptureActivity.class);
@@ -138,7 +135,7 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
         eventItemList = new ArrayList<Event>();
 
         // Initialize the adapter and set it to RecyclerView
-        eventAdapter = new EventyArrayAdapter(eventItemList, this);
+        eventAdapter = new EventyArrayAdapter(eventItemList, this, true);
         waitlistList.setAdapter(eventAdapter);
 
         eventViewModel.getUserEvents();

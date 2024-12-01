@@ -6,17 +6,22 @@ import java.util.List;
 public class Facility{
     private List<Event> Events;
 
-    String Name;
+    String facilityName;
     String Location;
 
-    public Facility(String name, String location){
+    // No-argument constructor (needed by Firestore)
+    public Facility() {
+        // Firebase needs a no-argument constructor
+    }
+
+    public Facility(String facilityName, String location){
         this.Events = new ArrayList<>();
-        this.Name = name;
+        this.facilityName = facilityName;
         this.Location = location;
     }
 
     public String getLocation() {
-        return this.Location;
+        return Location;
     }
 
     public void setLocation(String location) {
@@ -31,6 +36,6 @@ public class Facility{
         this.Events.clear();
     }
 
-    public String getName(){ return this.Name; }
+    public String getFacilityName(){ return facilityName; }
     
 }

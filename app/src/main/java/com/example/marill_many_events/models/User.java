@@ -16,6 +16,7 @@ public class User {
     private ArrayList<String> events;
     private ArrayList<DocumentReference> waitList;
     private boolean isOrganizer;
+    public boolean admin;
 
     /**
      * Default constructor for User.
@@ -30,7 +31,9 @@ public class User {
         this.email = email;
         this.phone = phone;
         this.profilePictureUrl = profilePictureUrl;
+        this.events = events;
         this.waitList = waitList;
+        this.admin = false;
     }
 
     /**
@@ -49,6 +52,24 @@ public class User {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Retrieves whether user is an admin.
+     *
+     * @return The admin status of the user.
+     */
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    /**
+     * Sets the admin status of the user.
+     *
+     * @param admin The admin status of the user.
+     */
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
     }
 
     /**

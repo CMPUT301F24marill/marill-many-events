@@ -1,8 +1,12 @@
 package com.example.marill_many_events.fragments;
 
+import static android.content.ContentValues.TAG;
+
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +46,9 @@ public class EventDetailsFragment extends Fragment {
     private Button createButton, deleteButton;
     private Event event;
     private User user;
+    private Button drawEntrantsButton;
+    private Button viewParticipantsButton;
+    private String eventDocumentId;
 
     public EventDetailsFragment() {
         // Required empty public constructor
@@ -62,6 +69,8 @@ public class EventDetailsFragment extends Fragment {
         QRview = view.findViewById(R.id.QRcode);
         posterView = view.findViewById(R.id.poster);
         user = eventViewModel.getCurrentUser();
+        drawEntrantsButton = view.findViewById(R.id.draw_entrants_button);
+        viewParticipantsButton = view.findViewById(R.id.view_participants_button);
 
 
         createButton = view.findViewById(R.id.create);
@@ -92,6 +101,42 @@ public class EventDetailsFragment extends Fragment {
 
 
 
+
+        // Set up the OnClickListener for the drawEntrantsButton
+        drawEntrantsButton.setOnClickListener(v -> {
+            if (eventDocumentId != null) {
+                // Create a new instance of EntrantsDrawFragment, passing the eventDocumentId
+                EntrantsDrawFragment entrantsDrawFragment = EntrantsDrawFragment.newInstance(eventDocumentId);
+
+                // Replace the current fragment with EntrantsDrawFragment
+                FragmentManager fragmentManager = getParentFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, entrantsDrawFragment)
+                        .addToBackStack(null)
+                        .commit();
+            } else {
+                Log.e(TAG, "Event Document ID is null");
+                // Show an error message to the user if needed
+            }
+        });
+
+        // Set up the OnClickListener for the viewParticipantsButton
+        viewParticipantsButton.setOnClickListener(v -> {
+            if (eventDocumentId != null) {
+                // Create a new instance of ViewParticipantsFragment, passing the eventDocumentId
+                ViewParticipantsFragment viewParticipantsFragment = ViewParticipantsFragment.newInstance(eventDocumentId);
+
+                // Replace the current fragment with ViewParticipantsFragment
+                FragmentManager fragmentManager = getParentFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, viewParticipantsFragment)
+                        .addToBackStack(null)
+                        .commit();
+            } else {
+                Log.e(TAG, "Event Document ID is null");
+                // Show an error message to the user if needed
+            }
+        });
 
         return view;
     }
