@@ -11,6 +11,7 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -45,11 +46,10 @@ public class ImagesAdminFragment extends Fragment implements ImageyArrayAdapter.
 
     private FirebaseEvents firebaseEvents;
     private FirebaseStorage firestore;
-    private StorageReference storageReference;
+    private StorageReference folder;
     private Identity identity;
     StorageReference user;
     StorageReference user_posters;
-    //private onLeaveListener listener;
 
     /**
      * Default constructor for EventFragment.
@@ -75,20 +75,16 @@ public class ImagesAdminFragment extends Fragment implements ImageyArrayAdapter.
     public void onResume() {
         super.onResume();
         getImages();
-        Log.d("FragmentLifecycle", "Fragment is now visible.");
+        Log.d("FragmentLifecycle", "Fragment ImagesAdminFragment is now visible.");
 
-        //addToItemList( new Event("https://firebasestorage.googleapis.com/v0/b/marill-many-events.appspot.com/o/event_posters%2Feventposters%2Fimage_1730935799965_05ae8f93-85df-4308-aa48-cdd23874342a.jpg.jpg?alt=media&token=81e266fb-bc73-4489-9f10-8f893e3260ae"
-        //        , "Event1", null, null, null, 1, false, null));
-        //addToItemList( new Event("https://firebasestorage.googleapis.com/v0/b/marill-many-events.appspot.com/o/event_posters%2Feventposters%2Fimage_1730935799965_05ae8f93-85df-4308-aa48-cdd23874342a.jpg.jpg?alt=media&token=81e266fb-bc73-4489-9f10-8f893e3260ae"
-        //       , "Event9001", null, null, null, 1, false, null));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {// Inflate the layout for this fragment
 
         firestore = identity.getStorage();
-        user = firestore.getReference().child("profile_pictures");
-        user_posters = firestore.getReference().child("event_posters");
+        user = firestore.getReference().child("/profile_pictures");
+        user_posters = firestore.getReference().child("/event_posters/eventposters");
 
         View view = inflater.inflate(R.layout.fragment_imageslist, container, false);
 
@@ -102,17 +98,27 @@ public class ImagesAdminFragment extends Fragment implements ImageyArrayAdapter.
             }
         });
 
-
-        // Initialize RecyclerView and CardAdapter
+        // Initialize RecyclerView and CardAdapter for avatars
         avatarlist = view.findViewById(R.id.avatar_list);
         avatarlist.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false));
 
-        // Initialize the data list
+        // Initialize the data list for avatars
         avatarItemList = new ArrayList<String>();
 
-        // Initialize the adapter and set it to RecyclerView
+        // Initialize the adapter and set it to RecyclerView for avatars
         avatarAdapter = new ImageyArrayAdapter(avatarItemList, this);
         avatarlist.setAdapter(avatarAdapter);
+
+        // Initialize RecyclerView and CardAdapter for posters
+        posterlist = view.findViewById(R.id.posters_list);
+        posterlist.setLayoutManager(new GridLayoutManager(getContext(), 2));
+
+        // Initialize the data list for posters
+        posterItemList = new ArrayList<String>();
+
+        // Initialize the adapter and set it to RecyclerView for posters
+        posterAdapter = new ImageyArrayAdapter(posterItemList, this);
+        posterlist.setAdapter(posterAdapter);
 
         return view;
     }
@@ -136,10 +142,42 @@ public class ImagesAdminFragment extends Fragment implements ImageyArrayAdapter.
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Log.d("ImageURL", "Fail to get image url");
+                            Log.d("ImageURL", "Fail to get avatar image url");
                         }
                     });
                 }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e("ImageURL", "Fail to list avatar files: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+
+        user_posters.listAll().addOnSuccessListener(new OnSuccessListener<ListResult>(){
+            @Override
+            public void onSuccess(ListResult listResult) {
+                for (StorageReference item: listResult.getItems()){
+                    item.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            String url = uri.toString();
+                            addToPosterItemList(url);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d("ImageURL", "Fail to get poster image url");
+                        }
+                    });
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e("ImageURL", "Fail to list poster files: " + e.getMessage());
+                e.printStackTrace();
             }
         });
     }
@@ -180,8 +218,51 @@ public class ImagesAdminFragment extends Fragment implements ImageyArrayAdapter.
     public void onItemClick(String url) {
     }
 
+    /**
+     * Delete a file from Firebase Storage by url
+     * @param url: url of image
+     */
     @Override
-    public void onDeleteClick(String event) {
+    public void onDeleteClick(String url) {
 
+        String fullPath = getPathfromURL(url);
+        if(fullPath == null){
+            return;
+        }
+
+        folder = firestore.getReference().child(fullPath);
+
+        Log.d("S", "goal: "+fullPath);
+
+        folder.delete()
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firebase", "Photo deleted successfully");
+
+                    //remove from local list
+                    avatarItemList.remove(url);
+                    posterItemList.remove(url);
+                    posterAdapter.notifyDataSetChanged();
+                    avatarAdapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Failed to delete photo: " + e.getMessage());
+                });
+    }
+
+    /**
+     * get a file path from url
+     * @param url: url of image
+     * @return string path to file, null if url doesn't match base
+     */
+    private String getPathfromURL(String url){
+        String urlBase = "https://firebasestorage.googleapis.com/v0/b/marill-many-events.appspot.com/o";
+        if(url.startsWith(urlBase)) {
+            String path = url.substring(urlBase.length());
+            return path.substring(0, path.indexOf("?")).replace("%2F", "/");
+        }
+        else {
+            Log.d("URL path", "URL does not start with URL base");
+            return null;
+        }
     }
 }
