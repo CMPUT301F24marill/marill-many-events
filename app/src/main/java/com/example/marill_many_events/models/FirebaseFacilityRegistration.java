@@ -33,7 +33,7 @@ public class FirebaseFacilityRegistration {
 
     public void updateFacility(String name, String location) {
         Map<String, Object> userUpdates = new HashMap<>();
-        userUpdates.put("name", name);
+        userUpdates.put("facilityName", name);
         userUpdates.put("location", location);
 
         firestore.collection("facilities").document(facilityId)
