@@ -2,6 +2,7 @@ package com.example.marill_many_events.fragments;
 
 import static androidx.test.InstrumentationRegistry.getContext;
 
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,7 +79,7 @@ public class EventyArrayAdapter extends RecyclerView.Adapter<EventyArrayAdapter.
         });
 
         if(set_Garbage){
-            leaveButton.setImageResource(R.id.delete);
+            leaveButton.setImageResource(R.drawable.delete);
         }
     }
 

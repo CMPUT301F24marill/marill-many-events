@@ -20,6 +20,7 @@ public class Event{
     String QRcode;
     Date startDate;
     Date drawDate;
+    String id;
 
     Integer capacity;
     boolean checkGeo;
@@ -95,6 +96,24 @@ public class Event{
      */
     public void setImageURL(String url){
         this.ImageURL = url;
+    }
+
+    /**
+     * set id
+     *
+     * @param id for event
+     */
+    public void setID(String id){
+        this.id = id;
+    }
+
+    /**
+     * get id
+     *
+     * @return String id for event
+     */
+    public String getID(){
+        return this.id;
     }
 
     // Getter and setter methods for event properties
