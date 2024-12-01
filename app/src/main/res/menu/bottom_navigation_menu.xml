@@ -2,13 +2,13 @@
     <item
         android:id="@+id/nav_home"
         android:icon="@drawable/home"
-        android:title="Home" />
+        android:title="@string/lbl_Events" />
     <item
         android:id="@+id/nav_menu"
         android:icon="@drawable/menu"
-        android:title="Menu" />
+        android:title="@string/lbl_Facility" />
     <item
         android:id="@+id/nav_profile"
         android:icon="@drawable/default_profile"
-        android:title="Profile" />
+        android:title="@string/lbl_Profile" />
 </menu>

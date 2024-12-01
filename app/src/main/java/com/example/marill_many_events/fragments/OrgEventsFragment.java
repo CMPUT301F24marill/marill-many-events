@@ -115,7 +115,7 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
         eventItemList = new ArrayList<Event>();
 
         // Initialize the adapter and set it to RecyclerView
-        eventAdapter = new EventyArrayAdapter(eventItemList, this);
+        eventAdapter = new EventyArrayAdapter(eventItemList, this, false);
         waitlistList.setAdapter(eventAdapter);
         //eventAdapter.hideLeaveButton();
 
@@ -217,5 +217,6 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
     public void onDeleteClick(Event event){
 
     }
+
 
 }

@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_facilities"
+        android:icon="@drawable/home"
+        android:title="@string/lbl_Facilities" />
+    <item
+        android:id="@+id/nav_images"
+        android:icon="@drawable/images"
+        android:title="@string/lbl_images" />
+    <item
+        android:id="@+id/nav_events"
+        android:icon="@drawable/menu"
+        android:title="@string/lbl_Events" />
+    <item
+        android:id="@+id/nav_profiles"
+        android:icon="@drawable/default_profile"
+        android:title="@string/lbl_Profiles"/>
+</menu>
