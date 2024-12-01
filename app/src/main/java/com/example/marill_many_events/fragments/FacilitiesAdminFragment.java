@@ -260,14 +260,14 @@ public class FacilitiesAdminFragment extends Fragment implements EventyArrayAdap
     public void onDeleteClick(Event event){
             // Register the current deviceID (user) to the given event by writing to the user and event a reference to each other
             WriteBatch batch = firestore.batch();
-            DocumentReference eventUsers = firestore.collection("events").document(event.getQRcode());
+            DocumentReference eventUsers = firestore.collection("events").document(event.getFirebaseID());
 
             batch.update(user, "waitList", FieldValue.arrayRemove(eventUsers));
             batch.update(eventUsers, "waitList", FieldValue.arrayRemove(user));
 
             batch.commit()
                     .addOnSuccessListener(aVoid -> {
-                        firestore.collection("events").document(event.getQRcode()).get()
+                        firestore.collection("events").document(event.getFirebaseID()).get()
                                 .addOnSuccessListener(documentSnapshot -> {
                                     if (documentSnapshot.exists()) {
                                         Event newEvent = documentSnapshot.toObject(Event.class);

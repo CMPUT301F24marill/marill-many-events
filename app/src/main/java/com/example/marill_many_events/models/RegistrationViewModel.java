@@ -59,7 +59,7 @@ public class RegistrationViewModel extends ViewModel implements UserCallback {
     }
 
     public void updateUser(String name, String email, String phone, Uri profilePictureUri) {
-        firebaseUsers.updateUser(name, email, phone, profilePictureUri);
+        firebaseUsers.updateUser(name, email, phone, profilePictureUri, false);
     }
 
     public LiveData<Boolean> isRegistrationComplete() {
