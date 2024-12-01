@@ -93,6 +93,10 @@ public class EventDetailsFragment extends Fragment {
                 datePickerEnd.setText(formatter.format(event.getDrawDate()));
                 capacityField.setText(String.valueOf(event.getCapacity()));
 
+                setNoEdit(nameField);
+                setNoEdit(locationField);
+                setNoEdit(capacityField);
+
                 if (event.getFirebaseID() != null) {
                     QRview.setVisibility(View.VISIBLE);
                     QRview.setImageBitmap(generateQRcode.generateQR(event.getFirebaseID()));
@@ -169,7 +173,12 @@ public class EventDetailsFragment extends Fragment {
         });
     }
 
-
+    public void setNoEdit(TextView textView){
+        textView.setFocusable(false);
+        textView.setCursorVisible(false);
+        textView.setKeyListener(null);
+        textView.setTextIsSelectable(true);
+    }
 
     public void setUI() {
         if(user != null){
