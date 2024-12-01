@@ -162,6 +162,11 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
         profilePicture = view.findViewById(R.id.profile_picture);
         gearButton = view.findViewById(R.id.admin_gear);
 
+        gearButton.setEnabled(false);
+        gearButton.setClickable(false);
+        gearButton.setFocusable(false);
+        gearButton.setAlpha((float) 0.0);
+
         firebaseUserRegistration.loadUserDetails(); // Try getting an existing user
 
         profilePicture.setOnClickListener(v -> photoPicker.showPhotoOptions(profilePictureUrl));
@@ -296,10 +301,11 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
             editTextMobile.setText(user.getPhone());
             buttonRegister.setText("Save");
 
-            if(user.isAdmin() != true){
-                gearButton.setClickable(false);
-                gearButton.setFocusable(false);
-                gearButton.setAlpha((float) 0.0);
+            if(user.isAdmin() == true){
+                gearButton.setEnabled(true);
+                gearButton.setClickable(true);
+                gearButton.setFocusable(true);
+                gearButton.setAlpha((float) 1.0);
             }
 
             name = user.getName();

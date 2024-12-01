@@ -12,6 +12,8 @@ public class User {
     public String[] events;
     public boolean admin;
 
+    public String id;
+
     /**
      * Default constructor for User.
      */
@@ -118,5 +120,13 @@ public class User {
      */
     public void setProfilePictureUrl(String profilePictureUrl) {
         this.profilePictureUrl = profilePictureUrl;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

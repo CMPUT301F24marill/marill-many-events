@@ -46,4 +46,5 @@
     <string name="lbl_Events">Events</string>
     <string name="lbl_Home">Home</string>
     <string name="lbl_Facility">Facility</string>
+    <string name="lbl_delete_yourself">You cannot delete yourself.</string>
 </resources>

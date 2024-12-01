@@ -192,7 +192,6 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
         Log.d("S", "event id: "+event.getID());
         eventDoc.delete()
                 .addOnSuccessListener(aVoid -> {
-                    Log.d("Firebase", "attempting Event delete");
                     //remove from local list
                     removeItemfromList(event);
                     Log.d("Firebase", "Event deleted successfully");
