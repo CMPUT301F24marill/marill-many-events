@@ -96,6 +96,8 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
         firestore = identity.getFirestore();
         events = firestore.collection("events");
         facility = firestore.collection("facilities");
+
+
         //firebaseFacilityRegistration.getFacility(deviceId);
 
         View view = inflater.inflate(R.layout.fragment_eventlist, container, false);
@@ -125,44 +127,61 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
     }
 
 
-    public void getFacilityEvents(){
-        facility.document(deviceId)
+    public void getUserEvents() {
+        eventItemList.clear();
+
+        // Fetch the facility document using the deviceId
+        firestore.collection("facilities")
+                .document(deviceId) // Use the deviceId to get the specific facility document
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         DocumentSnapshot facilityDoc = task.getResult();
                         if (facilityDoc.exists()) {
                             // Extract event IDs from the 'events' field
-                            facilityEvents = (List<String>) facilityDoc.get("events");
+                            List<String> eventIds = (List<String>) facilityDoc.get("events");
+
+                            if (eventIds != null) {
+                                // Loop through the event IDs and fetch the corresponding events from the "events" collection
+                                for (String eventId : eventIds) {
+                                    fetchEventDetails(eventId);
+                                }
+                            } else {
+                                Toast.makeText(getContext(), "No events found in the facility", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(getContext(), "Facility document not found", Toast.LENGTH_SHORT).show();
                         }
+                    } else {
+                        Toast.makeText(getContext(), "Error retrieving facility", Toast.LENGTH_SHORT).show();
                     }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Error getting facility", Toast.LENGTH_SHORT).show();
                 });
     }
 
-    public void getUserEvents() {
-        eventItemList.clear();
-        getFacilityEvents();
-        if (facilityEvents != null) {
-            for (String eventID : facilityEvents) {
-
-                events.document(eventID).get()
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                // Retrieve the array of DocumentReferences
-                                DocumentSnapshot document = task.getResult();
-                                addToItemList(document.toObject(Event.class));
-
-                            } else {
-                                // Document doesn't exist
-                                Toast.makeText(getContext(), "Document not found", Toast.LENGTH_SHORT).show();
+    public void fetchEventDetails(String eventId) {
+        // Fetch the event document from the "events" collection using the eventId
+        events.document(eventId).get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot eventDoc = task.getResult();
+                        if (eventDoc.exists()) {
+                            Event event = eventDoc.toObject(Event.class);
+                            if (event != null) {
+                                addToItemList(event);
                             }
-                        })
-                        .addOnFailureListener(e -> {
-                            // Handle error in retrieving the document
-                            Toast.makeText(getContext(), "Error getting document", Toast.LENGTH_SHORT).show();
-                        });
-            }
-        }
+                        } else {
+                            Log.d("Event Fetch", "Event not found: " + eventId);
+                        }
+                    } else {
+                        Log.d("Event Fetch", "Error fetching event: " + eventId);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.d("Event Fetch", "Error getting event document: " + e.getMessage());
+                });
     }
 
     public void addToItemList(Event event){
