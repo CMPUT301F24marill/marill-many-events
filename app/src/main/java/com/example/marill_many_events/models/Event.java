@@ -1,25 +1,19 @@
 package com.example.marill_many_events.models;
 
-import android.os.Parcelable;
-
-import com.example.marill_many_events.models.User;
-
-import java.io.Serializable;
-import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 public class Event{
-    //private String eventDocumentId;
     EntrantList entrants;
     String Name;
     String Location;
     String ImageURL;
-    String QRcode;
+    String FirebaseID;
     Date startDate;
     Date drawDate;
+    String facilityID;
 
     Integer capacity;
     boolean checkGeo;
@@ -28,17 +22,18 @@ public class Event{
         // This constructor is needed by Firebase or Gson
     }
 
-    public Event(String imageURL, String name, String location, Date startDate, Date drawDate, Integer capacity, @Nullable boolean checkGeo, String QRcode){
-        this.entrants = new EntrantList();
-        this.ImageURL = imageURL;
-        this.QRcode = QRcode;
-        this.capacity = capacity;
+    public Event(String imageURL, String name, String location, Date startDate, Date drawDate, @Nullable Integer capacity, boolean checkGeo, String FirebaseID, String facilityID){
+
         this.Name = name;
+        this.ImageURL = imageURL;
         this.Location = location;
         this.startDate = startDate;
         this.drawDate = drawDate;
+        this.FirebaseID = FirebaseID;
+        this.capacity = capacity;
+        this.entrants = new EntrantList();
         this.checkGeo = checkGeo;
-        //this. eventDocumentId = eventDocumentId; //, String eventDocumentId
+        this.facilityID = facilityID;
     }
 
 
@@ -187,19 +182,20 @@ public class Event{
         this.checkGeo = checkGeo;
     }
 
-    public String getQRcode() {
-        return QRcode;
+    public String getFirebaseID() {
+        return this.FirebaseID;
     }
 
-    public void setQRcode(String QRcode) {
-        this.QRcode = QRcode;
+    public void setFirebaseID(String FirebaseID) {
+        this.FirebaseID = FirebaseID;
     }
-//
-//    public void setEventDocumentId(String eventDocumentId) {
-//        this.eventDocumentId = eventDocumentId;
-//    }
-//
-//    public String getEventDocumentId() {
-//        return eventDocumentId;
-//    }
+
+    public String getFacilityID() {
+        return facilityID;
+    }
+
+    public void setFacilityID(String facilityID) {
+        this.facilityID = facilityID;
+    }
+
 }

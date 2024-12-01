@@ -1,11 +1,17 @@
 package com.example.marill_many_events.activities;
 
 import android.os.Bundle;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
+import com.example.marill_many_events.UserCallback;
 import com.example.marill_many_events.fragments.RegistrationFragment;
+import com.example.marill_many_events.models.FirebaseUsers;
+import com.example.marill_many_events.models.User;
+import com.google.firebase.Firebase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -23,7 +29,8 @@ public class RegistrationActivity extends AppCompatActivity implements Identity 
     private FirebaseFirestore firestore; // Firestore instance
     private String deviceId; // Store deviceId here
     private FirebaseStorage firebaseStorage; // Firebase Storage for images
-
+    private FirebaseUsers firebaseUsers;
+    User user;
 
     /**
      * Called when the app is starting. This method sets up the layout and
@@ -42,6 +49,7 @@ public class RegistrationActivity extends AppCompatActivity implements Identity 
         firestore = FirebaseFirestore.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
 
+        //firebaseUsers = new FirebaseUsers(firestore, firebaseStorage, deviceId, this);
 
 
 
@@ -76,4 +84,5 @@ public class RegistrationActivity extends AppCompatActivity implements Identity 
     public FirebaseFirestore getFirestore(){
         return firestore;
     }
+
 }

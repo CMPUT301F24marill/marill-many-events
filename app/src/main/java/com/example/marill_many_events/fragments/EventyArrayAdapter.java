@@ -78,7 +78,7 @@ public class EventyArrayAdapter extends RecyclerView.Adapter<EventyArrayAdapter.
         });
 
         if(set_Garbage){
-            leaveButton.setImageResource(R.id.delete);
+            leaveButton.setImageResource(R.drawable.delete);
         }
     }
 

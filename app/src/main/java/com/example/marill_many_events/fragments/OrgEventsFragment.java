@@ -37,7 +37,7 @@ import java.util.List;
 /**
  * Displays all events as a list, events can either be user's waitlist or organizer's created events
  */
-public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener {
+public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener, FacilityCallback {
 
 
     private Event currentEvent;
@@ -51,13 +51,14 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
     ScanOptions options = new ScanOptions();
 
 
-    private FirebaseEvents firebaseEvents;
     private FirebaseFirestore firestore;
     private String deviceId;
+
     private StorageReference storageReference;
     private Identity identity;
     CollectionReference events;
-    Facility facility;
+    CollectionReference facility;
+    private List<String> facilityEvents;
 
 
     public OrgEventsFragment() {
@@ -94,6 +95,9 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
         deviceId = identity.getdeviceID();
         firestore = identity.getFirestore();
         events = firestore.collection("events");
+        facility = firestore.collection("facilities");
+
+
         //firebaseFacilityRegistration.getFacility(deviceId);
 
         View view = inflater.inflate(R.layout.fragment_eventlist, container, false);
@@ -121,6 +125,7 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
 
         return view;
     }
+
 
     public void getUserEvents() {
         eventItemList.clear();
@@ -182,6 +187,8 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
     public void addToItemList(Event event){
         if (!eventItemList.contains(event)) {
             eventItemList.add(event);
+            Log.d("FragmentLifecycle", event.getFirebaseID());
+
         }
         eventAdapter.notifyDataSetChanged();
     }
@@ -215,8 +222,40 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
     }
 
     public void onDeleteClick(Event event){
+        if(event != null) {
+            firestore.collection("events") // "events" is the name of your collection
+                    .document(event.getFirebaseID())
+                    .delete()
+                    .addOnSuccessListener(documentReference -> {
+                        removeItemfromList(event);
+                        Log.d("Firestore", "Event deleted");
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.w("Firestore", "Error adding event", e);
+                    });
+        }
+    }
 
+    public void removeItemfromList(Event event){
+        if (eventItemList.contains(event)) {
+            eventItemList.remove(event);
+        }
+        eventAdapter.notifyDataSetChanged();
     }
 
 
+    @Override
+    public void onFacilityLoaded(Facility facility) {
+    }
+
+
+    @Override
+    public void onFacilityRegistered() {
+
+    }
+
+    @Override
+    public void onFacilityUpdated() {
+
+    }
 }
