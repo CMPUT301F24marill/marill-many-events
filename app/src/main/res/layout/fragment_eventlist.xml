@@ -41,6 +41,4 @@
         android:contentDescription="fab_content_desc"
         app:srcCompat="@drawable/qradd"/>
 
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

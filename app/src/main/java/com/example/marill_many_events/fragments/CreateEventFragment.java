@@ -97,8 +97,6 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
     private Identity identity;
     private FirebaseEvents firebaseEvents;
 
-    private SwitchCompat geoSwitch;
-    private TextView tvSelectedLocation;
 
     public CreateEventFragment() {
         // Required empty public constructor
@@ -195,7 +193,6 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         });
 
     }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -205,8 +202,6 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
             selectedLocationTextView.setText("Selected Location: " + selectedLatitude + ", " + selectedLongitude);
         }
     }
-
-
 
 
 

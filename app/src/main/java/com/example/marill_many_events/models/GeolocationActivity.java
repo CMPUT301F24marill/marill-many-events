@@ -13,15 +13,9 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.Marker;
-
 public class GeolocationActivity extends AppCompatActivity {
     private MapView mapView;
     private GeoPoint selectedLocation;
-    private double selectedLatitude;
-    private double selectedLongitude;
-    private Button btnSelectLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

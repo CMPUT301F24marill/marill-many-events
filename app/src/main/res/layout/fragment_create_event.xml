@@ -173,17 +173,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/GeoSwitch" />
 
-
         <TextView
             android:id="@+id/tvSelectedLocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="140dp"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="8dp"
             android:text="Selected Location: None"
             android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/GeoSwitch" />
+            app:layout_constraintTop_toBottomOf="@+id/btnSelectGeolocation" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
