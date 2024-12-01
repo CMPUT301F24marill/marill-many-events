@@ -23,11 +23,14 @@ public class Event{
     Integer capacity;
     boolean checkGeo;
 
+    private double latitude;
+    private double longitude;
+
     public Event() {
         // This constructor is needed by Firebase or Gson
     }
 
-    public Event(String imageURL, String name, String location, Date startDate, Date drawDate, Integer capacity, @Nullable boolean checkGeo, String QRcode){
+    public Event(String imageURL, String name, String location, Date startDate, Date drawDate, Integer capacity, @Nullable boolean checkGeo, String QRcode, double latitude, double longitude){
         this.entrants = new EntrantList();
         this.ImageURL = imageURL;
         this.QRcode = QRcode;
@@ -37,6 +40,8 @@ public class Event{
         this.startDate = startDate;
         this.drawDate = drawDate;
         this.checkGeo = checkGeo;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
 
@@ -191,5 +196,39 @@ public class Event{
 
     public void setQRcode(String QRcode) {
         this.QRcode = QRcode;
+    }
+    /**
+     * Gets the latitude of the event.
+     *
+     * @return The latitude as a {@link Double}.
+     */
+    public double getLatitude() {
+        return latitude;
+    }
+
+    /**
+     * Sets the latitude of the event.
+     *
+     * @param latitude The latitude to set.
+     */
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+    /**
+     * Gets the longitude of the event.
+     *
+     * @return The longitude as a {@link Double}.
+     */
+    public double getLongitude() {
+        return longitude;
+    }
+
+    /**
+     * Sets the longitude of the event.
+     *
+     * @param longitude The longitude to set.
+     */
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 }
