@@ -239,14 +239,14 @@ public class EventViewModel extends ViewModel implements EventsCallback {
         batch.update(userReference, "waitList", FieldValue.arrayRemove(eventUsers));
         batch.update(eventUsers, "waitList", FieldValue.arrayRemove(userReference));
 
-        batch.commit()
+        batch.commit() // remove event from user and user from event atomically
                 .addOnSuccessListener(aVoid -> {
-                    firebaseFirestore.collection("events").document(event.getFirebaseID()).get()
+                    firebaseFirestore.collection("events").document(event.getFirebaseID()).get() // get the present event's firebase id from its local copy
                             .addOnSuccessListener(documentSnapshot -> {
                                 if (documentSnapshot.exists()) {
                                     Event newEvent = documentSnapshot.toObject(Event.class);
                                     if (newEvent != null) {
-                                        removeFromEventList(newEvent); // Remove from list
+                                        removeFromEventList(event); // Remove from list
                                     }
                                 }
                             });

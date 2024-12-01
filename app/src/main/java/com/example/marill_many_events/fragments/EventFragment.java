@@ -197,6 +197,7 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
 
 
     public void onDeleteClick(Event event){
+        Log.d("FragmentLifecycle", "Deleting Event.");
         eventViewModel.deleteEvent(event);
     }
 

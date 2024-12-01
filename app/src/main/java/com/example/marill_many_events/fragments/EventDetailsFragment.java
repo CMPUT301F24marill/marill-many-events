@@ -176,7 +176,7 @@ public class EventDetailsFragment extends Fragment {
             ArrayList<DocumentReference> waitList = user.getwaitList();
             if (waitList != null){
                 if (waitList.contains(eventViewModel.getEventDocumentReference())) {
-                    createButton.setText("Leave Event");
+                    eventFound();
                 }
                 else
                     eventNotFound();
@@ -200,7 +200,12 @@ public class EventDetailsFragment extends Fragment {
             });
     }
 
-    public void leaveEvent(){
+
+    private void eventFound(){
+        createButton.setText("Leave Event");
+        createButton.setOnClickListener(v-> {
+            eventViewModel.deleteEvent(event);
+        });
 
     }
 }
