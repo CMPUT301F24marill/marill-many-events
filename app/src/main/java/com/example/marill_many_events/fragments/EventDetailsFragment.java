@@ -4,19 +4,21 @@ import static android.content.ContentValues.TAG;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button; // Import Button
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager; // Import FragmentManager
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
@@ -24,15 +26,27 @@ import com.bumptech.glide.request.transition.Transition;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Event;
+import com.example.marill_many_events.models.EventViewModel;
 import com.example.marill_many_events.models.GenerateQRcode;
+import com.example.marill_many_events.models.User;
+import com.google.firebase.firestore.DocumentReference;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 
+/**
+ * Shows the details of any selected event object, invoked from either user's waitlist or organizers event list
+ */
 public class EventDetailsFragment extends Fragment {
 
-    private TextView NameField, locationField, capacityField, datePickerStart, datePickerEnd;
+    private TextView nameField, locationField ,capacityField, datePickerStart, datePickerEnd;
     private ImageView QRview, posterView;
     private GenerateQRcode generateQRcode;
+    private EventViewModel eventViewModel;
+    private Button createButton, deleteButton;
+    private Event event;
+    private User user;
     private Button drawEntrantsButton;
     private Button viewParticipantsButton;
     private String eventDocumentId;
@@ -41,52 +55,53 @@ public class EventDetailsFragment extends Fragment {
         // Required empty public constructor
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        View view = inflater.inflate(R.layout.fragment_edit_event, container, false);
-        HomePageActivity parentActivity = (HomePageActivity) getActivity();
+        View view = inflater.inflate(R.layout.fragment_create_event, container, false);
+        eventViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
         generateQRcode = new GenerateQRcode();
 
-        NameField = view.findViewById(R.id.NameField);
+        nameField = view.findViewById(R.id.NameField);
         datePickerStart = view.findViewById(R.id.Startdatefield);
         datePickerEnd = view.findViewById(R.id.DrawdateField);
         capacityField = view.findViewById(R.id.Capacityfield);
         locationField = view.findViewById(R.id.LocationField);
         QRview = view.findViewById(R.id.QRcode);
         posterView = view.findViewById(R.id.poster);
+        user = eventViewModel.getCurrentUser();
         drawEntrantsButton = view.findViewById(R.id.draw_entrants_button);
         viewParticipantsButton = view.findViewById(R.id.view_participants_button);
 
-        Event event = parentActivity.getCurrentEvent();
-        // Explicitly set the eventDocumentId to the desired value
-        //eventDocumentId = "ShcEvw5fLTiqrBJedY47";
 
-        if (event != null) {
-            eventDocumentId = event.getQRcode(); // Assign eventDocumentId from QRcode
-        } else {
-            Log.e(TAG, "Event object is null");
-            // Handle the error appropriately
-        }
+        createButton = view.findViewById(R.id.create);
+        deleteButton = view.findViewById(R.id.delete);
+
+
+        setUI(); // Change UI elements based on context
 
         SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
 
-        // Fill in all views as long as a valid event was passed
-        if (event != null) {
-            loadPoster(event.getImageURL());
-            NameField.setText(event.getName());
-            locationField.setText(event.getLocation());
 
-            datePickerStart.setText(formatter.format(event.getStartDate()));
-            datePickerEnd.setText(formatter.format(event.getDrawDate()));
+        eventViewModel.getSelectedEvent().observe(getViewLifecycleOwner(), event -> {
+            this.event = event;
+            if (event != null) {
+                loadPoster(event.getImageURL());
+                nameField.setText(event.getName());
+                locationField.setText(event.getLocation());
+                datePickerStart.setText(formatter.format(event.getStartDate()));
+                datePickerEnd.setText(formatter.format(event.getDrawDate()));
+                capacityField.setText(String.valueOf(event.getCapacity()));
 
-            if (event.getQRcode() != null) { // If a QR code string is available, generate and display it
-                QRview.setVisibility(View.VISIBLE);
-                QRview.setImageBitmap(generateQRcode.generateQR(event.getQRcode()));
+                if (event.getFirebaseID() != null) {
+                    QRview.setVisibility(View.VISIBLE);
+                    QRview.setImageBitmap(generateQRcode.generateQR(event.getFirebaseID()));
+                }
             }
+        });
 
-            capacityField.setText(Integer.toString(event.getCapacity()));
-        }
+
+
 
         // Set up the OnClickListener for the drawEntrantsButton
         drawEntrantsButton.setOnClickListener(v -> {
@@ -128,8 +143,9 @@ public class EventDetailsFragment extends Fragment {
     }
 
     /**
-     * Retrieve poster from Firebase storage and load with aspect ratio in mind
+     * Retrieve poster from firebase storage and load with aspect ratio in mind
      */
+
     public void loadPoster(String url) {
         posterView.post(() -> {
             Glide.with(this).asBitmap().load(url).into(new CustomTarget<Bitmap>() {
@@ -151,5 +167,45 @@ public class EventDetailsFragment extends Fragment {
                 public void onLoadCleared(@Nullable Drawable placeholder) {}
             });
         });
+    }
+
+
+
+    public void setUI() {
+        if(user != null){
+            ArrayList<DocumentReference> waitList = user.getwaitList();
+            if (waitList != null){
+                if (waitList.contains(eventViewModel.getEventDocumentReference())) {
+                    eventFound();
+                }
+                else
+                    eventNotFound();
+            }
+            else
+                eventNotFound();
+        }
+
+
+        if (this.user.isOrganizer()) {
+            deleteButton.setVisibility(View.VISIBLE);
+        }
+
+
+    }
+
+    private void eventNotFound(){
+            createButton.setText("Join Event");
+            createButton.setOnClickListener(v-> {
+                eventViewModel.registerUser();
+            });
+    }
+
+
+    private void eventFound(){
+        createButton.setText("Leave Event");
+        createButton.setOnClickListener(v-> {
+            eventViewModel.deleteEvent(event);
+        });
+
     }
 }

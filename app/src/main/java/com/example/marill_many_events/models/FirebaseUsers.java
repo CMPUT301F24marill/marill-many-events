@@ -5,6 +5,7 @@ import android.net.Uri;
 import com.example.marill_many_events.UserCallback;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
@@ -14,7 +15,7 @@ import java.util.Map;
 /**
  * Handles firebase functions for user class
  */
-public class FirebaseUserRegistration {
+public class FirebaseUsers {
 
     private FirebaseFirestore firestore;
     private StorageReference storageReference;
@@ -23,9 +24,9 @@ public class FirebaseUserRegistration {
     private boolean isEditMode;
     private UserCallback callback;
 
-    public FirebaseUserRegistration(FirebaseFirestore firestore, StorageReference storageReference, String deviceId, UserCallback callback) {
+    public FirebaseUsers(FirebaseFirestore firestore, FirebaseStorage firebaseStorage, String deviceId, UserCallback callback) {
         this.firestore = firestore;
-        this.storageReference = storageReference;
+        this.storageReference = firebaseStorage.getReference();
         this.deviceId = deviceId;
         this.isEditMode = false;
         this.callback = callback;

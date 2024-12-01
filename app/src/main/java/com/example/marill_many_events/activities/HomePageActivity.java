@@ -7,8 +7,10 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.example.marill_many_events.Identity;
+import com.example.marill_many_events.UserCallback;
 import com.example.marill_many_events.fragments.CreateFacilityFragment;
 import com.example.marill_many_events.fragments.EventFragment;
+import com.example.marill_many_events.fragments.CreateEventFragment;
 import com.example.marill_many_events.fragments.NavbarFragment;
 import com.example.marill_many_events.NavbarListener;
 import com.example.marill_many_events.R;
@@ -19,10 +21,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.marill_many_events.models.Event;
+import com.example.marill_many_events.models.EventViewModel;
+import com.example.marill_many_events.models.FirebaseUsers;
+import com.example.marill_many_events.models.User;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -33,11 +40,13 @@ import com.google.firebase.firestore.DocumentSnapshot;
  * display of the navigation bar and handling user profile interactions.
  * It implements the {@link NavbarListener} interface to respond to navigation events.
  */
-public class HomePageActivity extends AppCompatActivity implements NavbarListener, Identity{
+public class HomePageActivity extends AppCompatActivity implements NavbarListener, Identity {
 
+    private FirebaseStorage firebaseStorage; // Firebase Storage for images
     private FirebaseFirestore firestore; // Firestore instance
     private String deviceId; // Store deviceId here
-    private FirebaseStorage firebaseStorage; // Firebase Storage for images
+    private FirebaseUsers firebaseUsers;
+
     private boolean isOrgList;
     private String eventDocumentId;
 
@@ -59,6 +68,10 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
         deviceId = getIntent().getStringExtra("deviceId"); // Retrieve deviceId
         firestore = FirebaseFirestore.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
+        //firebaseUsers= new FirebaseUsers(firestore, firebaseStorage, deviceId, this);
+        //firebaseUsers.loadUserDetails();
+
+
 
         Log.d("HomePageActivity", "Fragment Container Visibility: " + findViewById(R.id.fragment_container).getVisibility());
 
@@ -197,13 +210,36 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
         currentEvent = event;
     }
 
+    public void setOrgList(boolean orgList){
+        isOrgList = orgList;
+    }
+
+    public boolean getOrgList(){
+        return isOrgList;
+    }
+
+//    @Override
+//    public void onUserloaded(User user) {
+//        this.user = user;
+//    }
+//
+//    @Override
+//    public void onUserUpdated() {
+//        firebaseUsers.loadUserDetails();
+//    }
+//
+//    @Override
+//    public void onRegistered() {
+//        firebaseUsers.loadUserDetails();
+//    }
+
     public void setEventDocumentId(String eventDocumentId) {
         this.eventDocumentId = eventDocumentId;
     }
     public String getEventDocumentId() {
         return eventDocumentId;
     }
-  
+
     @Override
     public void onFacilitiesSelected() {}
     @Override
