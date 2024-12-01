@@ -68,7 +68,6 @@ dependencies {
     // Geolocation OSMDroid for Maps
     implementation("org.osmdroid:osmdroid-android:6.1.14")
 
-
     // Material Design Components
     implementation("com.google.android.material:material")
 
