@@ -25,6 +25,7 @@ import com.example.marill_many_events.models.FirebaseFacilityRegistration;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.StorageReference;
@@ -50,13 +51,14 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
     ScanOptions options = new ScanOptions();
 
 
-    private FirebaseEvents firebaseEvents;
     private FirebaseFirestore firestore;
     private String deviceId;
+
     private StorageReference storageReference;
     private Identity identity;
     CollectionReference events;
-    Facility facility;
+    CollectionReference facility;
+    private List<String> facilityEvents;
 
 
     public OrgEventsFragment() {
@@ -93,6 +95,7 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
         deviceId = identity.getdeviceID();
         firestore = identity.getFirestore();
         events = firestore.collection("events");
+        facility = firestore.collection("facilities");
         //firebaseFacilityRegistration.getFacility(deviceId);
 
         View view = inflater.inflate(R.layout.fragment_eventlist, container, false);
@@ -121,25 +124,45 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
         return view;
     }
 
-    public void getUserEvents() {
-        eventItemList.clear();
-        events.get()
+
+    public void getFacilityEvents(){
+        facility.document(deviceId)
+                .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        // Retrieve the array of DocumentReferences
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                                addToItemList(document.toObject(Event.class));
-                            }
-
-                    } else {
-                        // Document doesn't exist
-                        Toast.makeText(getContext(), "Document not found", Toast.LENGTH_SHORT).show();
+                        DocumentSnapshot facilityDoc = task.getResult();
+                        if (facilityDoc.exists()) {
+                            // Extract event IDs from the 'events' field
+                            facilityEvents = (List<String>) facilityDoc.get("events");
+                        }
                     }
-                })
-                .addOnFailureListener(e -> {
-                    // Handle error in retrieving the document
-                    Toast.makeText(getContext(), "Error getting document", Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    public void getUserEvents() {
+        eventItemList.clear();
+        getFacilityEvents();
+        if (facilityEvents != null) {
+            for (String eventID : facilityEvents) {
+
+                events.document(eventID).get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                // Retrieve the array of DocumentReferences
+                                DocumentSnapshot document = task.getResult();
+                                addToItemList(document.toObject(Event.class));
+
+                            } else {
+                                // Document doesn't exist
+                                Toast.makeText(getContext(), "Document not found", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            // Handle error in retrieving the document
+                            Toast.makeText(getContext(), "Error getting document", Toast.LENGTH_SHORT).show();
+                        });
+            }
+        }
     }
 
     public void addToItemList(Event event){
@@ -204,7 +227,6 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
 
     @Override
     public void onFacilityLoaded(Facility facility) {
-        this.facility = facility;
     }
 
 
