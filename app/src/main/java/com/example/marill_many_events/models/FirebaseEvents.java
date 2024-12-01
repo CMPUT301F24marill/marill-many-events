@@ -16,7 +16,9 @@ import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.qrcode.QRCodeWriter;
 
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -155,12 +157,39 @@ public class FirebaseEvents {
 //        //.addOnSuccessListener(aVoid -> Toast.makeText(getActivity(), "Profile picture updated!", Toast.LENGTH_SHORT).show())
 //        //.addOnFailureListener(e -> Toast.makeText(getActivity(), "Failed to update profile picture.", Toast.LENGTH_SHORT).show());
 //    }
+    /**
+     * Updates the geolocation fields for an existing event in Firestore.
+     *
+     * @param eventId   The ID of the event to update.
+     * @param latitude  The latitude of the event location.
+     * @param longitude The longitude of the event location.
+     */
+    public void updateEventGeolocation(String eventId, double latitude, double longitude) {
+        Map<String, Object> geolocationData = new HashMap<>();
+        geolocationData.put("latitude", latitude);
+        geolocationData.put("longitude", longitude);
 
-
-    public void deleteUser(){
-        firestore.collection("users").document(deviceId).delete();
+        firestore.collection("events")
+                .document(eventId)
+                .update(geolocationData)
+                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Geolocation updated successfully"))
+                .addOnFailureListener(e -> Log.e("Firestore", "Error updating geolocation", e));
     }
 
+    /**
+     * Deletes a user document from Firestore.
+     */
+    public void deleteUser(){
+        firestore.collection("users").document(deviceId).delete()
+                .addOnSuccessListener(aVoid -> Log.d("Firestore", "User deleted successfully"))
+                .addOnFailureListener(e -> Log.e("Firestore", "Error deleting user", e));
+    }
+
+    /**
+     * Generates a random filename for uploaded files.
+     *
+     * @return A unique filename.
+     */
     public String generateRandomFilename() {    // https://stackoverflow.com/questions/5126559/android-create-unique-string-for-file-name
         long timestamp = System.currentTimeMillis();
         return "image_" + timestamp + "_" + UUID.randomUUID().toString() + ".jpg"; // Add your desired extension

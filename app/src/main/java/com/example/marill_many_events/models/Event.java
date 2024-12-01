@@ -12,7 +12,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 public class Event{
-    //private String eventDocumentId;
     EntrantList entrants;
     String Name;
     String Location;
@@ -38,7 +37,6 @@ public class Event{
         this.startDate = startDate;
         this.drawDate = drawDate;
         this.checkGeo = checkGeo;
-        //this. eventDocumentId = eventDocumentId; //, String eventDocumentId
     }
 
 
@@ -194,12 +192,4 @@ public class Event{
     public void setQRcode(String QRcode) {
         this.QRcode = QRcode;
     }
-//
-//    public void setEventDocumentId(String eventDocumentId) {
-//        this.eventDocumentId = eventDocumentId;
-//    }
-//
-//    public String getEventDocumentId() {
-//        return eventDocumentId;
-//    }
 }
