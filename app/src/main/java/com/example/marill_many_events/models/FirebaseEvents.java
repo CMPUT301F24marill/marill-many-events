@@ -104,7 +104,6 @@ public class FirebaseEvents {
                 });
     }
 
-
     /**
      * Deletes the current profile picture from Firebase Storage and removes the download link reference from Firestore.
      */

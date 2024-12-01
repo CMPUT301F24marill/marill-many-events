@@ -39,6 +39,7 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
     private String deviceId; // Store deviceId here
     private FirebaseStorage firebaseStorage; // Firebase Storage for images
     private boolean isOrgList;
+    private String eventDocumentId;
 
     private Event currentEvent;
 
@@ -196,6 +197,13 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
         currentEvent = event;
     }
 
+    public void setEventDocumentId(String eventDocumentId) {
+        this.eventDocumentId = eventDocumentId;
+    }
+    public String getEventDocumentId() {
+        return eventDocumentId;
+    }
+  
     @Override
     public void onFacilitiesSelected() {}
     @Override

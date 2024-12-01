@@ -1,6 +1,7 @@
 package com.example.marill_many_events.models;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -70,5 +71,14 @@ public class EntrantList {
                 break; // Exit loop after removing to prevent concurrent modification
             }
         }
+    }
+
+    /**
+     * Retrieves the list of all entrants.
+     *
+     * @return A list of {@link Entrant} objects.
+     */
+    public List<Entrant> getEntrants() {
+        return new ArrayList<>(entrants);
     }
 }
