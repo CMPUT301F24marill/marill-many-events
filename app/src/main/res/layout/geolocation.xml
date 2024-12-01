@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".models.GeolocationActivity">
 
+    <!-- MapView for displaying the map -->
     <org.osmdroid.views.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_above="@id/btnSelectLocation" />
 
+    <!-- Button to confirm location selection -->
     <Button
         android:id="@+id/btnSelectLocation"
         android:layout_width="wrap_content"
@@ -16,9 +21,12 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="16dp"
-        android:text="Select Location" />
+        android:text="Select Location"
+        android:background="@color/design_default_color_primary"
+        android:textColor="@android:color/black"
+        android:padding="10dp"
+        android:textSize="16sp" />
+
 </RelativeLayout>
-
-
 
 

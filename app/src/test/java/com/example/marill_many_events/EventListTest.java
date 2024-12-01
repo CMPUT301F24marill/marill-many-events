@@ -28,7 +28,7 @@ public class EventListTest {
      */
     public Event MockEvent(){
         mockEvent = new  Event("https://firebasestorage.googleapis.com/v0/b/marill-many-events.appspot.com/o/event_posters%2Feventposters%2Fimage_1730935799965_05ae8f93-85df-4308-aa48-cdd23874342a.jpg.jpg?alt=media&token=81e266fb-bc73-4489-9f10-8f893e3260ae"
-                , "Event1", null, null, null, 1, false, null);
+                , "Event1", null, null, null, 1, false, null,53,-113);
         return mockEvent;
     }
 
