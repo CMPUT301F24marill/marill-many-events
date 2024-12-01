@@ -176,6 +176,11 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
         profilePicture = view.findViewById(R.id.profile_picture);
         gearButton = view.findViewById(R.id.admin_gear);
 
+        gearButton.setEnabled(false);
+        gearButton.setClickable(false);
+        gearButton.setFocusable(false);
+        gearButton.setAlpha((float) 0.0);
+
         //firebaseUsers.loadUserDetails(); // Try getting an existing user
 
 
@@ -328,35 +333,28 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
         return true;
     }
 
-//    /**
-//     * Callback method called when user details are loaded from Firestore.
-//     *
-//     * @param returnedUser The User object retrieved from Firestore.
-//     */
-//    public void onUserloaded(User returnedUser) {
-//        if (returnedUser != null) {
-//            user = returnedUser;
-//            isEditMode = true;
-//
-//            editTextName.setText(user.getName());
-//            editTextEmail.setText(user.getEmail());
-//            editTextMobile.setText(user.getPhone());
-//            buttonRegister.setText("Save");
-//
-//            if(user.isAdmin() != true){
-//                gearButton.setClickable(false);
-//                gearButton.setFocusable(false);
-//                gearButton.setAlpha((float) 0.0);
-//            }
-//
-//            name = user.getName();
-//            profilePictureUrl = user.getProfilePictureUrl();
-//
-//            loadProfilewithGlide(null, profilePictureUrl);
-//        } else {
-//            Toast.makeText(getActivity(), "User not found. You can register.", Toast.LENGTH_SHORT).show();
-//        }
-//    }
+    /**
+     * Callback method called when user details are loaded from Firestore.
+     *
+     * @param returnedUser The User object retrieved from Firestore.
+     */
+    public void onUserloaded(User returnedUser) {
+        if (returnedUser != null) {
+            user = returnedUser;
+            isEditMode = true;
+
+            editTextName.setText(user.getName());
+            editTextEmail.setText(user.getEmail());
+            editTextMobile.setText(user.getPhone());
+            buttonRegister.setText("Save");
+
+            name = user.getName();
+            profilePictureUrl = user.getProfilePictureUrl();
+            loadProfilewithGlide(null, profilePictureUrl);
+        } else {
+            Toast.makeText(getActivity(), "User not found. You can register.", Toast.LENGTH_SHORT).show();
+        }
+    }
 
 
     /**
