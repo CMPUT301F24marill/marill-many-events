@@ -40,12 +40,11 @@
         <activity android:name=".activities.HomePageActivity" />
         <!-- Events Activity -->
         <activity android:name=".activities.EventsActivity" />
-<<<<<<< Updated upstream
+
         <activity android:name=".activities.AdminPageActivity" />
-=======
 
         <activity android:name=".models.GeolocationActivity" />
->>>>>>> Stashed changes
+
     </application>
 
 </manifest>
