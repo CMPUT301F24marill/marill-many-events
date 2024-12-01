@@ -131,6 +131,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/Capacityfield" />
 
+
+
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/GeoSwitch"
             android:layout_width="wrap_content"
@@ -157,7 +159,7 @@
             android:id="@+id/draw_entrants_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="52dp"
+            android:layout_marginTop="96dp"
             android:text="Draw Entrants"
             android:textAllCaps="true"
             app:layout_constraintEnd_toEndOf="parent"
@@ -186,6 +188,18 @@
             android:background="@android:color/transparent"
             android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@+id/create" />
+
+        <TextView
+            android:id="@+id/tvSelectedLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="132dp"
+            android:layout_marginTop="8dp"
+            android:text="Selected Location: None"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/GeoSwitch" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
