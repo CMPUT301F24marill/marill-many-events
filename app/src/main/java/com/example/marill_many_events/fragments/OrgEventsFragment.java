@@ -56,8 +56,7 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
     private String deviceId;
     private StorageReference storageReference;
     private Identity identity;
-    private CollectionReference events;
-
+    CollectionReference events;
     Facility facility;
 
 
@@ -119,8 +118,6 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
         eventAdapter = new EventyArrayAdapter(eventItemList, this, false);
         waitlistList.setAdapter(eventAdapter);
         //eventAdapter.hideLeaveButton();
-        // Fetch user events
-        getUserEvents();
 
         return view;
     }
@@ -199,26 +196,6 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
     }
 
 
-    @Override
-    public void onItemClick(Event event) {
-        HomePageActivity parentActivity = (HomePageActivity) getActivity();
-        parentActivity.setCurrentEvent(event);
-        Log.d("FragmentLifecycle", "Opening details.");
-        showEventDetails();
-
-        // Add geolocation logic alongside existing code
-        if (event.isCheckGeo()) {
-            double latitude = event.getLatitude();
-            double longitude = event.getLongitude();
-            String locationInfo = "Event Location:\nLatitude: " + latitude + "\nLongitude: " + longitude;
-            Toast.makeText(getContext(), locationInfo, Toast.LENGTH_LONG).show();
-        }
-    }
-
-    public void onDeleteClick(Event event){
-
-    }
-
     public void showEventDetails(){
         EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
 
@@ -229,8 +206,17 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
                 .commit();
     }
 
+    @Override
+    public void onItemClick(Event event) {
+        HomePageActivity parentActivity = (HomePageActivity) getActivity();
+        parentActivity.setCurrentEvent(event);
+        Log.d("FragmentLifecycle", "Opening details.");
+        showEventDetails();
+    }
 
+    public void onDeleteClick(Event event){
 
+    }
 
 
 }

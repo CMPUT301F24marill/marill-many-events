@@ -1,28 +1,23 @@
 package com.example.marill_many_events.activities;
 
-import com.example.marill_many_events.BuildConfig;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.provider.Settings;
-import android.util.Log;
 
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.activity.result.ActivityResultLauncher;
+
+import android.util.Log;
+
 import androidx.fragment.app.Fragment;
 
 import com.example.marill_many_events.R;
-import com.example.marill_many_events.activities.HomePageActivity;
-import com.example.marill_many_events.activities.RegistrationActivity;
 import com.example.marill_many_events.fragments.RegistrationFragment;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.CollectionReference;
-
-import org.osmdroid.config.Configuration;
-
 
 /**
  * MainActivity checks for an existing user registration based on the device ID
@@ -52,10 +47,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Configure OSMDroid cache directory for maps and geolocation
-        Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
-
         setContentView(R.layout.activity_main);
 
         // Retrieve the unique device ID

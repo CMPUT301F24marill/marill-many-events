@@ -3,7 +3,7 @@ package com.example.marill_many_events.fragments;
 import static com.google.firebase.appcheck.internal.util.Logger.TAG;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import android.app.Activity;
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -35,7 +35,6 @@ import com.bumptech.glide.request.transition.Transition;
 import com.example.marill_many_events.EventsCallback;
 import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
-import com.example.marill_many_events.models.GeolocationActivity;
 import com.example.marill_many_events.models.Event;
 import com.example.marill_many_events.models.FirebaseEvents;
 import com.example.marill_many_events.models.GenerateQRcode;
@@ -51,13 +50,9 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
-import com.google.android.material.datepicker.MaterialDatePicker;
-
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Map;
 
 /**
  * Fragment that is opened when a facility has been created and the user wants to create a new event.
@@ -67,13 +62,13 @@ import java.util.Map;
 public class CreateEventFragment extends Fragment implements EventsCallback, PhotoPicker.OnPhotoSelectedListener {
 
     //Views
-    private TextView NameField, datePickerStart, datePickerEnd, capacityField, locationField, selectedLocationTextView;
+    private TextView NameField, datePickerStart, datePickerEnd, capacityField, locationField;
     private ListView waitlistList, registeredList;
     private ArrayList<Event> waitlistdataList;
     private ArrayList<Event> registereddataList;
     private EventyArrayAdapter waitlistAdapter, registeredAdapter;
     private SwitchCompat switchCompat;
-    private Button createButton, selectGeolocationButton;;
+    private Button createButton;
     private ImageView posterview, QRview;
 
 
@@ -83,8 +78,6 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
     private Date endDate;
     private int capacity;
     private boolean geolocation;
-    private double selectedLatitude = 0.0;
-    private double selectedLongitude = 0.0;
     private PhotoPicker photoPicker;
     private Uri posterUri;
     private String posterUrl, location;
@@ -167,8 +160,6 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         locationField = view.findViewById(R.id.LocationField);
         switchCompat = view.findViewById(R.id.GeoSwitch);
         QRview = view.findViewById(R.id.QRcode);
-        selectGeolocationButton = view.findViewById(R.id.btnSelectGeolocation);
-        selectedLocationTextView = view.findViewById(R.id.tvSelectedLocation);
 
         datePicker(datePickerStart, true);
         datePicker(datePickerEnd,false);
@@ -186,25 +177,7 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
             geolocation = isChecked;
         });
 
-        // Geolocation selection button
-        selectGeolocationButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), GeolocationActivity.class);
-            startActivityForResult(intent, 100);
-        });
-
     }
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 100 && resultCode == Activity.RESULT_OK && data != null) {
-            selectedLatitude = data.getDoubleExtra("latitude", 0.0);
-            selectedLongitude = data.getDoubleExtra("longitude", 0.0);
-            selectedLocationTextView.setText("Selected Location: " + selectedLatitude + ", " + selectedLongitude);
-        }
-    }
-
-
-
 
     /**
      * Callback for when an event document is created. The qr code is drawn using the url locally
@@ -212,7 +185,6 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
      * @param documentID          The firestore document ID for the newly created event
      */
     public void onEventCreate(String documentID){
-        // Existing QR code logic
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
         View sheetView = LayoutInflater.from(getContext()).inflate(R.layout.qr_sheet, null);
         bottomSheetDialog.setContentView(sheetView);
@@ -225,36 +197,6 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         //bottomSheetDialog.show();
         ImageView qrview = sheetView.findViewById(R.id.QRcode);
         qrview.setImageBitmap(code);
-
-        // Geolocation update logic
-        if (geolocation) { // Check if geolocation is enabled
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-            // Update geolocation fields for the event
-            db.collection("events").document(documentID).update(
-                    "latitude", selectedLatitude,
-                    "longitude", selectedLongitude,
-                    "checkGeo", true
-            ).addOnSuccessListener(aVoid -> {
-                Log.d("Firestore", "Event geolocation updated successfully");
-            }).addOnFailureListener(e -> {
-                Log.e("Firestore", "Error updating event geolocation", e);
-            });
-
-            // Example logic to add an entrant with geolocation (if applicable)
-            Map<String, Object> entrantData = new HashMap<>();
-            entrantData.put("status", "Waitlist");
-            Map<String, Object> entrantGeolocation = new HashMap<>();
-            entrantGeolocation.put("latitude", selectedLatitude); // Replace with actual latitude
-            entrantGeolocation.put("longitude", selectedLongitude); // Replace with actual longitude
-            entrantData.put("geolocation", entrantGeolocation);
-
-            db.collection("events").document(documentID).collection("entrants")
-                    .document("userId1") // Replace with actual user ID
-                    .set(entrantData)
-                    .addOnSuccessListener(aVoid -> Log.d("Firestore", "Entrant with geolocation added successfully"))
-                    .addOnFailureListener(e -> Log.e("Firestore", "Error adding entrant with geolocation", e));
-        }
     }
 
     public void onEventDelete(){}
@@ -360,20 +302,7 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         }
         eventName = NameField.getText().toString().trim();
         location = locationField.getText().toString().trim();
-
-        // Include geolocation in Event creation
-        Event event = new Event(
-                posterUrl,
-                eventName,
-                location,
-                startDate,
-                endDate,
-                capacity,
-                geolocation,
-                null, // QR Code (if applicable)
-                selectedLatitude,
-                selectedLongitude
-        );
+        Event event = new Event(posterUrl, eventName, location, startDate, endDate, capacity, geolocation, null);
         return event;
     }
 
