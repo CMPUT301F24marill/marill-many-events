@@ -41,4 +41,17 @@
         android:contentDescription="fab_content_desc"
         app:srcCompat="@drawable/qradd"/>
 
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/event_details"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:layout_margin="24dp"
+        android:background="@drawable/background_gradient"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

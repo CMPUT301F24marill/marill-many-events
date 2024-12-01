@@ -171,7 +171,7 @@ public class FacilitiesAdminFragment extends Fragment implements FacilityArrayAd
                 .addToBackStack(null)
                 .commit();
     }
-
+  
     @Override
     public void onItemClick(Facility facility) {
 

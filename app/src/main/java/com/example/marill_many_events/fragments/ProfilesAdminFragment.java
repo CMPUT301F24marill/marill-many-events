@@ -191,6 +191,7 @@ public class ProfilesAdminFragment extends Fragment implements ProfileyArrayAdap
                         //remove from local list
                         removeItemfromList(userObject);
                         Log.d("Firebase", "Event deleted successfully");
+
                     })
                     .addOnFailureListener(e -> {
                         Log.e("Firebase", "failed to delete event: " + e.getMessage());
