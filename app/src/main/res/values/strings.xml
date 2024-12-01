@@ -27,8 +27,8 @@
     <string name="lbl_participants">Participants</string>
     <string name="lbl_view_participants">View Participants</string>
 
-    <string name="lbl_create_facility_top_label">Create Your Facility Frofile</string>
-    <string name="lbl_edit_facility_top_label">Edit Your Facility Frofile</string>
+    <string name="lbl_create_facility_top_label">Create Your Facility Profile</string>
+    <string name="lbl_edit_facility_top_label">Edit Your Facility Profile</string>
     <string name="lbl_enter_facility_name">Enter Facility Name</string>
     <string name="lbl_enter_facility_location">Enter Facility Location</string>
     <string name="lbl_create_facility">Create Facility</string>
