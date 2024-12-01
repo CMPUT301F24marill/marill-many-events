@@ -1,9 +1,13 @@
 package com.example.marill_many_events.fragments;
 
+import static com.google.firebase.appcheck.internal.util.Logger.TAG;
+
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +19,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
@@ -22,11 +27,18 @@ import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
 
 import com.example.marill_many_events.UserCallback;
+import com.example.marill_many_events.activities.AdminPageActivity;
+import com.example.marill_many_events.activities.HomePageActivity;
+import com.example.marill_many_events.activities.MainActivity;
+import com.example.marill_many_events.activities.RegistrationActivity;
 import com.example.marill_many_events.models.PhotoPicker;
 import com.example.marill_many_events.models.ProfilePictureGenerator;
 import com.example.marill_many_events.models.User;
 import com.example.marill_many_events.models.FirebaseUserRegistration;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.StorageReference;
 import com.google.android.material.textfield.TextInputEditText;
@@ -44,7 +56,10 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
     private TextInputEditText editTextName, editTextEmail, editTextMobile;
     private Button buttonRegister;
 
+    private Button buttonFacilityProfile;
+
     private ImageView profilePicture;
+    private ImageView gearButton;
     private String profilePictureUrl;
     private Uri profilePictureUri;
     private PhotoPicker photoPicker;
@@ -124,10 +139,28 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
         textInputLayoutMobile = view.findViewById(R.id.textInputLayoutMobile);
 
         buttonRegister = view.findViewById(R.id.buttonRegister);
+
+        buttonFacilityProfile = view.findViewById(R.id.buttonFacilityProfile);
+        // show if facility registered, hide if not
+        firestore.collection("facilities").document(deviceId).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful() && task.getResult().exists()) {
+                            Log.d(TAG, "Device ID exists in facilities. Showing facility management button.");
+                            buttonFacilityProfile.setVisibility(View.VISIBLE);
+                        } else {
+                            Log.d(TAG, "Device ID does not exist in facilities. Hiding facility management button.");
+                            buttonFacilityProfile.setVisibility(View.GONE);
+                        }
+                    }
+                });
+
         editTextName = view.findViewById(R.id.editTextName);
         editTextEmail = view.findViewById(R.id.editTextEmail);
         editTextMobile = view.findViewById(R.id.editTextMobile);
         profilePicture = view.findViewById(R.id.profile_picture);
+        gearButton = view.findViewById(R.id.admin_gear);
 
         firebaseUserRegistration.loadUserDetails(); // Try getting an existing user
 
@@ -143,7 +176,8 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
                             editTextName.getText().toString().trim(),
                             editTextEmail.getText().toString().trim(),
                             editTextMobile.getText().toString().trim(),
-                            profilePictureUri);
+                            profilePictureUri,
+                            gearButton.isClickable());
                 } else {
                     firebaseUserRegistration.registerUser(
                             editTextName.getText().toString().trim(),
@@ -151,6 +185,25 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
                             editTextMobile.getText().toString().trim(),
                             profilePictureUri);
                 }
+            }
+        });
+
+        // Set click listener for the Facility Profile button
+        buttonFacilityProfile.setOnClickListener(v -> {
+            HomePageActivity parentActivity = (HomePageActivity) getActivity();
+
+            if (parentActivity != null) {
+                parentActivity.openFacilityProfile();
+            }
+        });
+
+        // Set click listener for the Admin button
+        gearButton.setOnClickListener(v -> {
+            HomePageActivity parentActivity = (HomePageActivity) getActivity();
+
+            if (parentActivity != null) {
+                // navigate to AdminPageActivity
+                parentActivity.openAdmin();
             }
         });
     }
@@ -242,6 +295,12 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
             editTextEmail.setText(user.getEmail());
             editTextMobile.setText(user.getPhone());
             buttonRegister.setText("Save");
+
+            if(user.isAdmin() != true){
+                gearButton.setClickable(false);
+                gearButton.setFocusable(false);
+                gearButton.setAlpha((float) 0.0);
+            }
 
             name = user.getName();
             profilePictureUrl = user.getProfilePictureUrl();

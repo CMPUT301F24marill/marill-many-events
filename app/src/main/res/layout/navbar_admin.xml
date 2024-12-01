@@ -13,5 +13,5 @@
         app:itemIconTint="@color/light_blue"
         app:itemTextColor="@color/light_blue"
         app:labelVisibilityMode="labeled"
-        app:menu="@menu/bottom_navigation_menu" />
+        app:menu="@menu/bottom_navigation_menu_admin" />
 </RelativeLayout>
