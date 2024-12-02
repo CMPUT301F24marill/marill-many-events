@@ -27,7 +27,15 @@ public class User {
     public User() {
         // Default constructor
     }
-
+    /**
+     * Constructs a new User instance with specified details.
+     *
+     * @param name              User's name.
+     * @param email             User's email address.
+     * @param phone             User's phone number.
+     * @param profilePictureUrl URL of the user's profile picture.
+     * @param waitList          List of events the user is waitlisted for.
+     */
     public User(String name, String email, String phone, String profilePictureUrl, ArrayList<DocumentReference> waitList) {
         // Initialize user profile
         this.name = name;
