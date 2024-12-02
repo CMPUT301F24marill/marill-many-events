@@ -43,7 +43,7 @@ public class EntrantsDrawFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         // Inflate a simple layout (can be an empty layout since we're not displaying anything)
-        View view = inflater.inflate(R.layout.fragment_create_event, container, false);
+        View view = inflater.inflate(R.layout.fragment_edit_event, container, false);
 
         if (getArguments() != null) {
             eventDocumentId = getArguments().getString("eventDocumentId");

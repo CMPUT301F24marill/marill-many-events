@@ -97,3 +97,79 @@ public class EntrantsDrawActivity {
 }
 
 
+
+//package com.example.marill_many_events.activities;
+//
+//import android.util.Log;
+//
+//import com.example.marill_many_events.models.Entrant;
+//import com.google.firebase.firestore.CollectionReference;
+//import com.google.firebase.firestore.FirebaseFirestore;
+//import com.google.firebase.firestore.QueryDocumentSnapshot;
+//
+//import java.util.ArrayList;
+//import java.util.Collections;
+//import java.util.List;
+//
+//public class EntrantsDrawActivity {
+//
+//    private static final String TAG = "EntrantsDrawActivity";
+//
+//    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+//    private final String eventID;
+//
+//    public EntrantsDrawActivity(String eventID) {
+//        this.eventID = eventID;
+//    }
+//
+//    public interface EntrantsCallback {
+//        void onEntrantsSelected(List<Entrant> selectedEntrants);
+//    }
+//
+//    public void fetchAndSelectEntrants(int numberOfEntrantsToSelect, EntrantsCallback callback) {
+//        if (eventID == null || eventID.isEmpty()) {
+//            Log.e(TAG, "Event ID is not initialized.");
+//            callback.onEntrantsSelected(new ArrayList<>());
+//            return;
+//        }
+//
+//        CollectionReference userInWaitList = db.collection("events")
+//                .document(eventID)
+//                .collection("waitList");
+//
+//        userInWaitList.get().addOnCompleteListener(task -> {
+//            if (task.isSuccessful()) {
+//                List<Entrant> entrantList = new ArrayList<>();
+//                for (QueryDocumentSnapshot document : task.getResult()) {
+//                    Entrant entrant = document.toObject(Entrant.class);
+//                    entrantList.add(entrant);
+//                }
+//                Log.d(TAG, "Fetched " + entrantList.size() + " entrants.");
+//
+//                // Randomly select entrants
+//                List<Entrant> selectedEntrants = selectRandomEntrants(entrantList, numberOfEntrantsToSelect);
+//                Log.d(TAG, "Selected " + selectedEntrants.size() + " entrants.");
+//
+//                callback.onEntrantsSelected(selectedEntrants);
+//            } else {
+//                Log.w(TAG, "Error getting documents.", task.getException());
+//                callback.onEntrantsSelected(new ArrayList<>());
+//            }
+//        });
+//    }
+//
+//    private List<Entrant> selectRandomEntrants(List<Entrant> entrantList, int numberOfEntrantsToSelect) {
+//        if (entrantList.isEmpty()) {
+//            Log.w(TAG, "The entrant list is empty.");
+//            return new ArrayList<>();
+//        }
+//
+//        if (numberOfEntrantsToSelect >= entrantList.size()) {
+//            Log.w(TAG, "Requested number of entrants exceeds or equals the available entrants. Returning all entrants.");
+//            return new ArrayList<>(entrantList);
+//        }
+//
+//        Collections.shuffle(entrantList);
+//        return new ArrayList<>(entrantList.subList(0, numberOfEntrantsToSelect));
+//    }
+//}

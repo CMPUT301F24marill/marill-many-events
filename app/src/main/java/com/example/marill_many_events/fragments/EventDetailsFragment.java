@@ -86,18 +86,6 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         createButton = view.findViewById(R.id.create);
         deleteButton = view.findViewById(R.id.delete);
 
-        // Fetch current event
-        HomePageActivity parentActivity = (HomePageActivity) getActivity();
-        event = parentActivity.getCurrentEvent(); // Fallback to fetching directly from activity if ViewModel is delayed
-
-        if (event != null) {
-            eventDocumentId = event.getFirebaseID(); // Assign eventDocumentId from QRcode
-        } else {
-            Log.e(TAG, "Event object is null");
-            // Handle the error appropriately
-        }
-
-
 
         setUI(); // Change UI elements based on context
 
