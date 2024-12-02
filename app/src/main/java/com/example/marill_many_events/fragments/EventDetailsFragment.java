@@ -275,6 +275,11 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
 
         deleteButton.setOnClickListener(v->{
             eventViewModel.rejectEvent();
+            HomePageActivity parentActivity = (HomePageActivity) getActivity();
+
+            if (parentActivity != null) {
+                parentActivity.onwaitlistSelected();
+            }
         });
 
 

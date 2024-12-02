@@ -443,7 +443,6 @@ public class EventViewModel extends ViewModel implements EventsCallback {
                                     }
                                 }
                             });
-                    Toast.makeText(getContext(), "Event added to the waiting list!", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
                     //Toast.makeText(getContext(), "Error adding item to the list", Toast.LENGTH_SHORT).show();
@@ -518,6 +517,7 @@ public class EventViewModel extends ViewModel implements EventsCallback {
 
         batch.update(userReference, "pending", FieldValue.arrayRemove(eventUsers)); // remove the event from the user's pending events
         //batch.update(eventUsers, "entrants", FieldValue.arrayRemove(userReference));
+        batch.update(eventUsers, "pending", FieldValue.arrayRemove(userReference)); // remove the user from the event's pending list
         batch.update(eventUsers, "cancelled", FieldValue.arrayUnion(userReference)); // add the user to the event's cancelled list
 
         batch.commit() // remove event from user and user from event atomically
