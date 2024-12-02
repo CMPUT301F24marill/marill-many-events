@@ -27,6 +27,7 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.marill_many_events.EventsCallback;
 import com.example.marill_many_events.R;
+import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Event;
 import com.example.marill_many_events.models.EventViewModel;
 import com.example.marill_many_events.models.FirebaseEvents;
@@ -252,6 +253,11 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         createButton.setText("Leave Event");
         createButton.setOnClickListener(v-> {
             eventViewModel.leaveEvent();
+            HomePageActivity parentActivity = (HomePageActivity) getActivity();
+
+            if (parentActivity != null) {
+                parentActivity.onwaitlistSelected();
+            }
         });
     }
 
@@ -260,6 +266,11 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         createButton.setText("Leave Waitlist");
         createButton.setOnClickListener(v-> {
             eventViewModel.leaveWaitlist();
+            HomePageActivity parentActivity = (HomePageActivity) getActivity();
+
+            if (parentActivity != null) {
+                parentActivity.onwaitlistSelected();
+            }
         });
     }
 
@@ -270,6 +281,11 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
 
         deleteButton.setOnClickListener(v->{
             eventViewModel.rejectEvent();
+            HomePageActivity parentActivity = (HomePageActivity) getActivity();
+
+            if (parentActivity != null) {
+                parentActivity.onwaitlistSelected();
+            }
         });
 
 

@@ -159,7 +159,7 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
         deviceId = getIntent().getStringExtra("deviceId"); // Retrieve deviceId
 
         WaitlistFragment waitlistFragment = new WaitlistFragment();
-        Log.d(TAG, "onHomeSelected called with deviceId: " + deviceId);
+        Log.d(TAG, "onwailistSelected called with deviceId: " + deviceId);
         isOrgList = false;
 
         getSupportFragmentManager().beginTransaction()
