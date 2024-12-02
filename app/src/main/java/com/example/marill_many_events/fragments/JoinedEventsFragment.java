@@ -130,7 +130,8 @@ public class JoinedEventsFragment extends Fragment implements EventyArrayAdapter
 
     public void onDeleteClick(Event event){
         Log.d("FragmentLifecycle", "Deleting Event.");
-        eventViewModel.leaveEvent(event);
+        eventViewModel.setSelectedEvent(event);
+        eventViewModel.leaveEvent();
     }
 
 

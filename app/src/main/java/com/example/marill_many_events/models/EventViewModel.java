@@ -36,8 +36,12 @@ public class EventViewModel extends ViewModel implements EventsCallback {
     private final MutableLiveData<List<Event>> userWaitList = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<List<Event>> userOwnedList = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<List<Event>> userEventList = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<List<Event>> userPendingList = new MutableLiveData<>(new ArrayList<>());
 
 
+    public LiveData<List<Event>> getUserPendingList() {
+        return userPendingList;
+    }
 
     public LiveData<List<Event>> getUserEventList() {
         return userEventList;
@@ -48,6 +52,33 @@ public class EventViewModel extends ViewModel implements EventsCallback {
     }
     public LiveData<List<Event>> getUserOwnedList() {
         return userOwnedList;
+    }
+
+    /**
+     * Adds a new event to the current event list and updates the LiveData.
+     *
+     * @param event The event to add.
+     */
+    private void addToPendingList(Event event) {
+        List<Event> currentList = userPendingList.getValue();
+        if (currentList == null) {
+            currentList = new ArrayList<>();
+        }
+        currentList.add(event);
+        userPendingList.setValue(currentList); // Trigger observers
+    }
+
+    /**
+     * Remove an event from the current event list and updates the LiveData.
+     *
+     * @param event The event to remove.
+     */
+    private void removeFromPendingList(Event event) {
+        List<Event> currentList = userPendingList.getValue();
+        if (currentList != null && currentList.contains(event)) {
+            currentList.remove(event);
+            userPendingList.setValue(currentList); // Trigger observers
+        }
     }
 
     /**
@@ -131,6 +162,21 @@ public class EventViewModel extends ViewModel implements EventsCallback {
         }
     }
 
+    public void leaveList(Event event){
+        if(getUserPendingList().getValue().contains(event)){
+            setSelectedEvent(event);
+            rejectEvent();
+        }
+        else if(getUserWaitList().getValue().contains(event)){
+            setSelectedEvent(event);
+            leaveWaitlist();
+        }
+        else if(getUserEventList().getValue().contains(event)){
+            setSelectedEvent(event);
+            leaveEvent();
+        }
+    }
+
     public void getUserEventlist() {
         userEventList.setValue(new ArrayList<>()); // Clear the current list
         userReference.get()
@@ -198,6 +244,42 @@ public class EventViewModel extends ViewModel implements EventsCallback {
                     Toast.makeText(getContext(), "Error getting document", Toast.LENGTH_SHORT).show();
                 });
     }
+
+    /**
+     * Fetch all events the user is registered in and update LiveData.
+     */
+    public void getUserPendinglist() {
+        userPendingList.setValue(new ArrayList<>()); // Clear the current list
+        userReference.get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        List<DocumentReference> docRefs = (List<DocumentReference>) documentSnapshot.get("pending");
+
+                        if (docRefs != null) {
+                            for (DocumentReference reference : docRefs) {
+                                reference.get()
+                                        .addOnSuccessListener(innerDoc -> {
+                                            if (innerDoc.exists()) {
+                                                Event event = innerDoc.toObject(Event.class);
+                                                addToPendingList(event);
+                                            }
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            // Handle error fetching the event document
+                                            Toast.makeText(getContext(), "Error fetching referenced document", Toast.LENGTH_SHORT).show();
+                                        });
+                            }
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "Document not found", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Handle error retrieving the user document
+                    Toast.makeText(getContext(), "Error getting document", Toast.LENGTH_SHORT).show();
+                });
+    }
+
 
     public void getUserOwnedEvents() {
         userOwnedList.setValue(new ArrayList<>()); // Clear the current list
@@ -371,6 +453,9 @@ public class EventViewModel extends ViewModel implements EventsCallback {
         WriteBatch batch = firebaseFirestore.batch();
         DocumentReference eventUsers = firebaseFirestore.collection("events").document(getSelectedEvent().getValue().FirebaseID);
 
+        batch.update(userReference, "pending", FieldValue.arrayRemove(eventUsers)); // remove the event from the user's pending events
+        batch.update(eventUsers, "pending", FieldValue.arrayRemove(userReference)); // remove the event from the user's pending events
+
         batch.update(userReference, "events", FieldValue.arrayUnion(eventUsers));
         batch.update(eventUsers, "entrants", FieldValue.arrayUnion(userReference));
 
@@ -396,10 +481,10 @@ public class EventViewModel extends ViewModel implements EventsCallback {
      * Leave an event as a user
      * @param event to leave
      */
-    public void leaveEvent(Event event){
+    public void leaveEvent(){
         // Leave an event as a user
         WriteBatch batch = firebaseFirestore.batch();
-        DocumentReference eventUsers = firebaseFirestore.collection("events").document(event.getFirebaseID());
+        DocumentReference eventUsers = firebaseFirestore.collection("events").document(getSelectedEvent().getValue().getFirebaseID());
 
         batch.update(userReference, "events", FieldValue.arrayRemove(eventUsers));
         batch.update(eventUsers, "entrants", FieldValue.arrayRemove(userReference));
@@ -407,12 +492,12 @@ public class EventViewModel extends ViewModel implements EventsCallback {
 
         batch.commit() // remove event from user and user from event atomically
                 .addOnSuccessListener(aVoid -> {
-                    firebaseFirestore.collection("events").document(event.getFirebaseID()).get() // get the present event's firebase id from its local copy
+                    firebaseFirestore.collection("events").document(getSelectedEvent().getValue().getFirebaseID()).get() // get the present event's firebase id from its local copy
                             .addOnSuccessListener(documentSnapshot -> {
                                 if (documentSnapshot.exists()) {
                                     Event newEvent = documentSnapshot.toObject(Event.class);
                                     if (newEvent != null) {
-                                        removeFromWaitList(event); // Remove from list
+                                        removeFromWaitList(getSelectedEvent().getValue()); // Remove from list
                                     }
                                 }
                             });
@@ -425,12 +510,42 @@ public class EventViewModel extends ViewModel implements EventsCallback {
 
     /**
      * Leave an event as a user
-     * @param event to leave
      */
-    public void leaveWaitlist(Event event){
+    public void rejectEvent(){
         // Leave an event as a user
         WriteBatch batch = firebaseFirestore.batch();
-        DocumentReference eventUsers = firebaseFirestore.collection("events").document(event.getFirebaseID());
+        DocumentReference eventUsers = firebaseFirestore.collection("events").document(getSelectedEvent().getValue().getFirebaseID());
+
+        batch.update(userReference, "pending", FieldValue.arrayRemove(eventUsers)); // remove the event from the user's pending events
+        //batch.update(eventUsers, "entrants", FieldValue.arrayRemove(userReference));
+        batch.update(eventUsers, "cancelled", FieldValue.arrayUnion(userReference)); // add the user to the event's cancelled list
+
+        batch.commit() // remove event from user and user from event atomically
+                .addOnSuccessListener(aVoid -> {
+                    firebaseFirestore.collection("events").document(getSelectedEvent().getValue().getFirebaseID()).get() // get the present event's firebase id from its local copy
+                            .addOnSuccessListener(documentSnapshot -> {
+                                if (documentSnapshot.exists()) {
+                                    Event newEvent = documentSnapshot.toObject(Event.class);
+                                    if (newEvent != null) {
+                                        removeFromPendingList(getSelectedEvent().getValue()); // Remove from list
+                                    }
+                                }
+                            });
+                    //Toast.makeText(getContext(), "Left the event!", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    //Toast.makeText(getContext(), "Error leaving the event", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+
+    /**
+     * Leave an event as a user
+     */
+    public void leaveWaitlist(){
+        // Leave an event as a user
+        WriteBatch batch = firebaseFirestore.batch();
+        DocumentReference eventUsers = firebaseFirestore.collection("events").document(getSelectedEvent().getValue().getFirebaseID());
 
         batch.update(userReference, "waitList", FieldValue.arrayRemove(eventUsers));
         batch.update(eventUsers, "waitList", FieldValue.arrayRemove(userReference));
@@ -438,12 +553,12 @@ public class EventViewModel extends ViewModel implements EventsCallback {
 
         batch.commit() // remove event from user and user from event atomically
                 .addOnSuccessListener(aVoid -> {
-                    firebaseFirestore.collection("events").document(event.getFirebaseID()).get() // get the present event's firebase id from its local copy
+                    firebaseFirestore.collection("events").document(getSelectedEvent().getValue().getFirebaseID()).get() // get the present event's firebase id from its local copy
                             .addOnSuccessListener(documentSnapshot -> {
                                 if (documentSnapshot.exists()) {
                                     Event newEvent = documentSnapshot.toObject(Event.class);
                                     if (newEvent != null) {
-                                        removeFromWaitList(event); // Remove from list
+                                        removeFromWaitList(getSelectedEvent().getValue()); // Remove from list
                                     }
                                 }
                             });
@@ -589,14 +704,14 @@ public class EventViewModel extends ViewModel implements EventsCallback {
 
 
         for (DocumentReference entrantRef : selectedEntrantRefs) {
-            batch.update(entrantRef, "events", FieldValue.arrayUnion(eventUsers)); // add to events
-            batch.update(entrantRef, "waitList", FieldValue.arrayRemove(eventUsers)); // remove from waitList
+            batch.update(entrantRef, "pending", FieldValue.arrayUnion(eventUsers)); // add to user's events
+            batch.update(entrantRef, "waitList", FieldValue.arrayRemove(eventUsers)); // remove from user's waitList
         }
 
-        batch.update(eventUsers, "entrants", FieldValue.arrayUnion(selectedEntrantRefs.toArray())); // add to entrants
+        batch.update(eventUsers, "pending", FieldValue.arrayUnion(selectedEntrantRefs.toArray())); // add to events entrants
 
         for (DocumentReference ref : selectedEntrantRefs) {
-            batch.update(eventUsers, "waitList", FieldValue.arrayRemove(ref)); // remove from waitlist
+            batch.update(eventUsers, "waitList", FieldValue.arrayRemove(ref)); // remove from event's waitlist
         }
 
 

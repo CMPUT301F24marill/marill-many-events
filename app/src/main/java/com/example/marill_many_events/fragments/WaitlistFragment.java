@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -41,8 +42,12 @@ public class WaitlistFragment extends Fragment implements EventyArrayAdapter.OnI
 
     private Event currentEvent;
     private RecyclerView waitlistList;
+    private RecyclerView pendinglist;
+
     private EventyArrayAdapter eventAdapter;
+    private EventyArrayAdapter pendingAdapter;
     private List<Event> eventItemList;
+    private List<Event> pendingEventsList;
     private HomePageActivity parentActivity;
     private EventViewModel eventViewModel;
     private User user;
@@ -131,7 +136,33 @@ public class WaitlistFragment extends Fragment implements EventyArrayAdapter.OnI
         eventAdapter = new EventyArrayAdapter(eventItemList, this, true);
         waitlistList.setAdapter(eventAdapter);
 
+
+        // Initialize RecyclerView and CardAdapter
+        pendinglist = view.findViewById(R.id.pending_list);
+        TextView pendinglabel = view.findViewById(R.id.pending_label);
+
+        pendinglist.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // Initialize the data list
+        pendingEventsList = new ArrayList<Event>();
+
+        // Initialize the adapter and set it to RecyclerView
+        pendingAdapter = new EventyArrayAdapter(pendingEventsList, this, true);
+        pendinglist.setAdapter(pendingAdapter);
+
+
+
         eventViewModel.getUserWaitlist();
+        eventViewModel.getUserPendinglist();
+
+
+        eventViewModel.getUserPendingList().observe(getViewLifecycleOwner(), updatedList ->{
+            pendinglist.setVisibility(View.VISIBLE);
+            pendinglabel.setVisibility(View.VISIBLE);
+            pendingEventsList.clear();
+            pendingEventsList.addAll(updatedList);
+            pendingAdapter.notifyDataSetChanged();
+        });
 
         eventViewModel.getUserWaitList().observe(getViewLifecycleOwner(), updatedList -> {
             eventItemList.clear(); // Clear the old list
@@ -163,7 +194,7 @@ public class WaitlistFragment extends Fragment implements EventyArrayAdapter.OnI
 
     public void onDeleteClick(Event event){
         Log.d("FragmentLifecycle", "Deleting Event.");
-        eventViewModel.leaveWaitlist(event);
+        eventViewModel.leaveList(event);
     }
 
 

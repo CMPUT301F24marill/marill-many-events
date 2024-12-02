@@ -24,11 +24,35 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/waitlist_list"
         android:layout_width="match_parent"
-        android:layout_height="584dp"
+        android:layout_height="wrap_content"
         android:layout_margin="-16dp"
         android:isScrollContainer="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/waitlist_label" />
+
+
+    <TextView
+        android:id="@+id/pending_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:text="Pending Invites"
+        android:visibility="gone"
+        android:textColor="@color/light_blue"
+        android:textSize="34sp"
+        android:textStyle="bold|italic"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/waitlist_list" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/pending_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="-16dp"
+        android:visibility="gone"
+        android:isScrollContainer="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pending_label" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/scan"
