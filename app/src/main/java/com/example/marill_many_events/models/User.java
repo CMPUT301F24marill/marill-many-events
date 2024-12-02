@@ -161,4 +161,11 @@ public class User {
         this.waitList.add(event);
     }
 
+    public void setWaitList(ArrayList<DocumentReference> waitList) {
+        this.waitList = waitList;
+    }
+
+    public void setEvents(ArrayList<DocumentReference> events) {
+        this.events = events;
+    }
 }
