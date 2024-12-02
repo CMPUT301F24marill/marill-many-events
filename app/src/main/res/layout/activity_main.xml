@@ -6,11 +6,12 @@
 
     <!-- Logo and Title Area -->
     <LinearLayout
+        android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="20dp"
+        android:layout_marginTop="30dp"
         android:orientation="horizontal"
-        android:layout_marginTop="30dp">
+        android:padding="20dp">
 
         <!-- Logo Icon -->
         <ImageView
@@ -23,10 +24,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
             android:text="Marill"
-            android:textSize="18sp"
             android:textColor="#FFFFFF"
-            android:layout_marginStart="10dp" />
+            android:textSize="18sp" />
     </LinearLayout>
 
     <!-- Welcome Text -->
@@ -34,26 +35,26 @@
         android:id="@+id/welcome_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome to"
-        android:textSize="24sp"
-        android:textStyle="italic"
-        android:textColor="#FFFFFF"
+        android:layout_alignTop="@+id/linearLayout3"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/logo_icon"
-        android:layout_marginTop="50dp" />
+        android:layout_marginTop="60dp"
+        android:text="Welcome to"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:textStyle="italic" />
 
     <!-- Many Events Title -->
     <TextView
         android:id="@+id/title_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Many Events"
-        android:textSize="36sp"
-        android:textStyle="bold"
-        android:textColor="#FFFFFF"
-        android:layout_centerHorizontal="true"
         android:layout_below="@id/welcome_text"
-        android:layout_marginTop="10dp" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:text="Many Events"
+        android:textColor="#FFFFFF"
+        android:textSize="36sp"
+        android:textStyle="bold" />
 
     <!-- Login Button -->
     <Button
