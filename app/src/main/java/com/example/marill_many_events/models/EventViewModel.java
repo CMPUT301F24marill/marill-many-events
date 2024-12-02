@@ -1,30 +1,21 @@
 package com.example.marill_many_events.models;
 
-import static android.app.PendingIntent.getActivity;
 import static android.content.ContentValues.TAG;
 import static androidx.test.InstrumentationRegistry.getContext;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.marill_many_events.EventsCallback;
-import com.example.marill_many_events.activities.HomePageActivity;
-import com.example.marill_many_events.activities.MainActivity;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
+import com.google.firebase.appcheck.internal.util.Logger;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -34,7 +25,6 @@ import org.w3c.dom.Document;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Executor;
 
 public class EventViewModel extends ViewModel implements EventsCallback {
 
@@ -396,8 +386,8 @@ public class EventViewModel extends ViewModel implements EventsCallback {
     }
 
     /**
-     * Gets the DocumentReference for the selected event.
-     * @returns FirebaseFirestore
+     * Sets the DocumentReference for the selected event.
+     *
      */
     public FirebaseFirestore getFirebaseReference() {
         return firebaseFirestore;
@@ -435,7 +425,7 @@ public class EventViewModel extends ViewModel implements EventsCallback {
     /**
      * Register a user to an event by atomically adding user to event's waitlist and event to user's events
      */
-    public void registerUser() { // Register the current deviceID (user) to the given event by writing to the user and event a reference to each other
+    public void registerUser(){ // Register the current deviceID (user) to the given event by writing to the user and event a reference to each other
         WriteBatch batch = firebaseFirestore.batch();
         DocumentReference eventUsers = firebaseFirestore.collection("events").document(getSelectedEvent().getValue().FirebaseID);
 
@@ -455,36 +445,6 @@ public class EventViewModel extends ViewModel implements EventsCallback {
                                     }
                                 }
                             });
-                    //Toast.makeText(getContext(), "Item added to the list!", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    //Toast.makeText(getContext(), "Error adding item to the list", Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    /**
-     * Register a user to an event by atomically adding user to event's waitlist and event to user's events, accounting for their geolocation
-     */
-    public void registerUserGeo(GeoPoint geoPoint) { // Register the current deviceID (user) to the given event by writing to the user and event a reference to each other
-        WriteBatch batch = firebaseFirestore.batch();
-        DocumentReference eventUsers = firebaseFirestore.collection("events").document(getSelectedEvent().getValue().FirebaseID);
-
-        batch.update(userReference, "waitList", FieldValue.arrayUnion(eventUsers));
-        batch.update(eventUsers, "waitList", FieldValue.arrayUnion(userReference));
-        batch.update(eventUsers, "entrantGeoPoints", FieldValue.arrayUnion(geoPoint));
-
-        batch.commit()
-                .addOnSuccessListener(aVoid -> {
-                    firebaseFirestore.collection("events").document(getSelectedEvent().getValue().FirebaseID).get()
-                            .addOnSuccessListener(documentSnapshot -> {
-                                if (documentSnapshot.exists()) {
-                                    Event newEvent = documentSnapshot.toObject(Event.class);
-                                    if (newEvent != null) {
-                                        addToWaitList(newEvent); // Add directly to the list
-                                    }
-                                }
-                            });
-                    //Toast.makeText(getContext(), "Item added to the list!", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
                     //Toast.makeText(getContext(), "Error adding item to the list", Toast.LENGTH_SHORT).show();
@@ -517,7 +477,6 @@ public class EventViewModel extends ViewModel implements EventsCallback {
                                     }
                                 }
                             });
-                    //Toast.makeText(getContext(), "Item added to the list!", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
                     //Toast.makeText(getContext(), "Error adding item to the list", Toast.LENGTH_SHORT).show();
@@ -564,6 +523,7 @@ public class EventViewModel extends ViewModel implements EventsCallback {
 
         batch.update(userReference, "pending", FieldValue.arrayRemove(eventUsers)); // remove the event from the user's pending events
         //batch.update(eventUsers, "entrants", FieldValue.arrayRemove(userReference));
+        batch.update(eventUsers, "pending", FieldValue.arrayRemove(userReference)); // remove the user from the event's pending list
         batch.update(eventUsers, "cancelled", FieldValue.arrayUnion(userReference)); // add the user to the event's cancelled list
 
         batch.commit() // remove event from user and user from event atomically
@@ -595,7 +555,6 @@ public class EventViewModel extends ViewModel implements EventsCallback {
 
         batch.update(userReference, "waitList", FieldValue.arrayRemove(eventUsers));
         batch.update(eventUsers, "waitList", FieldValue.arrayRemove(userReference));
-        batch.update(eventUsers, "cancelled", FieldValue.arrayUnion(userReference));
 
         batch.commit() // remove event from user and user from event atomically
                 .addOnSuccessListener(aVoid -> {
@@ -618,15 +577,39 @@ public class EventViewModel extends ViewModel implements EventsCallback {
     public void deleteEvent(Event event){
         if(event != null) {
             firebaseFirestore.collection("events") // "events" is the name of your collection
-                    .document(event.getFirebaseID())
-                    .delete()
-                    .addOnSuccessListener(documentReference -> {
-                        removeFromOwnedList(event);
-                        Log.d("Firestore", "Event deleted");
+                .document(event.getFirebaseID())
+                .delete()
+                .addOnSuccessListener(documentReference -> {
+                    removeFromOwnedList(event);
+                    Log.d("Firestore", "Event deleted");
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("Firestore", "Error adding event", e);
+                });
+
+            firebaseFirestore.collection("facilities").document(event.facilityID)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            // Retrieve the current events list
+                            ArrayList<String> events = (ArrayList<String>) documentSnapshot.get("events");
+                            if (events != null && events.contains(event.FirebaseID)) {
+                                events.remove(event.FirebaseID); // Remove the eventId
+
+                                // Update the document with the modified list
+                                firebaseFirestore.collection("facilities").document(event.facilityID)
+                                        .update("events", events)
+                                        .addOnSuccessListener(aVoid -> Log.d(Logger.TAG, "Event " + event.FirebaseID + " removed successfully"))
+                                        .addOnFailureListener(e -> Log.e(Logger.TAG, "Error removing event " + event.FirebaseID, e));
+                            } else {
+                                Log.d(Logger.TAG, "Event " + event.FirebaseID + " not found in the list.");
+                            }
+                        } else {
+                            Log.d(Logger.TAG, "Facility document does not exist.");
+                        }
                     })
-                    .addOnFailureListener(e -> {
-                        Log.w("Firestore", "Error adding event", e);
-                    });
+                    .addOnFailureListener(e -> Log.e(Logger.TAG, "Error retrieving facility document", e));
+
         }
     }
 
@@ -773,10 +756,13 @@ public class EventViewModel extends ViewModel implements EventsCallback {
             batch.update(eventUsers, "waitList", FieldValue.arrayRemove(ref)); // remove from event's waitlist
         }
 
+
+
         batch.commit() // remove event from user and user from event atomically
                 .addOnSuccessListener(aVoid -> {
                     Log.d("BatchWrite", "Invited Users");
 
                 });
+
     }
 }

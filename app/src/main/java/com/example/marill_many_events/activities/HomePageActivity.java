@@ -2,10 +2,7 @@ package com.example.marill_many_events.activities;
 
 import static com.google.firebase.appcheck.internal.util.Logger.TAG;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -20,14 +17,11 @@ import com.example.marill_many_events.fragments.OrgEventsFragment;
 import com.example.marill_many_events.fragments.RegistrationFragment;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.marill_many_events.models.Event;
 import com.example.marill_many_events.models.FirebaseUsers;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.storage.FirebaseStorage;
 
 import androidx.annotation.NonNull;
@@ -36,10 +30,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 
-
-import android.location.Location;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 
 /**
  * HomePageActivity serves as the main activity for the application, managing the
@@ -52,9 +42,6 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
     private FirebaseFirestore firestore; // Firestore instance
     private String deviceId; // Store deviceId here
     private FirebaseUsers firebaseUsers;
-    private FusedLocationProviderClient fusedLocation;
-
-    GeoPoint current_geo;
 
     private boolean isOrgList;
     private String eventDocumentId;
@@ -80,6 +67,8 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
         //firebaseUsers= new FirebaseUsers(firestore, firebaseStorage, deviceId, this);
         //firebaseUsers.loadUserDetails();
 
+
+
         Log.d("HomePageActivity", "Fragment Container Visibility: " + findViewById(R.id.fragment_container).getVisibility());
 
         // Set up NavbarFragment
@@ -93,8 +82,6 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
                 .replace(R.id.fragment_container, joinedEventsFragment) // replace the fragment already in fragment_container
                 .addToBackStack(null) // add to back stack
                 .commit();
-
-        fusedLocation = LocationServices.getFusedLocationProviderClient(this);
     }
 
     /**
@@ -175,7 +162,7 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
         deviceId = getIntent().getStringExtra("deviceId"); // Retrieve deviceId
 
         WaitlistFragment waitlistFragment = new WaitlistFragment();
-        Log.d(TAG, "onHomeSelected called with deviceId: " + deviceId);
+        Log.d(TAG, "onwailistSelected called with deviceId: " + deviceId);
         isOrgList = false;
 
         getSupportFragmentManager().beginTransaction()
@@ -279,50 +266,4 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
     public void onEventsSelected() {}
     @Override
     public void onProfilesSelected() {}
-
-    /** check permissions if location permissions are accepted
-     *
-     */
-    public void checkLocationPerms(){
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-        }else{
-            getLocation();
-            Log.d("Location Permission", "Location permission accepted.");
-        }
-    }
-
-
-    /** get if location permissions are accepted
-     *
-     */
-    public boolean getLocationPerms(){
-        return !(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED);
-    }
-
-    /** get location and put it in current_geo
-     *
-     */
-    public void getLocation(){
-        Task<Location> locationResult = fusedLocation.getLastLocation();
-        locationResult.addOnSuccessListener(this, new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                if (location != null) {
-                    // Use the location here (latitude and longitude)
-                    double latitude = location.getLatitude();
-                    double longitude = location.getLongitude();
-                    current_geo = new GeoPoint(latitude, longitude);
-                }
-            }
-        });
-    }
-
-    public GeoPoint getCurrent_geo() {
-        return current_geo;
-    }
-
-    public void setCurrent_geo(GeoPoint current_geo) {
-        this.current_geo = current_geo;
-    }
 }

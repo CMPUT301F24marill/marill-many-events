@@ -56,8 +56,4 @@
     <string name="lbl_cancelled">Cancelled</string>
     <string name="lbl_draw_entrants">Draw Entrants</string>
     <string name="lbl_View_Map">View Map</string>
-    <string name="lbl_join_event">Join Event</string>
-    <string name="lbl_leave_event">Leave Event</string>
-    <string name="lbl_delete_event">Delete Event</string>
-    <string name="lbl_back">Back</string>
 </resources>
