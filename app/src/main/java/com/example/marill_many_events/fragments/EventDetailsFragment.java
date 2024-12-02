@@ -77,7 +77,7 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
     List<Object> current_geoPoints;
     ArrayList<GeoPoint> geoPointList;
     HomePageActivity parentActivity;
-    private Identity identity;
+    private Identity identity;o
 
     private Handler handler = new Handler();
     private Runnable runnable;
