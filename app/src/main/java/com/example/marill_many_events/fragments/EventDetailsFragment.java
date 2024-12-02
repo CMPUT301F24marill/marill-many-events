@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -32,6 +33,7 @@ import com.example.marill_many_events.models.FirebaseEvents;
 import com.example.marill_many_events.models.GenerateQRcode;
 import com.example.marill_many_events.models.PhotoPicker;
 import com.example.marill_many_events.models.User;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.storage.FirebaseStorage;
 
@@ -236,6 +238,17 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
 
     private void eventNotFound(){
             createButton.setText("Join Event");
+
+            if(switchCompat.isChecked()){
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Geolocation Warning")
+                        .setMessage("This event will record your location and will make it available to the organizer")
+                        .setCancelable(false); // Prevent dismissal by tapping outside
+
+                AlertDialog dialog = builder.show();
+            }
+
+
             createButton.setOnClickListener(v-> {
                 eventViewModel.registerUser();
             });
