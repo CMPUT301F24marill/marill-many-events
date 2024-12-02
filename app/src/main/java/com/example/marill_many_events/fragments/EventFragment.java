@@ -131,9 +131,9 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
         eventAdapter = new EventyArrayAdapter(eventItemList, this, true);
         waitlistList.setAdapter(eventAdapter);
 
-        eventViewModel.getUserEvents();
+        eventViewModel.getUserWaitlist();
 
-        eventViewModel.getUserEventList().observe(getViewLifecycleOwner(), updatedList -> {
+        eventViewModel.getUserWaitList().observe(getViewLifecycleOwner(), updatedList -> {
             eventItemList.clear(); // Clear the old list
             eventItemList.addAll(updatedList); // Add the updated list
             eventAdapter.notifyDataSetChanged(); // Notify the adapter of the changes

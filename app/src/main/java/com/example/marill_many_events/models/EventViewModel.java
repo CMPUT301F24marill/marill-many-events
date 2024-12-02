@@ -29,13 +29,13 @@ public class EventViewModel extends ViewModel implements EventsCallback {
     private StorageReference eventStorageReference;
     private FirebaseStorage firebaseStorage;
     private DocumentReference userReference;
-    private final MutableLiveData<List<Event>> userEventList = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<List<Event>> userWaitList = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<List<Event>> userOwnedList = new MutableLiveData<>(new ArrayList<>());
 
 
 
-    public LiveData<List<Event>> getUserEventList() {
-        return userEventList;
+    public LiveData<List<Event>> getUserWaitList() {
+        return userWaitList;
     }
     public LiveData<List<Event>> getUserOwnedList() {
         return userOwnedList;
@@ -47,12 +47,12 @@ public class EventViewModel extends ViewModel implements EventsCallback {
      * @param event The event to add.
      */
     private void addToEventList(Event event) {
-        List<Event> currentList = userEventList.getValue();
+        List<Event> currentList = userWaitList.getValue();
         if (currentList == null) {
             currentList = new ArrayList<>();
         }
         currentList.add(event);
-        userEventList.setValue(currentList); // Trigger observers
+        userWaitList.setValue(currentList); // Trigger observers
     }
 
     /**
@@ -61,10 +61,10 @@ public class EventViewModel extends ViewModel implements EventsCallback {
      * @param event The event to remove.
      */
     private void removeFromEventList(Event event) {
-        List<Event> currentList = userEventList.getValue();
+        List<Event> currentList = userWaitList.getValue();
         if (currentList != null && currentList.contains(event)) {
             currentList.remove(event);
-            userEventList.setValue(currentList); // Trigger observers
+            userWaitList.setValue(currentList); // Trigger observers
         }
     }
 
@@ -99,8 +99,8 @@ public class EventViewModel extends ViewModel implements EventsCallback {
     /**
      * Fetch all events the user is registered in and update LiveData.
      */
-    public void getUserEvents() {
-        userEventList.setValue(new ArrayList<>()); // Clear the current list
+    public void getUserWaitlist() {
+        userWaitList.setValue(new ArrayList<>()); // Clear the current list
         userReference.get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
