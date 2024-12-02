@@ -47,4 +47,5 @@
     <string name="lbl_Home">Home</string>
     <string name="lbl_Facility">Facility</string>
     <string name="lbl_delete_yourself">You cannot delete yourself.</string>
+    <string name="lbl_delete_hashdata">Annihilate hash data</string>
 </resources>

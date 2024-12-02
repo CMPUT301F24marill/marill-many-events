@@ -23,9 +23,11 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.marill_many_events.R;
+import com.example.marill_many_events.activities.AdminPageActivity;
 import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Event;
 import com.example.marill_many_events.models.EventViewModel;
+import com.example.marill_many_events.models.Facility;
 import com.example.marill_many_events.models.GenerateQRcode;
 import com.example.marill_many_events.models.User;
 import com.google.firebase.firestore.DocumentReference;
@@ -36,7 +38,7 @@ import java.util.ArrayList;
 /**
  * Shows the details of any selected event object, invoked from either user's waitlist or organizers event list
  */
-public class EventDetailsFragment extends Fragment {
+public class AdminEventDetailsFragment extends Fragment {
 
     private TextView nameField, locationField ,capacityField, datePickerStart, datePickerEnd;
     private ImageView QRview, posterView;
@@ -44,13 +46,14 @@ public class EventDetailsFragment extends Fragment {
     private EventViewModel eventViewModel;
     private Button createButton, deleteButton;
     private Event event;
-    private User user;
     private Button drawEntrantsButton;
     private Button viewParticipantsButton;
     private String eventDocumentId;
 
-    public EventDetailsFragment() {
-        // Required empty public constructor
+    private OnItemClickListener listener;
+
+    public AdminEventDetailsFragment(OnItemClickListener listener) {
+        this.listener = listener;
     }
 
 
@@ -67,16 +70,14 @@ public class EventDetailsFragment extends Fragment {
         locationField = view.findViewById(R.id.LocationField);
         QRview = view.findViewById(R.id.QRcode);
         posterView = view.findViewById(R.id.poster);
-        user = eventViewModel.getCurrentUser();
         drawEntrantsButton = view.findViewById(R.id.draw_entrants_button);
         viewParticipantsButton = view.findViewById(R.id.view_participants_button);
-
 
         createButton = view.findViewById(R.id.create);
         deleteButton = view.findViewById(R.id.delete);
 
         // Fetch current event
-        HomePageActivity parentActivity = (HomePageActivity) getActivity();
+        AdminPageActivity parentActivity = (AdminPageActivity) getActivity();
         event = parentActivity.getCurrentEvent(); // Fallback to fetching directly from activity if ViewModel is delayed
 
         if (event != null) {
@@ -92,7 +93,6 @@ public class EventDetailsFragment extends Fragment {
 
         SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
 
-
         eventViewModel.getSelectedEvent().observe(getViewLifecycleOwner(), event -> {
             this.event = event;
             if (event != null) {
@@ -103,7 +103,6 @@ public class EventDetailsFragment extends Fragment {
                 datePickerEnd.setText(formatter.format(event.getDrawDate()));
                 capacityField.setText(String.valueOf(event.getCapacity()));
 
-
                 if (event.getFirebaseID() != null) {
                     QRview.setVisibility(View.VISIBLE);
                     QRview.setImageBitmap(generateQRcode.generateQR(event.getQRcode()));
@@ -112,42 +111,10 @@ public class EventDetailsFragment extends Fragment {
         });
 
 
-
-
-        // Set up the OnClickListener for the drawEntrantsButton
-        drawEntrantsButton.setOnClickListener(v -> {
-            if (eventDocumentId != null) {
-                // Create a new instance of EntrantsDrawFragment, passing the eventDocumentId
-                EntrantsDrawFragment entrantsDrawFragment = EntrantsDrawFragment.newInstance(eventDocumentId);
-
-                // Replace the current fragment with EntrantsDrawFragment
-                FragmentManager fragmentManager = getParentFragmentManager();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, entrantsDrawFragment)
-                        .addToBackStack(null)
-                        .commit();
-            } else {
-                Log.e(TAG, "Event Document ID is null");
-                // Show an error message to the user if needed
-            }
-        });
-
-        // Set up the OnClickListener for the viewParticipantsButton
-        viewParticipantsButton.setOnClickListener(v -> {
-            if (eventDocumentId != null) {
-                // Create a new instance of ViewParticipantsFragment, passing the eventDocumentId
-                ViewParticipantsFragment viewParticipantsFragment = ViewParticipantsFragment.newInstance(eventDocumentId);
-
-                // Replace the current fragment with ViewParticipantsFragment
-                FragmentManager fragmentManager = getParentFragmentManager();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, viewParticipantsFragment)
-                        .addToBackStack(null)
-                        .commit();
-            } else {
-                Log.e(TAG, "Event Document ID is null");
-                // Show an error message to the user if needed
-            }
+        // Set up the OnClickListener for the hashdata removal
+        createButton.setOnClickListener(v -> {
+            listener.onDeleteHashDataClick(event);
+            QRview.setVisibility(View.INVISIBLE);
         });
 
         return view;
@@ -188,53 +155,19 @@ public class EventDetailsFragment extends Fragment {
     }
 
     public void setUI() {
-        if (eventViewModel.userOwnsEvent()) {
-            isOrganizer();
-        }
+        setNoEdit(nameField);
+        setNoEdit(locationField);
+        setNoEdit(capacityField);
+        drawEntrantsButton.setVisibility(View.INVISIBLE);
+        drawEntrantsButton.setEnabled(false);
+        viewParticipantsButton.setVisibility(View.INVISIBLE);
+        viewParticipantsButton.setEnabled(false);
 
-        else {
-            setNoEdit(nameField);
-            setNoEdit(locationField);
-            setNoEdit(capacityField);
-
-            if (user != null) {
-                ArrayList<DocumentReference> waitList = user.getwaitList();
-                if (waitList != null) {
-                    if (waitList.contains(eventViewModel.getEventDocumentReference())) {
-                        eventFound();
-                    } else
-                        eventNotFound();
-                } else
-                    eventNotFound();
-            }
-        }
+        createButton.setText(getString(R.string.lbl_delete_hashdata));
     }
 
-    private void eventNotFound(){
-            createButton.setText("Join Event");
-            createButton.setOnClickListener(v-> {
-                eventViewModel.registerUser();
-            });
-    }
-
-
-    private void eventFound(){
-        createButton.setText("Leave Event");
-        createButton.setOnClickListener(v-> {
-            eventViewModel.leaveEvent(event);
-        });
-
-    }
-
-    private void isOrganizer(){
-        deleteButton.setText("Delete Event");
-        deleteButton.setVisibility(View.VISIBLE);
-        createButton.setText("Save");
-        drawEntrantsButton.setVisibility(View.VISIBLE);
-        viewParticipantsButton.setVisibility(View.VISIBLE);
-        deleteButton.setOnClickListener(v -> {
-            eventViewModel.deleteEvent(eventViewModel.getSelectedEvent().getValue());
-            requireActivity().getSupportFragmentManager().popBackStack();
-        });
+    // Define an interface for item click listener
+    public interface OnItemClickListener {
+        void onDeleteHashDataClick(Event event );
     }
 }

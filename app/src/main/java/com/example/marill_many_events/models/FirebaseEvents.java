@@ -89,6 +89,15 @@ public class FirebaseEvents {
                 .addOnFailureListener(e -> {
                     Log.w("Firestore", "Error adding event", e);
                 });
+        firestore.collection("events") // "events" is the name of your collection
+                .document(documentID) // This automatically generates a document ID
+                .update("qrcode", documentID)
+                .addOnSuccessListener(documentReference -> {
+                    eventsCallback.onEventCreate(documentID);
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("Firestore", "Error adding event", e);
+                });
     }
 
     /**

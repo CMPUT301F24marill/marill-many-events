@@ -1,5 +1,7 @@
 package com.example.marill_many_events.models;
 
+import android.util.Log;
+
 import java.util.Date;
 import java.util.List;
 
@@ -11,9 +13,9 @@ public class Event{
     String Location;
     String ImageURL;
     String FirebaseID;
+    String QRcode;
     Date startDate;
     Date drawDate;
-    String id;
     String facilityID;
 
     Integer capacity;
@@ -24,19 +26,18 @@ public class Event{
     }
 
     public Event(String imageURL, String name, String location, Date startDate, Date drawDate, @Nullable Integer capacity, boolean checkGeo, String FirebaseID, String facilityID){
-
         this.Name = name;
         this.ImageURL = imageURL;
         this.Location = location;
         this.startDate = startDate;
         this.drawDate = drawDate;
         this.FirebaseID = FirebaseID;
+        this.QRcode = FirebaseID;
         this.capacity = capacity;
         this.entrants = new EntrantList();
         this.checkGeo = checkGeo;
         this.facilityID = facilityID;
     }
-
 
     /**
      * Retrieves a list of entrants with a specified status.
@@ -91,24 +92,6 @@ public class Event{
      */
     public void setImageURL(String url){
         this.ImageURL = url;
-    }
-
-    /**
-     * set id
-     *
-     * @param id for event
-     */
-    public void setID(String id){
-        this.id = id;
-    }
-
-    /**
-     * get id
-     *
-     * @return String id for event
-     */
-    public String getID(){
-        return this.id;
     }
 
     // Getter and setter methods for event properties
@@ -207,6 +190,14 @@ public class Event{
 
     public void setFirebaseID(String FirebaseID) {
         this.FirebaseID = FirebaseID;
+    }
+
+    public String getQRcode() {
+        return this.QRcode;
+    }
+
+    public void setQRcode(String FirebaseID) {
+        this.QRcode = FirebaseID;
     }
 
     public String getFacilityID() {

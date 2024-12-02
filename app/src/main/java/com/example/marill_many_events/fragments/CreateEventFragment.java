@@ -191,6 +191,7 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         bottomSheetDialog.setContentView(sheetView);
 
         event.setFirebaseID(documentID);
+        event.setQRcode(documentID);
         Bitmap code = generateQRcode.generateQR(documentID);
         QRview.setImageBitmap(code);
         QRview.setVisibility(View.VISIBLE);
@@ -256,7 +257,6 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
                     else // Portrait image (9:16 or taller), limit the height to 1/4 of the fragment height
                         height = getView().getHeight()/4;
 
-
                     // Set the height of the ImageView
                     ViewGroup.LayoutParams params = posterview.getLayoutParams();
                     params.height = height;
@@ -307,8 +307,4 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         event = new Event(posterUrl, eventName, location, startDate, endDate, capacity, geolocation, null, null);
         return event;
     }
-
-
-
-
 }
