@@ -71,6 +71,12 @@ dependencies {
     testImplementation("org.mockito:mockito-core:5.4.0")
     androidTestImplementation("org.mockito:mockito-android:5.4.0")
 
+    // AndroidX Test dependencies
+    androidTestImplementation ("androidx.test:core:1.4.0")
+    androidTestImplementation ("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation ("androidx.test:runner:1.4.0")
+    androidTestImplementation ("androidx.test:rules:1.4.0")
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)

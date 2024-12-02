@@ -10,6 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Date;
+
 
 public class EventListTest {
 
@@ -26,11 +28,31 @@ public class EventListTest {
      * create a mock event
      * @return Event
      */
+//    public Event MockEvent(){
+//        mockEvent = new  Event("https://firebasestorage.googleapis.com/v0/b/marill-many-events.appspot.com/o/event_posters%2Feventposters%2Fimage_1730935799965_05ae8f93-85df-4308-aa48-cdd23874342a.jpg.jpg?alt=media&token=81e266fb-bc73-4489-9f10-8f893e3260ae"
+//                , "Event1", null, null, null, 1, false, null);
+//        return mockEvent;
+//    }
     public Event MockEvent(){
-        mockEvent = new  Event("https://firebasestorage.googleapis.com/v0/b/marill-many-events.appspot.com/o/event_posters%2Feventposters%2Fimage_1730935799965_05ae8f93-85df-4308-aa48-cdd23874342a.jpg.jpg?alt=media&token=81e266fb-bc73-4489-9f10-8f893e3260ae"
-                , "Event1", null, null, null, 1, false, null);
+        // Using current date for startDate and drawDate
+        Date startDate = new Date();  // Current date for start date
+        Date drawDate = new Date();   // Current date for draw date
+
+        // Create a mock event with valid parameters
+        mockEvent = new Event(
+                "https://firebasestorage.googleapis.com/v0/b/marill-many-events.appspot.com/o/event_posters%2Feventposters%2Fimage_1730935799965_05ae8f93-85df-4308-aa48-cdd23874342a.jpg.jpg?alt=media&token=81e266fb-bc73-4489-9f10-8f893e3260ae",
+                "Event1",
+                "Location1",  // Assuming a valid location is provided
+                startDate,
+                drawDate,
+                1,  // Capacity as integer
+                true,  // Check geo as boolean
+                "FirebaseID123",  // Example Firebase ID
+                "FacilityID123"  // Example Facility ID
+        );
         return mockEvent;
     }
+
 
     /**
      * Add an event to the Event List,
