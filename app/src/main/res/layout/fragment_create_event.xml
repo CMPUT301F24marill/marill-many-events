@@ -8,27 +8,27 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="584dp">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/posterView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.RoundedCorners"
             app:cardBackgroundColor="@color/blue_end_translucent"
+            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.RoundedCorners"
             app:strokeWidth="1dp">
 
             <ImageView
                 android:id="@+id/poster"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:src="@drawable/default_profile"
-                android:background="@android:color/transparent"/>
+                android:background="@android:color/transparent"
+                android:src="@drawable/default_profile" />
 
         </com.google.android.material.card.MaterialCardView>
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/pencil2"
             android:layout_width="38dp"
             android:layout_height="41dp"
             app:layout_constraintBottom_toBottomOf="@+id/NameField"
@@ -38,7 +38,7 @@
             app:srcCompat="@drawable/pencil" />
 
         <ImageView
-            android:id="@+id/imageView8"
+            android:id="@+id/pencil1"
             android:layout_width="38dp"
             android:layout_height="41dp"
             android:layout_marginTop="8dp"
@@ -55,8 +55,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:background="@color/blue_start"
-            android:padding="10dp"
             android:hint="@string/Event_Name"
+            android:padding="10dp"
             android:textAlignment="viewStart"
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
@@ -69,8 +69,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:background="@color/blue_start"
-            android:padding="10dp"
             android:hint="@string/Location"
+            android:padding="10dp"
             android:textAlignment="viewStart"
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
@@ -83,8 +83,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:background="@color/blue_start"
-            android:padding="10dp"
             android:hint="@string/Start_Date"
+            android:padding="10dp"
             android:textAlignment="viewStart"
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
@@ -97,8 +97,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:background="@color/blue_start"
-            android:padding="10dp"
             android:hint="@string/Draw_Date"
+            android:padding="10dp"
             android:textAlignment="viewStart"
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
@@ -111,8 +111,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:background="@color/blue_start"
-            android:padding="10dp"
             android:hint="@string/Capacity_Prompt"
+            android:padding="10dp"
             android:textAlignment="viewStart"
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
@@ -125,9 +125,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="@string/Geolocation"
-            android:textSize="30sp"
             android:textAlignment="viewStart"
             android:textColor="@color/white"
+            android:textSize="30sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/Capacityfield" />
@@ -136,10 +136,10 @@
             android:id="@+id/GeoSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:trackTint="@color/blue_start"
             app:layout_constraintBottom_toBottomOf="@+id/TextView"
             app:layout_constraintEnd_toEndOf="@+id/TextView"
-            app:layout_constraintTop_toTopOf="@+id/TextView"
-            android:trackTint="@color/blue_start" />
+            app:layout_constraintTop_toTopOf="@+id/TextView" />
 
         <Button
             android:id="@+id/create"
@@ -156,13 +156,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
+            android:backgroundTint="@color/delete_red"
             android:text="@string/Delete"
             android:textColor="@color/white"
             android:visibility="gone"
-            android:backgroundTint="@color/delete_red"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/create" />
+
+
+        <Button
+            android:id="@+id/map_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:text="@string/lbl_View_Map"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/delete" />
 
 
         <Button
@@ -170,7 +182,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
-            android:text="Draw Entrants"
+            android:text="@string/lbl_draw_entrants"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -181,7 +193,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
-            android:text="View Participants"
+            android:text="@string/lbl_view_participants"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -192,8 +204,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:src="@drawable/default_profile"
             android:background="@android:color/transparent"
+            android:src="@drawable/default_profile"
             android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@+id/view_participants_button" />
 

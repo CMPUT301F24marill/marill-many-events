@@ -54,4 +54,6 @@
     <string name="lbl_invited">Invited</string>
     <string name="lbl_waitlisted">Waitlisted</string>
     <string name="lbl_cancelled">Cancelled</string>
+    <string name="lbl_draw_entrants">Draw Entrants</string>
+    <string name="lbl_View_Map">View Map</string>
 </resources>
