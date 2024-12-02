@@ -20,8 +20,10 @@ import com.example.marill_many_events.models.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
-
-//EventyArrayAdapter contains Events in list and retrieves a events information for the view
+/**
+ * The adapter for displaying a list of participants (Entrants) in a RecyclerView.
+ * This adapter binds each participant's information to a view (e.g., name, status, and profile picture).
+ */
 public class EntrantyArrayAdapter extends RecyclerView.Adapter<EntrantyArrayAdapter.ProfileViewHolder> {
     private List<Entrant> profileList;
     private OnItemClickListener listener; // Listener for item clicks
@@ -58,14 +60,27 @@ public class EntrantyArrayAdapter extends RecyclerView.Adapter<EntrantyArrayAdap
         this.profileList = userItemList;
         this.listener = listener;
     }
-
+    /**
+     * Called when a new ViewHolder is created. This method inflates the layout for the individual
+     * list item (participant) and returns a new instance of the ViewHolder.
+     *
+     * @param parent The parent ViewGroup into which the new view will be added.
+     * @param viewType The view type of the new View.
+     * @return A new ProfileViewHolder instance containing the inflated view.
+     */
     @Override
     public ProfileViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.participant_list, parent, false);
         return new ProfileViewHolder(itemView);
     }
-
+    /**
+     * Binds the data to the ViewHolder for the given position. This method sets the participant's
+     * details such as name, profile picture, status, and handles button visibility and click events.
+     *
+     * @param holder The ProfileViewHolder to bind data to.
+     * @param position The position of the item in the profileList.
+     */
     @Override
     public void onBindViewHolder(ProfileViewHolder holder, int position) {
         Entrant currentItem = profileList.get(position);
