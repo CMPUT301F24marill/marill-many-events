@@ -35,9 +35,7 @@ import com.journeyapps.barcodescanner.ScanOptions;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Displays all events as a list, events can either be user's waitlist or organizer's created events
- */
+
 public class WaitlistFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener{
 
     private Event currentEvent;
@@ -69,7 +67,9 @@ public class WaitlistFragment extends Fragment implements EventyArrayAdapter.OnI
     public WaitlistFragment() {
         // Required empty public constructor
     }
-
+    /**
+     * Registers a QR code scan result handler using an `ActivityResultLauncher`.
+     */
     final ActivityResultLauncher<ScanOptions> qrCodeLauncher = registerForActivityResult(
             new ScanContract(),
             result -> {
@@ -82,7 +82,11 @@ public class WaitlistFragment extends Fragment implements EventyArrayAdapter.OnI
                 }
             });
 
-
+    /**
+     * Attaches the fragment to its parent context and ensures the context implements the `Identity` interface.
+     *
+     * @param context The context to attach the fragment to.
+     */
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -94,13 +98,23 @@ public class WaitlistFragment extends Fragment implements EventyArrayAdapter.OnI
             throw new ClassCastException(context.toString() + " must implement Identity Interface");
         }
     }
-
+    /**
+     * Called when the fragment becomes visible to the user.
+     * Logs the visibility state.
+     */
     @Override
     public void onResume() {
         super.onResume();
         Log.d("FragmentLifecycle", "Fragment is now visible.");
     }
-
+    /**
+     * Inflates the fragment's layout, initializes UI components, and sets up RecyclerViews for waitlisted and pending events.
+     *
+     * @param inflater The LayoutInflater used to inflate the layout.
+     * @param container The parent view that the fragment's UI will be attached to.
+     * @param savedInstanceState The saved state of the fragment.
+     * @return The view for the fragment.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {// Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_eventlist, container, false);
@@ -174,7 +188,9 @@ public class WaitlistFragment extends Fragment implements EventyArrayAdapter.OnI
     }
 
     /**
-     * Get event details from a qr code of its firebase reference
+     * Fetches event details from Firestore using the scanned QR code.
+     *
+     * @param eventID The ID of the event document.
      */
     public void getEvent(String eventID){
         firestore.collection("events").document(eventID)
@@ -191,13 +207,19 @@ public class WaitlistFragment extends Fragment implements EventyArrayAdapter.OnI
                 });
     }
 
-
+    /**
+     * Removes an event from the user's list.
+     *
+     * @param event The event to remove.
+     */
     public void onDeleteClick(Event event){
         Log.d("FragmentLifecycle", "Deleting Event.");
         eventViewModel.leaveList(event);
     }
 
-
+    /**
+     * Navigates to the EventDetailsFragment to display the details of a selected event.
+     */
     public void showEventDetails(){
         EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
 
@@ -208,16 +230,20 @@ public class WaitlistFragment extends Fragment implements EventyArrayAdapter.OnI
                 .commit();
     }
 
-
-
+    /**
+     * Handles the click event for an event item in the RecyclerView.
+     *
+     * @param event The clicked event.
+     */
     @Override
     public void onItemClick(Event event) {
         eventViewModel.setSelectedEvent(event);
         Log.d("FragmentLifecycle", "Opening details.");
         showEventDetails();
     }
-
-
+    /**
+     * Fetches the current user's details from Firestore and updates the ViewModel.
+     */
     public void getUser(){
         userReference.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
