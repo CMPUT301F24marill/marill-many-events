@@ -121,10 +121,22 @@ public class Entrant {
 //    public void setDeviceId(String deviceId) {
 //        this.deviceId = deviceId;
 //    }
+    /**
+     * Gets the Firestore document reference associated with this object.
+     * The document reference is used to uniquely identify and interact with
+     * the Firestore document related to this object.
+     *
+     * @return The Firestore document reference.
+     */
     public DocumentReference getReference() {
         return reference;
     }
-
+    /**
+     * Sets the Firestore document reference for this object.
+     * This method allows associating the object with a specific Firestore document.
+     *
+     * @param reference The Firestore document reference to associate with this object.
+     */
     public void setReference(DocumentReference reference) {
         this.reference = reference;
     }
