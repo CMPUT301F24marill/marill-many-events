@@ -1,17 +1,20 @@
 package com.example.marill_many_events.models;
 
 import com.example.marill_many_events.models.User;
+import com.google.firebase.firestore.DocumentReference;
 
+import java.lang.ref.Reference;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Entrant represents an individual participating in events.
- * It holds the user's profile, status, geolocation, and a list of events the user is associated with.
+ * It holds the user's profile, status, geolocation, and a list of events the user is associated with.\
  */
 public class Entrant {
     String status;
     Geolocation Geo;
+    DocumentReference reference;
     //private String deviceId;
 
     private List<Event> Events = new ArrayList<>();
@@ -118,4 +121,11 @@ public class Entrant {
 //    public void setDeviceId(String deviceId) {
 //        this.deviceId = deviceId;
 //    }
+    public DocumentReference getReference() {
+        return reference;
+    }
+
+    public void setReference(DocumentReference reference) {
+        this.reference = reference;
+    }
 }

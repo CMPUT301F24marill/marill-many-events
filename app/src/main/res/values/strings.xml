@@ -48,4 +48,10 @@
     <string name="lbl_Facility">Facility</string>
     <string name="lbl_delete_yourself">You cannot delete yourself.</string>
     <string name="lbl_delete_hashdata">Annihilate hash data</string>
+
+    <string name="lbl_entrants">Entrants</string>
+    <string name="lbl_accepted">Accepted</string>
+    <string name="lbl_invited">Invited</string>
+    <string name="lbl_waitlisted">Waitlisted</string>
+    <string name="lbl_cancelled">Cancelled</string>
 </resources>

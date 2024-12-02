@@ -394,6 +394,7 @@ public class EventViewModel extends ViewModel implements EventsCallback {
 
     /**
      * Leave an event as a user
+     * @param event to leave
      */
     public void leaveEvent(Event event){
         // Leave an event as a user
@@ -402,6 +403,7 @@ public class EventViewModel extends ViewModel implements EventsCallback {
 
         batch.update(userReference, "events", FieldValue.arrayRemove(eventUsers));
         batch.update(eventUsers, "entrants", FieldValue.arrayRemove(userReference));
+        batch.update(eventUsers, "cancelled", FieldValue.arrayUnion(userReference));
 
         batch.commit() // remove event from user and user from event atomically
                 .addOnSuccessListener(aVoid -> {
@@ -423,6 +425,7 @@ public class EventViewModel extends ViewModel implements EventsCallback {
 
     /**
      * Leave an event as a user
+     * @param event to leave
      */
     public void leaveWaitlist(Event event){
         // Leave an event as a user
@@ -431,6 +434,7 @@ public class EventViewModel extends ViewModel implements EventsCallback {
 
         batch.update(userReference, "waitList", FieldValue.arrayRemove(eventUsers));
         batch.update(eventUsers, "waitList", FieldValue.arrayRemove(userReference));
+        batch.update(eventUsers, "cancelled", FieldValue.arrayUnion(userReference));
 
         batch.commit() // remove event from user and user from event atomically
                 .addOnSuccessListener(aVoid -> {
