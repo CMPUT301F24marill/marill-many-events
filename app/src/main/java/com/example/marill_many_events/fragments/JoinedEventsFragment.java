@@ -121,6 +121,7 @@ public class JoinedEventsFragment extends Fragment implements EventyArrayAdapter
         waitlistList.setAdapter(eventAdapter);
 
         eventViewModel.getUserEventlist();
+        checkNotifications();
 
 
         eventViewModel.getUserEventList().observe(getViewLifecycleOwner(), updatedList -> {
@@ -172,6 +173,36 @@ public class JoinedEventsFragment extends Fragment implements EventyArrayAdapter
             Log.d("Firestore", "Error getting user: ", e);
         });
     }
+
+
+    private void checkNotifications(){
+        userReference.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                // Retrieve the field
+                ArrayList<String> notificationStack = (ArrayList<String>) documentSnapshot.get("notifications"); // Replace 'fieldName' with your field key
+                StringBuilder notificationString = new StringBuilder();
+                if (notificationStack != null) {
+                    for(String notification : notificationStack){
+                        notificationString.append(notification);
+                        notificationString.append('\n');
+                    }
+                    sendNotification("Update", notificationString.toString());
+                    notificationStack.clear();
+
+                    userReference.update("notifications", notificationStack)
+                            .addOnSuccessListener(aVoid -> Log.d("Firestore", "Notifications cleared successfully"))
+                            .addOnFailureListener(e -> Log.e("Firestore", "Failed to clear notifications", e));
+                } else {
+                    System.out.println("Field does not exist in the document.");
+                }
+            } else {
+                System.out.println("Document does not exist.");
+            }
+        }).addOnFailureListener(e -> {
+            System.err.println("Error fetching document: " + e.getMessage());
+        });
+    }
+
 
     private void sendNotification(String title, String message) {
         NotificationManager notificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);

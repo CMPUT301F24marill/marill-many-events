@@ -431,6 +431,8 @@ public class EventViewModel extends ViewModel implements EventsCallback {
         batch.update(userReference, "waitList", FieldValue.arrayUnion(eventUsers));
         batch.update(eventUsers, "waitList", FieldValue.arrayUnion(userReference));
 
+
+
         batch.commit()
                 .addOnSuccessListener(aVoid -> {
                     firebaseFirestore.collection("events").document(getSelectedEvent().getValue().FirebaseID).get()
@@ -453,11 +455,16 @@ public class EventViewModel extends ViewModel implements EventsCallback {
         WriteBatch batch = firebaseFirestore.batch();
         DocumentReference eventUsers = firebaseFirestore.collection("events").document(getSelectedEvent().getValue().FirebaseID);
 
+
         batch.update(userReference, "pending", FieldValue.arrayRemove(eventUsers)); // remove the event from the user's pending events
         batch.update(eventUsers, "pending", FieldValue.arrayRemove(userReference)); // remove the event from the user's pending events
 
         batch.update(userReference, "events", FieldValue.arrayUnion(eventUsers));
+
         batch.update(eventUsers, "entrants", FieldValue.arrayUnion(userReference));
+
+
+
 
         batch.commit()
                 .addOnSuccessListener(aVoid -> {
@@ -479,7 +486,6 @@ public class EventViewModel extends ViewModel implements EventsCallback {
 
     /**
      * Leave an event as a user
-     * @param event to leave
      */
     public void leaveEvent(){
         // Leave an event as a user
@@ -673,7 +679,7 @@ public class EventViewModel extends ViewModel implements EventsCallback {
         List<DocumentReference> selectedEntrantRefs = selectRandomEntrants(waitListRefs, capacity);
 
         // Store selected entrants in Firestore
-        storeSelectedEntrants(selectedEntrantRefs);
+        storeSelectedEntrants(selectedEntrantRefs, waitListRefs);
 
     }
 
@@ -693,7 +699,7 @@ public class EventViewModel extends ViewModel implements EventsCallback {
         return new ArrayList<DocumentReference>(shuffledEntrantRefs.subList(0, numberOfEntrantsToSelect));
     }
 
-    private void storeSelectedEntrants(List<DocumentReference> selectedEntrantRefs) {
+    private void storeSelectedEntrants(List<DocumentReference> selectedEntrantRefs, List<DocumentReference> allEntrantRefs) {
         if (selectedEntrantRefs.isEmpty()) {
             Log.w(TAG, "No entrants to store.");
             return;
@@ -701,12 +707,25 @@ public class EventViewModel extends ViewModel implements EventsCallback {
 
         WriteBatch batch = firebaseFirestore.batch();
         DocumentReference eventUsers = getEventDocumentReference();
+        String notification = "Invited to" + getSelectedEvent().getValue().getName();
+        String rejection = "Draw failed for" + getSelectedEvent().getValue().getName();
 
+        List<DocumentReference> cancelled = new ArrayList<>(allEntrantRefs);
+        cancelled.removeAll(selectedEntrantRefs);
+
+        for (DocumentReference entrantRef : cancelled) {
+            batch.update(entrantRef, "waitList", FieldValue.arrayRemove(eventUsers)); // remove from user's waitList
+            batch.update(entrantRef, "notifications", FieldValue.arrayUnion(rejection)); // add rejection to user's notification stack
+        }
 
         for (DocumentReference entrantRef : selectedEntrantRefs) {
             batch.update(entrantRef, "pending", FieldValue.arrayUnion(eventUsers)); // add to user's events
             batch.update(entrantRef, "waitList", FieldValue.arrayRemove(eventUsers)); // remove from user's waitList
+            batch.update(entrantRef, "notifications", FieldValue.arrayUnion(notification)); // add to user's notification stack
         }
+
+
+
 
         batch.update(eventUsers, "pending", FieldValue.arrayUnion(selectedEntrantRefs.toArray())); // add to events entrants
 
@@ -718,7 +737,7 @@ public class EventViewModel extends ViewModel implements EventsCallback {
 
         batch.commit() // remove event from user and user from event atomically
                 .addOnSuccessListener(aVoid -> {
-                    Log.d("BatchWrite", "Added event to user and user to events");
+                    Log.d("BatchWrite", "Invited Users");
 
                 });
 
