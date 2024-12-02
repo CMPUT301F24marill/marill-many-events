@@ -134,7 +134,13 @@ public class EntrantyArrayAdapter extends RecyclerView.Adapter<EntrantyArrayAdap
          */
         void onDeleteClick(Entrant entrant);
     }
-    // Return the size of the profile list
+    /**
+     * Returns the total number of items (Entrants) in the list.
+     * This method is called by the RecyclerView to determine how many items
+     * are in the dataset, so it knows how many views to create and bind.
+     *
+     * @return The total number of items in the profile list.
+     */
     @Override
     public int getItemCount() {
         return profileList.size();
