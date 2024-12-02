@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.marill_many_events.EventsCallback;
+import com.google.firebase.appcheck.internal.util.Logger;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -548,7 +549,6 @@ public class EventViewModel extends ViewModel implements EventsCallback {
 
         batch.update(userReference, "waitList", FieldValue.arrayRemove(eventUsers));
         batch.update(eventUsers, "waitList", FieldValue.arrayRemove(userReference));
-        batch.update(eventUsers, "cancelled", FieldValue.arrayUnion(userReference));
 
         batch.commit() // remove event from user and user from event atomically
                 .addOnSuccessListener(aVoid -> {
@@ -571,15 +571,39 @@ public class EventViewModel extends ViewModel implements EventsCallback {
     public void deleteEvent(Event event){
         if(event != null) {
             firebaseFirestore.collection("events") // "events" is the name of your collection
-                    .document(event.getFirebaseID())
-                    .delete()
-                    .addOnSuccessListener(documentReference -> {
-                        removeFromOwnedList(event);
-                        Log.d("Firestore", "Event deleted");
+                .document(event.getFirebaseID())
+                .delete()
+                .addOnSuccessListener(documentReference -> {
+                    removeFromOwnedList(event);
+                    Log.d("Firestore", "Event deleted");
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("Firestore", "Error adding event", e);
+                });
+
+            firebaseFirestore.collection("facilities").document(event.facilityID)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            // Retrieve the current events list
+                            ArrayList<String> events = (ArrayList<String>) documentSnapshot.get("events");
+                            if (events != null && events.contains(event.FirebaseID)) {
+                                events.remove(event.FirebaseID); // Remove the eventId
+
+                                // Update the document with the modified list
+                                firebaseFirestore.collection("facilities").document(event.facilityID)
+                                        .update("events", events)
+                                        .addOnSuccessListener(aVoid -> Log.d(Logger.TAG, "Event " + event.FirebaseID + " removed successfully"))
+                                        .addOnFailureListener(e -> Log.e(Logger.TAG, "Error removing event " + event.FirebaseID, e));
+                            } else {
+                                Log.d(Logger.TAG, "Event " + event.FirebaseID + " not found in the list.");
+                            }
+                        } else {
+                            Log.d(Logger.TAG, "Facility document does not exist.");
+                        }
                     })
-                    .addOnFailureListener(e -> {
-                        Log.w("Firestore", "Error adding event", e);
-                    });
+                    .addOnFailureListener(e -> Log.e(Logger.TAG, "Error retrieving facility document", e));
+
         }
     }
 
