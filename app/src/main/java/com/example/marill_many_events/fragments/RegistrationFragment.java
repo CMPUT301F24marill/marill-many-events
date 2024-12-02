@@ -190,6 +190,13 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
                 editTextName.setText(name);
                 editTextEmail.setText(user.getEmail());
                 editTextMobile.setText(user.getPhone());
+
+                if(user.isAdmin() == true){
+                    gearButton.setEnabled(true);
+                    gearButton.setClickable(true);
+                    gearButton.setFocusable(true);
+                    gearButton.setAlpha((float) 1.0);
+                }
             }
         });
 
@@ -347,6 +354,13 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
             editTextEmail.setText(user.getEmail());
             editTextMobile.setText(user.getPhone());
             buttonRegister.setText("Save");
+
+            if(user.isAdmin() == true){
+                gearButton.setEnabled(true);
+                gearButton.setClickable(true);
+                gearButton.setFocusable(true);
+                gearButton.setAlpha((float) 1.0);
+            }
 
             name = user.getName();
             profilePictureUrl = user.getProfilePictureUrl();
