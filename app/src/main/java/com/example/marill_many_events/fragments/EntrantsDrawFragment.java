@@ -18,18 +18,31 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
+/**
+ * EntrantsDrawFragment is a fragment responsible for selecting a random set of entrants
+ * from the event's waitlist, based on the event's capacity.
+ * The fragment fetches data from Firestore, performs a random draw for entrants,
+ * and updates the event's document with the selected entrants.
+ */
 public class EntrantsDrawFragment extends Fragment {
 
     private static final String TAG = "EntrantsDrawFragment";
 
     private String eventDocumentId;
     private FirebaseFirestore db;
-
+    /**
+     * Default constructor for the fragment.
+     * Required for fragment instantiation. This constructor is empty.
+     */
     public EntrantsDrawFragment() {
         // Required empty public constructor
     }
-
+    /**
+     * Creates a new instance of EntrantsDrawFragment with the given event document ID.
+     *
+     * @param eventDocumentId The ID of the event document in Firestore.
+     * @return A new instance of EntrantsDrawFragment with the event document ID set.
+     */
     public static EntrantsDrawFragment newInstance(String eventDocumentId) {
         EntrantsDrawFragment fragment = new EntrantsDrawFragment();
         Bundle args = new Bundle();
@@ -37,7 +50,15 @@ public class EntrantsDrawFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-
+    /**
+     * Called when the fragment's view is being created. It inflates the layout for the fragment
+     * and initializes the necessary operations, like fetching the event data and performing the draw.
+     *
+     * @param inflater The LayoutInflater object used to inflate the view.
+     * @param container The parent ViewGroup to which the fragment's UI should be attached.
+     * @param savedInstanceState Any saved state from a previous instance of the fragment.
+     * @return The View representing the fragment's UI.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -52,7 +73,10 @@ public class EntrantsDrawFragment extends Fragment {
 
         return view;
     }
-
+    /**
+     * This method performs the draw to select entrants for the event. It fetches the event document
+     * from Firestore, retrieves the waitlist, and proceeds to randomly select entrants based on event capacity.
+     */
     private void performDraw() {
         db = FirebaseFirestore.getInstance();
         if (eventDocumentId == null || eventDocumentId.isEmpty()) {
@@ -92,7 +116,12 @@ public class EntrantsDrawFragment extends Fragment {
             }
         });
     }
-
+    /**
+     * Fetches the event's capacity from Firestore and selects random entrants based on the capacity.
+     * The selected entrants are then stored in the Firestore event document.
+     *
+     * @param waitListRefs The list of entrant references from the waitlist.
+     */
     private void getEventCapacityAndSelectEntrants(List<?> waitListRefs) {
         // Fetch the event's capacity from Firestore
         db.collection("events").document(eventDocumentId).get()
@@ -115,6 +144,13 @@ public class EntrantsDrawFragment extends Fragment {
                 });
     }
 
+    /**
+     * Selects a random subset of entrants from the waitlist based on the specified number of entrants to select.
+     *
+     * @param entrantRefs The list of entrant references.
+     * @param numberOfEntrantsToSelect The number of entrants to randomly select.
+     * @return A list of randomly selected entrants.
+     */
     private List<?> selectRandomEntrants(List<?> entrantRefs, int numberOfEntrantsToSelect) {
         if (entrantRefs.isEmpty()) {
             Log.w(TAG, "The entrant references list is empty.");
@@ -130,7 +166,11 @@ public class EntrantsDrawFragment extends Fragment {
         Collections.shuffle(shuffledEntrantRefs);
         return new ArrayList<>(shuffledEntrantRefs.subList(0, numberOfEntrantsToSelect));
     }
-
+    /**
+     * Stores the selected entrants in Firestore by updating the 'selectedEntrants' field in the event document.
+     *
+     * @param selectedEntrantRefs The list of selected entrants to store in Firestore.
+     */
     private void storeSelectedEntrants(List<?> selectedEntrantRefs) {
         if (selectedEntrantRefs.isEmpty()) {
             Log.w(TAG, "No entrants to store.");
