@@ -34,7 +34,7 @@ android {
 
 dependencies {
 
-    implementation(files("/Users/qiantongguo/Library/Android/sdk/platforms/android-34/android.jar"))
+    //implementation(files("/Users/qiantongguo/Library/Android/sdk/platforms/android-34/android.jar"))
 
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation("com.google.firebase:firebase-firestore")
