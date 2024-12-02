@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,9 +53,9 @@ public class JoinedEventsFragment extends Fragment implements EventyArrayAdapter
     private HomePageActivity parentActivity;
     private EventViewModel eventViewModel;
     private User user;
-
+    private FloatingActionButton notificationbutton;
     ScanOptions options = new ScanOptions();
-
+    private boolean allownotifications;
     private FirebaseEvents firebaseEvents;
     private FirebaseFirestore firestore;
     private String deviceId;
@@ -101,13 +103,32 @@ public class JoinedEventsFragment extends Fragment implements EventyArrayAdapter
         eventViewModel.setFirebaseStorage(identity.getStorage());
         eventViewModel.setFirebaseReference(firestore);
 
+        allownotifications = true;
+
         getUser();
 
         TextView title = view.findViewById(R.id.waitlist_label);
         title.setText("My Joined Events");
         FloatingActionButton scanButton = view.findViewById(R.id.scan);
-
+        notificationbutton = view.findViewById(R.id.notification);
         scanButton.setVisibility(View.GONE);
+        notificationbutton.setVisibility((View.VISIBLE));
+
+
+
+        notificationbutton.setOnClickListener(v-> {
+            allownotifications = !allownotifications;
+
+            if(!allownotifications)
+                notificationbutton.setImageResource(R.drawable.notification);
+            else
+                notificationbutton.setImageResource(R.drawable.notification_fill);
+
+
+            user.setAllownotifications(allownotifications);
+            userReference.update("allownotifications", allownotifications);
+        });
+
 
         // Initialize RecyclerView and CardAdapter
         waitlistList = view.findViewById(R.id.waitlist_list);
@@ -166,6 +187,11 @@ public class JoinedEventsFragment extends Fragment implements EventyArrayAdapter
             if (documentSnapshot.exists()) {
                 user = documentSnapshot.toObject(User.class);
                 eventViewModel.setCurrentUser(user);
+                allownotifications = user.allownotifications;
+                if(!allownotifications)
+                    notificationbutton.setImageResource(R.drawable.notification);
+                else
+                    notificationbutton.setImageResource(R.drawable.notification_fill);
             } else {
                 Log.d("Firestore", "No such user");
             }
@@ -181,12 +207,15 @@ public class JoinedEventsFragment extends Fragment implements EventyArrayAdapter
                 // Retrieve the field
                 ArrayList<String> notificationStack = (ArrayList<String>) documentSnapshot.get("notifications"); // Replace 'fieldName' with your field key
                 StringBuilder notificationString = new StringBuilder();
-                if (notificationStack != null) {
+                if (notificationStack != null && !notificationStack.isEmpty()) {
                     for(String notification : notificationStack){
                         notificationString.append(notification);
                         notificationString.append('\n');
                     }
-                    sendNotification("Update", notificationString.toString());
+
+                    if(allownotifications) {
+                        sendNotification("Update", notificationString.toString());
+                    }
                     notificationStack.clear();
 
                     userReference.update("notifications", notificationStack)

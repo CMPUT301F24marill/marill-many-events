@@ -618,11 +618,36 @@ public class EventViewModel extends ViewModel implements EventsCallback {
     public void deleteEvent(Event event){
         if(event != null) {
             firebaseFirestore.collection("events") // "events" is the name of your collection
-                    .document(event.getFirebaseID())
-                    .delete()
-                    .addOnSuccessListener(documentReference -> {
-                        removeFromOwnedList(event);
-                        Log.d("Firestore", "Event deleted");
+                .document(event.getFirebaseID())
+                .delete()
+                .addOnSuccessListener(documentReference -> {
+                    removeFromOwnedList(event);
+                    Log.d("Firestore", "Event deleted");
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("Firestore", "Error adding event", e);
+                });
+
+            firebaseFirestore.collection("facilities").document(event.getFacilityID())
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            // Retrieve the current events list
+                            ArrayList<String> events = (ArrayList<String>) documentSnapshot.get("events");
+                            if (events != null && events.contains(event.getFirebaseID())) {
+                                events.remove(event.getFirebaseID()); // Remove the eventId
+
+                                // Update the document with the modified list
+                                firebaseFirestore.collection("facilities").document(event.getFacilityID())
+                                        .update("events", events)
+                                        .addOnSuccessListener(aVoid -> Log.d(Logger.TAG, "Event " + event.getFirebaseID() + " removed successfully"))
+                                        .addOnFailureListener(e -> Log.e(Logger.TAG, "Error removing event " + event.getFirebaseID(), e));
+                            } else {
+                                Log.d(Logger.TAG, "Event " + event.getFirebaseID() + " not found in the list.");
+                            }
+                        } else {
+                            Log.d(Logger.TAG, "Facility document does not exist.");
+                        }
                     })
                     .addOnFailureListener(e -> {
                         Log.w("Firestore", "Error adding event", e);
