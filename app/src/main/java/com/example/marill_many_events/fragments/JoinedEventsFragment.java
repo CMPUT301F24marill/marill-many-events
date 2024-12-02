@@ -42,7 +42,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Displays all events as a list, events can either be user's waitlist or organizer's created events
+ * Fragment that displays a list of events the user has joined.
+ * Users can view event details, leave events, and manage notification preferences for updates.
  */
 public class JoinedEventsFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener{
 
@@ -71,7 +72,11 @@ public class JoinedEventsFragment extends Fragment implements EventyArrayAdapter
     public JoinedEventsFragment() {
         // Required empty public constructor
     }
-
+    /**
+     * Attaches the fragment to the activity and checks if the activity implements the Identity interface.
+     *
+     * @param context The context to attach the fragment to.
+     */
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -83,13 +88,23 @@ public class JoinedEventsFragment extends Fragment implements EventyArrayAdapter
             throw new ClassCastException(context.toString() + " must implement Identity Interface");
         }
     }
+    /**
+     * Logs a message indicating the fragment is visible.
+     */
 
     @Override
     public void onResume() {
         super.onResume();
         Log.d("FragmentLifecycle", "Fragment is now visible.");
     }
-
+    /**
+     * Inflates the fragment layout, initializes UI components, and sets up the event list.
+     *
+     * @param inflater The LayoutInflater used to inflate the fragment's view.
+     * @param container The parent view that the fragment's UI will be attached to.
+     * @param savedInstanceState The saved state of the fragment.
+     * @return The view for the fragment.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {// Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_eventlist, container, false);
@@ -154,14 +169,20 @@ public class JoinedEventsFragment extends Fragment implements EventyArrayAdapter
         return view;
     }
 
-
+    /**
+     * Handles the delete button click event to leave an event.
+     *
+     * @param event The event to leave.
+     */
     public void onDeleteClick(Event event){
         Log.d("FragmentLifecycle", "Deleting Event.");
         eventViewModel.setSelectedEvent(event);
         eventViewModel.leaveEvent();
     }
 
-
+    /**
+     * Navigates to the EventDetailsFragment to display event details.
+     */
     public void showEventDetails(){
         EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
 
@@ -173,7 +194,11 @@ public class JoinedEventsFragment extends Fragment implements EventyArrayAdapter
     }
 
 
-
+    /**
+     * Handles item click events to view event details.
+     *
+     * @param event The clicked event.
+     */
     @Override
     public void onItemClick(Event event) {
         eventViewModel.setSelectedEvent(event);
@@ -181,7 +206,9 @@ public class JoinedEventsFragment extends Fragment implements EventyArrayAdapter
         showEventDetails();
     }
 
-
+    /**
+     * Fetches the current user's data from Firestore and updates the ViewModel and notification button state.
+     */
     public void getUser(){
         userReference.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
@@ -200,7 +227,9 @@ public class JoinedEventsFragment extends Fragment implements EventyArrayAdapter
         });
     }
 
-
+    /**
+     * Checks for pending notifications and displays them if notifications are enabled.
+     */
     private void checkNotifications(){
         userReference.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
@@ -232,7 +261,12 @@ public class JoinedEventsFragment extends Fragment implements EventyArrayAdapter
         });
     }
 
-
+    /**
+     * Sends a notification with the given title and message.
+     *
+     * @param title   The title of the notification.
+     * @param message The message content of the notification.
+     */
     private void sendNotification(String title, String message) {
         NotificationManager notificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
         String channelId = "entrant_updates";
