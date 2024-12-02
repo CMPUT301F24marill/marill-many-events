@@ -26,9 +26,7 @@ import com.example.marill_many_events.models.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.StorageReference;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
@@ -96,11 +94,6 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
     public void onResume() {
         super.onResume();
         Log.d("FragmentLifecycle", "Fragment is now visible.");
-
-        //addToItemList( new Event("https://firebasestorage.googleapis.com/v0/b/marill-many-events.appspot.com/o/event_posters%2Feventposters%2Fimage_1730935799965_05ae8f93-85df-4308-aa48-cdd23874342a.jpg.jpg?alt=media&token=81e266fb-bc73-4489-9f10-8f893e3260ae"
-        //        , "Event1", null, null, null, 1, false, null));
-        //addToItemList( new Event("https://firebasestorage.googleapis.com/v0/b/marill-many-events.appspot.com/o/event_posters%2Feventposters%2Fimage_1730935799965_05ae8f93-85df-4308-aa48-cdd23874342a.jpg.jpg?alt=media&token=81e266fb-bc73-4489-9f10-8f893e3260ae"
-        //       , "Event9001", null, null, null, 1, false, null));
     }
 
     @Override
@@ -167,43 +160,12 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
                 });
     }
 
-//    private void showDetails(Event event) {
-//        eventViewModel.setSelectedEvent(event);
-//
-//        FragmentManager fragmentManager = getParentFragmentManager();
-//        FragmentTransaction transaction = fragmentManager.beginTransaction();
-//
-//        EventDetailsFragment popupFragment = new EventDetailsFragment();
-//        transaction.add(R.id.event_details, popupFragment);
-//        transaction.addToBackStack(null);
-//        transaction.commit();
-//
-//        // Make the container visible
-//        View container = getView().findViewById(R.id.event_details);
-//        container.setVisibility(View.VISIBLE);
-//    }
-
-
-
-//    /**
-//     * Add en event to the list
-//     */
-//    public void addToItemList(Event event){
-//        if (!eventItemList.contains(event)) {
-//            eventItemList.add(event);
-//        }
-//        eventAdapter.notifyDataSetChanged();
-//    }
-
 
     public void onDeleteClick(Event event){
         Log.d("FragmentLifecycle", "Deleting Event.");
-        eventViewModel.deleteEvent(event);
+        eventViewModel.leaveEvent(event);
     }
 
-    public Event getCurrentEvent(){
-        return currentEvent;
-    }
 
     public void showEventDetails(){
         EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
