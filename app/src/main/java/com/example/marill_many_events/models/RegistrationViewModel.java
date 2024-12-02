@@ -140,13 +140,18 @@ public class RegistrationViewModel extends ViewModel implements UserCallback {
             messageLiveData.setValue("User not found. You can register.");
         }
     }
-
+    /**
+     * Handles callbacks related to user updates and registration events.
+     */
     @Override
     public void onUserUpdated() {
         messageLiveData.setValue("User updated successfully.");
         loadUserDetails();
     }
 
+    /**
+     * Handles the callback triggered upon successful user registration.
+     */
     @Override
     public void onRegistered() {
         messageLiveData.setValue("Registration successful.");
