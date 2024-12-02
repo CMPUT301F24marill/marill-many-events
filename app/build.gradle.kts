@@ -89,8 +89,7 @@ dependencies {
 
     testImplementation(libs.core) // This is for core testing
 
+
     implementation("androidx.cardview:cardview:1.0.0") // card based layout
     implementation("androidx.recyclerview:recyclerview:1.2.1") // Recyclerview for viewing events
-
-    implementation("com.google.android.gms:play-services-location:18.0.0") // location
 }

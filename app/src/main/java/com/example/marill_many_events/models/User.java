@@ -148,6 +148,9 @@ public class User {
 
 
     public ArrayList<DocumentReference> getEvents() {
+        if (events == null) {
+            return new ArrayList<>();
+        }
         return events;
     }
 
@@ -156,6 +159,9 @@ public class User {
     }
 
     public ArrayList<DocumentReference> getwaitList() {
+        if (waitList == null) {
+            return new ArrayList<>();
+        }
         return waitList;
     }
 
@@ -172,6 +178,9 @@ public class User {
     }
 
     public ArrayList<DocumentReference> getPending() {
+        if (pending == null) {
+            return new ArrayList<>();
+        }
         return pending;
     }
 
