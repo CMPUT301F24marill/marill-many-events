@@ -1,31 +1,46 @@
 package com.example.marill_many_events.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.models.Entrant;
 import com.example.marill_many_events.models.User;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewParticipantsFragment extends Fragment {
+public class ViewParticipantsFragment extends Fragment implements EntrantyArrayAdapter.OnItemClickListener{
+
+    private RecyclerView entrantList;
+    private EntrantyArrayAdapter entrantAdapter;
+    private List<Entrant> EntrantItemList;
 
     private static final String TAG = "ViewParticipantsFrag";
+
+    private FirebaseFirestore firestore;
+    private Identity identity;
+    private DocumentReference user;
 
     private String eventDocumentId;
     private FirebaseFirestore db;
@@ -37,6 +52,18 @@ public class ViewParticipantsFragment extends Fragment {
         // Required empty public constructor
     }
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        // Make sure the activity implements the required interface
+        if (context instanceof Identity) {
+            identity = (Identity) context;
+        } else {
+            throw new ClassCastException(context.toString() + " must implement Identity Interface");
+        }
+    }
+
     public static ViewParticipantsFragment newInstance(String eventDocumentId) {
         ViewParticipantsFragment fragment = new ViewParticipantsFragment();
         Bundle args = new Bundle();
@@ -46,13 +73,24 @@ public class ViewParticipantsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_participantlist, container, false);
+    public void onResume() {
+        super.onResume();
+        getEntrants();
+        Log.d("FragmentLifecycle", "Profiles Fragment is now visible.");
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_eventlist, container, false);
+
+        firestore = identity.getFirestore();
 
         // Initialize RecyclerView
-        recyclerView = view.findViewById(R.id.participant_list);
+        recyclerView = view.findViewById(R.id.waitlist_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        TextView title = view.findViewById(R.id.waitlist_label);
+        title.setText(getString(R.string.lbl_entrants));
 
         // Initialize the adapter
         entrantsAdapter = new EntrantsAdapter();
@@ -61,38 +99,60 @@ public class ViewParticipantsFragment extends Fragment {
         if (getArguments() != null) {
             eventDocumentId = getArguments().getString("eventDocumentId");
             Log.d(TAG, "Event Document ID from arguments: " + eventDocumentId);
-            fetchAndDisplayParticipants();
         }
+        user = firestore.collection("events").document(eventDocumentId);
+
+        // Initialize RecyclerView and CardAdapter
+        entrantList = view.findViewById(R.id.waitlist_list);
+        entrantList.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // Initialize the data list
+        EntrantItemList = new ArrayList<Entrant>();
+
+        // Initialize the adapter and set it to RecyclerView
+        entrantAdapter = new EntrantyArrayAdapter(EntrantItemList, this);
+        entrantList.setAdapter(entrantAdapter);
 
         return view;
     }
 
-    private void fetchAndDisplayParticipants() {
-        db = FirebaseFirestore.getInstance();
-        if (eventDocumentId == null || eventDocumentId.isEmpty()) {
-            Log.e(TAG, "Event Document ID is null or empty.");
-            return;
-        }
 
-        //hard code to pass id
-        //eventDocumentId = "ShcEvw5fLTiqrBJedY47";
-        //Log.d(TAG, "Using hardcoded Event Document ID: " + eventDocumentId);
-        //eventDocumentId = event.getQRcode();
-
-        // Reference to the event document
-        DocumentReference eventDocRef = db.collection("events").document(eventDocumentId);
+    /**
+     * Get all of the entrants under and event complete with their status
+     */
+    public void getEntrants(){
+        EntrantItemList.clear();
 
         // Fetch the selectedEntrants from Firestore
-        eventDocRef.get().addOnCompleteListener(task -> {
+        user.get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
                 DocumentSnapshot eventSnapshot = task.getResult();
                 Log.d(TAG, "Event document fetched successfully: " + eventSnapshot.getId());
 
-                // Get the selectedEntrants field from the event document
-                Object selectedEntrantRefsObj = eventSnapshot.get("selectedEntrants");
-                Log.d(TAG, "selectedEntrantRefsObj: " + selectedEntrantRefsObj);
-                List<?> selectedEntrantRefs = null;
+                // Get the accepted Entrants field from the event document
+                Object selectedEntrantRefsObj = eventSnapshot.get("acceptedEntrants");
+                Log.d(TAG, "acceptedEntrantRefsObj: " + selectedEntrantRefsObj);
 
+                List<?> selectedEntrantRefs = null;
+                if (selectedEntrantRefsObj instanceof List) {
+                    selectedEntrantRefs = (List<?>) selectedEntrantRefsObj;
+                    Log.d(TAG, "acceptedEntrants: " + selectedEntrantRefs);
+                }
+
+                if (selectedEntrantRefs != null && !selectedEntrantRefs.isEmpty()) {
+                    Log.d(TAG, "Number of references in acceptedEntrants: " + selectedEntrantRefs.size());
+
+                    // Fetch and display selected entrants
+                    fetchUserDetails(selectedEntrantRefs, getString(R.string.lbl_accepted));
+                } else {
+                    Log.d(TAG, "acceptedEntrants is empty or null.");
+                }
+
+                // Get the selectedEntrants field from the event document
+                selectedEntrantRefsObj = eventSnapshot.get("selectedEntrants");
+                Log.d(TAG, "selectedEntrantRefsObj: " + selectedEntrantRefsObj);
+
+                selectedEntrantRefs = null;
                 if (selectedEntrantRefsObj instanceof List) {
                     selectedEntrantRefs = (List<?>) selectedEntrantRefsObj;
                     Log.d(TAG, "selectedEntrantRefs: " + selectedEntrantRefs);
@@ -102,9 +162,47 @@ public class ViewParticipantsFragment extends Fragment {
                     Log.d(TAG, "Number of references in selectedEntrants: " + selectedEntrantRefs.size());
 
                     // Fetch and display selected entrants
-                    fetchUserDetails(selectedEntrantRefs);
+                    fetchUserDetails(selectedEntrantRefs, getString(R.string.lbl_invited));
                 } else {
                     Log.d(TAG, "SelectedEntrants is empty or null.");
+                }
+
+                // Get the waitlistedEntrants field from the event document
+                selectedEntrantRefs = null;
+                selectedEntrantRefsObj = eventSnapshot.get("waitList");
+                Log.d(TAG, "waitListRefsObj: " + selectedEntrantRefsObj);
+
+                if (selectedEntrantRefsObj instanceof List) {
+                    selectedEntrantRefs = (List<?>) selectedEntrantRefsObj;
+                    Log.d(TAG, "waitList: " + selectedEntrantRefs);
+                }
+
+                if (selectedEntrantRefs != null && !selectedEntrantRefs.isEmpty()) {
+                    Log.d(TAG, "Number of references in waitList: " + selectedEntrantRefs.size());
+
+                    // Fetch and display selected entrants
+                    fetchUserDetails(selectedEntrantRefs, getString(R.string.lbl_waitlisted));
+                } else {
+                    Log.d(TAG, "waitList is empty or null.");
+                }
+
+                // Get the cancelled Entrants field from the event document
+                selectedEntrantRefs = null;
+                selectedEntrantRefsObj = eventSnapshot.get("cancelled");
+                Log.d(TAG, "cancelledRefsObj: " + selectedEntrantRefsObj);
+
+                if (selectedEntrantRefsObj instanceof List) {
+                    selectedEntrantRefs = (List<?>) selectedEntrantRefsObj;
+                    Log.d(TAG, "cancelled: " + selectedEntrantRefs);
+                }
+
+                if (selectedEntrantRefs != null && !selectedEntrantRefs.isEmpty()) {
+                    Log.d(TAG, "Number of references in cancelled: " + selectedEntrantRefs.size());
+
+                    // Fetch and display selected entrants
+                    fetchUserDetails(selectedEntrantRefs, getString(R.string.lbl_cancelled));
+                } else {
+                    Log.d(TAG, "cancelled is empty or null.");
                 }
 
             } else {
@@ -113,7 +211,12 @@ public class ViewParticipantsFragment extends Fragment {
         });
     }
 
-    private void fetchUserDetails(List<?> userRefs) {
+    /**
+     * get a list of users details based on their reference and add them to the entrant list with set status
+     * @param userRefs list of users referenced
+     * @param status status to set them when adding to the list
+     */
+    private void fetchUserDetails(List<?> userRefs, String status) {
         Log.d(TAG, "Number of user references: " + userRefs.size());
 
         List<Task<DocumentSnapshot>> userFetchTasks = new ArrayList<>();
@@ -157,8 +260,8 @@ public class ViewParticipantsFragment extends Fragment {
                                 if (user != null && user.getName() != null) {
                                     Entrant entrant = new Entrant();
                                     entrant.setUser(user);
-                                    entrant.setStatus("selected"); // Adjust status as needed
-                                    entrantList.add(entrant);
+                                    entrant.setStatus(status); // Adjust status as needed
+                                    addToItemList(entrant);
                                 } else {
                                     Log.e(TAG, "User data is null or missing name for document: " + userDoc.getId());
                                 }
@@ -182,4 +285,35 @@ public class ViewParticipantsFragment extends Fragment {
                 });
     }
 
+    /**
+     * Add a entrant to the list
+     * @param entrant: entrant to add
+     */
+    public void addToItemList(Entrant entrant){
+        if (!EntrantItemList.contains(entrant)) {
+            EntrantItemList.add(entrant);
+        }
+        entrantAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Remove an entrant from the list
+     * @param entrant: entrant to remove
+     */
+    public void removeItemfromList(Entrant entrant){
+        if (EntrantItemList.contains(entrant)) {
+            EntrantItemList.remove(entrant);
+        }
+        entrantAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onItemClick(Entrant entrant) {
+
+    }
+
+    @Override
+    public void onDeleteClick(Entrant entrant) {
+
+    }
 }

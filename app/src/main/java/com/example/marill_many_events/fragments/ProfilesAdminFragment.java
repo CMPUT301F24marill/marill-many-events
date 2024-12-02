@@ -42,13 +42,10 @@ import java.util.List;
  */
 public class ProfilesAdminFragment extends Fragment implements ProfileyArrayAdapter.OnItemClickListener{
 
-    private Event currentEvent;
     private RecyclerView userList;
     private ProfileyArrayAdapter userAdapter;
     private List<User> userItemList;
 
-
-    private FirebaseEvents firebaseEvents;
     private FirebaseFirestore firestore;
     private String deviceId;
     private StorageReference storageReference;
