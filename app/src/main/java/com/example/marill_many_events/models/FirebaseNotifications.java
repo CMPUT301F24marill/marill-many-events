@@ -38,6 +38,7 @@ public class FirebaseNotifications {
 
     /**
      * Loads Notification details from Firestore.
+     * @param documentID the documentID of the notification to query for
      */
     public void getNotificationDetails(String documentID) {
         firestore.collection("notifications").document(documentID)
@@ -55,6 +56,12 @@ public class FirebaseNotifications {
 
     /**
      * Create a notification
+     * @param sentTo The id of the user the notification is being sent to
+     *
+     * @param title The title of the notification
+     *
+     * @param content The content of the notificationw
+     *
      */
     public void createNotification(String sentTo,String title, String content) {
         Notification notification = new Notification(sentTo, title, content);
@@ -93,6 +100,7 @@ public class FirebaseNotifications {
 
     /**
      * Query notification for specific user
+     * @param sentTo The ID of the user the notification is being sent to
      */
     public void getUsersNotifications(String sentTo){
         firestore.collection("notifications").whereEqualTo("sentToId", sentTo)
