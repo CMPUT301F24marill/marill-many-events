@@ -5,19 +5,18 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.marill_many_events.R;
-import com.example.marill_many_events.fragments.EventFragment;
-import com.example.marill_many_events.fragments.RegistrationFragment;
+import com.example.marill_many_events.fragments.WaitlistFragment;
 
 /**
  * EventsActivity is responsible for displaying selected event data.
  * It extends {@link AppCompatActivity} and handles the initialization and
- * display of the EventFragment, passing data as needed.
+ * display of the WaitlistFragment, passing data as needed.
  */
 public class EventsActivity extends AppCompatActivity {
 
     /**
      * Called when the activity is first created. Initializes the activity, sets up the layout,
-     * and loads the {@link EventFragment} if no previous state is saved.
+     * and loads the {@link WaitlistFragment} if no previous state is saved.
      *
      * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
      *                           this Bundle contains the most recent data supplied. Otherwise, it is null.
@@ -30,14 +29,14 @@ public class EventsActivity extends AppCompatActivity {
         // Get the deviceId passed with the intent that started this activity.
         String deviceId = getIntent().getStringExtra("deviceId");
 
-        // Load the EventFragment if there is no saved instance state.
+        // Load the WaitlistFragment if there is no saved instance state.
         if (savedInstanceState == null) {
-            EventFragment myFragment = new EventFragment(); // Replace with your Fragment class
+            WaitlistFragment myFragment = new WaitlistFragment(); // Replace with your Fragment class
             Bundle args = new Bundle();
             args.putString("deviceId", deviceId); // Put the deviceId in the Bundle
             myFragment.setArguments(args);
 
-            // Replace the fragment container with the EventFragment.
+            // Replace the fragment container with the WaitlistFragment.
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, myFragment)
                     .commit();

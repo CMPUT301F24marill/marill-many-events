@@ -33,4 +33,6 @@ public interface NavbarListener {
      * Called when the profiles option is selected in the navigation bar FOR ADMINS.
      */
     void onProfilesSelected();
+
+    void onwaitlistSelected();
 }

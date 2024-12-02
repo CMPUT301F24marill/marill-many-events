@@ -85,6 +85,15 @@ public class NavbarFragment extends Fragment {
                     navbarListener.onProfileSelected();
                 }
                 return true;
+            }
+            else if (itemId == R.id.nav_waitlist) {
+            // Open registration fragment when profile is clicked
+            if (navbarListener != null) {
+                // Pass the deviceId when opening the registration fragment
+                bottomNavigation.getMenu().findItem(R.id.nav_waitlist).setIcon(R.drawable.hourglass_filled);
+                navbarListener.onwaitlistSelected();
+            }
+            return true;
             } else {
                 return false;
             }
@@ -115,7 +124,10 @@ public class NavbarFragment extends Fragment {
                 menuItem.setIcon(R.drawable.menu); // Reset to unselected icon
             } else if (menuItem.getItemId() == R.id.nav_profile) {
                 menuItem.setIcon(R.drawable.default_profile); // Reset to unselected icon
+            } else if (menuItem.getItemId() == R.id.nav_waitlist) {
+                menuItem.setIcon(R.drawable.hourglass_empty); // Reset to unselected icon
             }
+
         }
     }
 }
