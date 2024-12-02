@@ -247,7 +247,18 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
      * code that runs every frame
      */
     private void update() {
-        if(!button_pressed) setUI(); // Change UI elements based on context
+        if(!button_pressed) {
+            //get perms
+            boolean permission_check = parentActivity.getLocationPerms();
+            if(!permission_check){
+                createButton.setVisibility(View.INVISIBLE);
+                createButton.setEnabled(false);
+            }
+            else{
+                createButton.setVisibility(View.VISIBLE);
+                createButton.setEnabled(true);
+            }
+        } // Change UI elements based on context
     }
 
     /**
@@ -326,16 +337,6 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
             createButton.setText(getString(R.string.lbl_join_event));
             if(geo){
                 parentActivity.checkLocationPerms();
-                //get perms
-                boolean permission_check = parentActivity.getLocationPerms();
-                if(!permission_check){
-                    createButton.setVisibility(View.INVISIBLE);
-                    createButton.setEnabled(false);
-                }
-                else{
-                    createButton.setVisibility(View.VISIBLE);
-                    createButton.setEnabled(true);
-                }
                 createButton.setOnClickListener(v-> {
                     parentActivity.getLocation();
                     GeoPoint current_geo = parentActivity.getCurrent_geo();
@@ -357,7 +358,6 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
     private void eventFound(){
         createButton.setText(getString(R.string.lbl_leave_event));
         createButton.setOnClickListener(v-> {
-<<<<<<< Updated upstream
             eventViewModel.leaveEvent();
         });
     }
@@ -383,12 +383,6 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         createButton.setOnClickListener(v-> {
             eventViewModel.enterUser();
         });
-=======
-            eventViewModel.leaveWaitlist(event);
-            requireActivity().getSupportFragmentManager().popBackStack();
-            button_pressed = true;
-        });
->>>>>>> Stashed changes
     }
 
     private void isOrganizer(){

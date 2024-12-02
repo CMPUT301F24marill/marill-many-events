@@ -49,14 +49,11 @@ public class EventViewModel extends ViewModel implements EventsCallback {
     private final MutableLiveData<List<Event>> userEventList = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<List<Event>> userPendingList = new MutableLiveData<>(new ArrayList<>());
 
-<<<<<<< Updated upstream
 
     public LiveData<List<Event>> getUserPendingList() {
         return userPendingList;
     }
 
-=======
->>>>>>> Stashed changes
     public LiveData<List<Event>> getUserEventList() {
         return userEventList;
     }

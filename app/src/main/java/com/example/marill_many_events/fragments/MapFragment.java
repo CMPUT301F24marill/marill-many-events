@@ -37,6 +37,7 @@ import com.google.firebase.firestore.GeoPoint;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Shows the details of any selected event object, invoked from either user's waitlist or organizers event list
@@ -45,8 +46,10 @@ public class MapFragment extends Fragment {
 
     private Button backButton;
     private ImageView map;
-    FrameLayout frameLayout;
+    ViewGroup frameLayout;
+    ArrayList<ImageView> drawnViews;
     private ArrayList<GeoPoint> geoPointList;
+
 
     public MapFragment(ArrayList<GeoPoint> geoPointList) {
         this.geoPointList = geoPointList;
@@ -60,6 +63,8 @@ public class MapFragment extends Fragment {
         map.setAlpha((float)0.0);
         backButton.setAlpha((float)0.0);
         backButton.setEnabled(false);
+        frameLayout = container;
+        drawnViews = new ArrayList<>();
 
         int n = geoPointList.size();
         double[][] coordinates = new double[n][2];
@@ -87,7 +92,7 @@ public class MapFragment extends Fragment {
         imageView.setLayoutParams(params);
         // Add the ImageView to the container (FrameLayout)
         container.addView(imageView);
-
+        drawnViews.add(imageView);
         // Loop through coordinates and place the drawables at those positions
         for (double[] coordinate : coordinates) {
             float x = (float) (412*((coordinate[0] + 180)/360)+20);
@@ -120,7 +125,17 @@ public class MapFragment extends Fragment {
         backButton.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager().popBackStack();
         });
-
+        //add to array for removal after
+        drawnViews.add(imageView);
         return view;
+    }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        // Remove all drawn views from the container
+        for(ImageView drawn: drawnViews){
+            frameLayout.removeView(drawn);
+        }
     }
 }
