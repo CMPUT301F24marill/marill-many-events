@@ -12,13 +12,16 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.activities.AdminPageActivity;
+import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Event;
+import com.example.marill_many_events.models.EventViewModel;
 import com.example.marill_many_events.models.FirebaseEvents;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -34,23 +37,17 @@ import java.util.List;
 /**
  * Displays all events as a list, events can either be user's waitlist or organizer's created events
  */
-public class EventAdminFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener{
+public class EventAdminFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener, AdminEventDetailsFragment.OnItemClickListener{
 
     private Event currentEvent;
     private RecyclerView waitlistList;
     private EventyArrayAdapter eventAdapter;
     private List<Event> eventItemList;
 
-
-    ScanOptions options = new ScanOptions();
-
-    private FirebaseEvents firebaseEvents;
     private FirebaseFirestore firestore;
-    private String deviceId;
-    private StorageReference storageReference;
     private Identity identity;
     private CollectionReference user;
-    //private onLeaveListener listener;
+    private EventViewModel eventViewModel;
 
     /**
      * Default constructor for EventFragment.
@@ -91,6 +88,10 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
         firestore = identity.getFirestore();
         user = firestore.collection("events");
 
+        eventViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
+
+        eventViewModel.setFirebaseStorage(identity.getStorage());
+        eventViewModel.setFirebaseReference(firestore);
 
         View view = inflater.inflate(R.layout.fragment_eventlist_admin, container, false);
 
@@ -134,7 +135,6 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
                             // Fetch each document using the DocumentReference
                             Event eventIter = reference.toObject(Event.class);
                             if(eventIter != null){
-                                eventIter.setID(reference.getId());
                                 addToItemList(eventIter);
                             }
                         }
@@ -174,13 +174,13 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
     }
 
     public void showEventDetails(){
-        EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
-
+        AdminEventDetailsFragment eventDetailsFragment = new AdminEventDetailsFragment(this);
         // Replace the current fragment with the child fragment
         getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, eventDetailsFragment)
+                .add(R.id.fragment_container, eventDetailsFragment)
                 .addToBackStack(null)
                 .commit();
+        Log.d("S","showing event details");
     }
 
     /**
@@ -188,11 +188,10 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
      * @param event: event to be deleted
      */
     public void onDeleteClick(Event event ) {
-        DocumentReference eventDoc = user.document(event.getID());
-        Log.d("S", "event id: "+event.getID());
+        DocumentReference eventDoc = user.document(event.getFirebaseID());
+        Log.d("S", "event id: "+event.getFirebaseID());
         eventDoc.delete()
                 .addOnSuccessListener(aVoid -> {
-                    Log.d("Firebase", "attempting Event delete");
                     //remove from local list
                     removeItemfromList(event);
                     Log.d("Firebase", "Event deleted successfully");
@@ -202,11 +201,26 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
                 });
     }
 
+    /**
+     * Delete hash data
+     * @param event: event who's hash data is to be removed
+     */
+    public void onDeleteHashDataClick(Event event ) {
+        DocumentReference eventDoc = user.document(event.getFirebaseID());
+        Log.d("S", "event id: "+event.getFirebaseID());
+        eventDoc.update("qrcode", null)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firebase", "Hash data deleted successfully");
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "failed to delete Hashdata: " + e.getMessage());
+                });
+    }
+
     @Override
     public void onItemClick(Event event) {
-        /*HomePageActivity parentActivity = (HomePageActivity) getActivity();
-        parentActivity.setCurrentEvent(event);
+        eventViewModel.setSelectedEvent(event);
         Log.d("FragmentLifecycle", "Opening details.");
-        showEventDetails();*/
+        showEventDetails();
     }
 }

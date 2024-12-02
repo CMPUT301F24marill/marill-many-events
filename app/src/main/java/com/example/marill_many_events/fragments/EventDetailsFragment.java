@@ -25,6 +25,7 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.marill_many_events.EventsCallback;
 import com.example.marill_many_events.R;
+import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Event;
 import com.example.marill_many_events.models.EventViewModel;
 import com.example.marill_many_events.models.FirebaseEvents;
@@ -105,7 +106,7 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
 
                 if (event.getFirebaseID() != null) {
                     QRview.setVisibility(View.VISIBLE);
-                    QRview.setImageBitmap(generateQRcode.generateQR(event.getFirebaseID()));
+                    QRview.setImageBitmap(generateQRcode.generateQR(event.getQRcode()));
                 }
             }
         });

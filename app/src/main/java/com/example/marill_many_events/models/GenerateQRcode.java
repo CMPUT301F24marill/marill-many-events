@@ -13,6 +13,11 @@ import java.util.Hashtable;
 
 public class GenerateQRcode {
     public Bitmap generateQR(String documentID){
+
+        if(documentID == null){
+            return null;
+        }
+
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
 
         int size = 400;
