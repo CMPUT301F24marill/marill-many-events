@@ -19,7 +19,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
-//EventyArrayAdapter contains Events in list and retrieves a events information for the view
+/**
+ * Adapter for displaying a list of user profiles in a RecyclerView.
+ * This adapter handles binding user profile data to the RecyclerView and managing click interactions
+ * for viewing or deleting user profiles.
+ */
 public class ProfileyArrayAdapter extends RecyclerView.Adapter<ProfileyArrayAdapter.ProfileViewHolder> {
     private List<User> profileList;
     private OnItemClickListener listener; // Listener for item clicks
@@ -27,12 +31,18 @@ public class ProfileyArrayAdapter extends RecyclerView.Adapter<ProfileyArrayAdap
     private boolean set_Garbage;
 
     private String name;
-
+    /**
+     * ViewHolder class to hold references to the views for each user profile item in the RecyclerView.
+     */
     public static class ProfileViewHolder extends RecyclerView.ViewHolder {
         public ImageView profilePicture;
         public TextView userName;
         public TextView status;
-
+        /**
+         * Constructor that initializes the view references for a profile item.
+         *
+         * @param itemView The view for the individual profile item.
+         */
         public ProfileViewHolder(View itemView) {
             super(itemView);
             profilePicture = itemView.findViewById(R.id.profile_picture);
@@ -40,21 +50,38 @@ public class ProfileyArrayAdapter extends RecyclerView.Adapter<ProfileyArrayAdap
             status = itemView.findViewById(R.id.status);
         }
     }
-
+    /**
+     * Constructor for the ProfileyArrayAdapter.
+     *
+     * @param userItemList List of user profiles to display.
+     * @param listener OnItemClickListener to handle item clicks and delete actions.
+     * @param set_Garbage_value Flag to determine if the leave button should be shown as a delete button.
+     */
     public ProfileyArrayAdapter(List<User> userItemList, OnItemClickListener listener, boolean set_Garbage_value) {
         this.profileList = userItemList;
         this.listener = listener;
 
         set_Garbage = set_Garbage_value;
     }
-
+    /**
+     * Creates a new ViewHolder for the RecyclerView.
+     *
+     * @param parent The parent ViewGroup that the item view will be added to.
+     * @param viewType The view type of the new ViewHolder.
+     * @return A new ProfileViewHolder instance.
+     */
     @Override
     public ProfileViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.participant_list, parent, false);
         return new ProfileViewHolder(itemView);
     }
-
+    /**
+     * Binds data from the user profile list to the views in the ViewHolder.
+     *
+     * @param holder The ViewHolder to bind the data to.
+     * @param position The position of the item in the list.
+     */
     @Override
     public void onBindViewHolder(ProfileViewHolder holder, int position) {
         User currentItem = profileList.get(position);
@@ -91,18 +118,28 @@ public class ProfileyArrayAdapter extends RecyclerView.Adapter<ProfileyArrayAdap
             holder.status.setVisibility(View.GONE);
         }
     }
-
+    /**
+     * Interface for handling item click and delete events.
+     * Classes implementing this interface must define behavior for these actions.
+     */
     // Define an interface for item click listener
     public interface OnItemClickListener {
         void onItemClick(User user);  // Pass a single Event object on click
         void onDeleteClick(User user);
     }
-
+    /**
+     * Gets the total number of items in the profile list.
+     *
+     * @return The size of the profile list.
+     */
     @Override
     public int getItemCount() {
         return profileList.size();
     }
-
+    /**
+     * Hides the leave button (delete functionality) for a profile item.
+     * This can be used if the delete action is not needed for certain profiles.
+     */
     public void hideLeaveButton(){
         leaveButton.setVisibility(View.GONE);
     }
