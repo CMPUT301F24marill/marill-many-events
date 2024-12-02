@@ -29,12 +29,18 @@ public class EntrantyArrayAdapter extends RecyclerView.Adapter<EntrantyArrayAdap
 
     private String name;
     private String entrantStatus;
-
+    /**
+     * ViewHolder class for holding the views of a single item (participant).
+     */
     public static class ProfileViewHolder extends RecyclerView.ViewHolder {
         public ImageView profilePicture;
         public TextView userName;
         public TextView status;
-
+        /**
+         * Constructor for the ViewHolder.
+         *
+         * @param itemView The root view of the layout for each item (entrant).
+         */
         public ProfileViewHolder(View itemView) {
             super(itemView);
             profilePicture = itemView.findViewById(R.id.profile_picture);
@@ -42,7 +48,12 @@ public class EntrantyArrayAdapter extends RecyclerView.Adapter<EntrantyArrayAdap
             status = itemView.findViewById(R.id.status);
         }
     }
-
+    /**
+     * Constructor for EntrantyArrayAdapter.
+     *
+     * @param userItemList List of entrants to display.
+     * @param listener     OnItemClickListener for handling clicks.
+     */
     public EntrantyArrayAdapter(List<Entrant> userItemList, OnItemClickListener listener) {
         this.profileList = userItemList;
         this.listener = listener;
@@ -89,18 +100,33 @@ public class EntrantyArrayAdapter extends RecyclerView.Adapter<EntrantyArrayAdap
             leaveButton.setVisibility(View.INVISIBLE);
         }
     }
-
+    /**
+     * Interface for handling item clicks and delete button clicks.
+     * This interface is used to define actions for when an entrant is clicked or when the "leave" button is clicked.
+     */
     // Define an interface for item click listener
     public interface OnItemClickListener {
+        /**
+         * Called when an item (entrant) is clicked.
+         *
+         * @param entrant The clicked entrant object.
+         */
         void onItemClick(Entrant entrant);  // Pass a single Event object on click
+        /**
+         * Called when the delete (leave) button is clicked for an entrant.
+         *
+         * @param entrant The entrant object for which the leave button was clicked.
+         */
         void onDeleteClick(Entrant entrant);
     }
-
+    // Return the size of the profile list
     @Override
     public int getItemCount() {
         return profileList.size();
     }
-
+    /**
+     * Hides the leave (cancel) button in the adapter. This can be called if the button should not be shown.
+     */
     public void hideLeaveButton(){
         leaveButton.setVisibility(View.GONE);
     }
