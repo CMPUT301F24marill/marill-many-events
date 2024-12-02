@@ -58,7 +58,6 @@ import java.util.Hashtable;
  * Fragment that is opened when a facility has been created and the user wants to create a new event.
  * Implements creating an event in firebase and uploading poster
  */
-
 public class CreateEventFragment extends Fragment implements EventsCallback, PhotoPicker.OnPhotoSelectedListener {
 
     //Views
@@ -96,7 +95,12 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         // Required empty public constructor
     }
 
-
+    /**
+     * Called when the fragment is attached to its host context.
+     *
+     * @param context The activity context to which the fragment is attached.
+     * @throws ClassCastException if the activity does not implement Identity interface.
+     */
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -136,7 +140,6 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
      * @param savedInstanceState A Bundle containing the activity's previously saved state.
      * @return The view for this fragment.
      */
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -295,7 +298,9 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
 
 
     /**
-     * Create an event object with mandatory field validations.
+     * Attempts to create a new event from the user inputs. If the inputs are invalid, it shows a toast.
+     *
+     * @return The newly created event, or null if the event is invalid.
      */
     public Event createEvent() {
         // Validate event name

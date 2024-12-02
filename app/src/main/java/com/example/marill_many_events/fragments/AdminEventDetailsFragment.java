@@ -36,7 +36,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 /**
- * Shows the details of any selected event object, invoked from either user's waitlist or organizers event list
+ * AdminEventDetailsFragment displays the details of a selected event.
+ * This fragment is invoked from either the user's waitlist or the organizer's event list.
+ * It shows event details like name, location, capacity, start and end dates,
+ * and generates a QR code for the event.
  */
 public class AdminEventDetailsFragment extends Fragment {
 
@@ -52,11 +55,27 @@ public class AdminEventDetailsFragment extends Fragment {
 
     private OnItemClickListener listener;
 
+    /**
+     * Constructor for the AdminEventDetailsFragment.
+     * This constructor requires an OnItemClickListener to handle the deletion of event hash data.
+     *
+     * @param listener A listener for handling click events related to deleting event hash data.
+     */
     public AdminEventDetailsFragment(OnItemClickListener listener) {
         this.listener = listener;
     }
 
-
+    /**
+     * Called when the fragment is created. This method sets up the UI elements,
+     * fetches the current event from the parent activity, and observes changes to the selected event
+     * from the ViewModel. It also sets up listeners for buttons like create and delete.
+     *
+     * @param inflater           The LayoutInflater object to inflate the fragment's view.
+     * @param container          The parent view that the fragment's UI will be attached to.
+     * @param savedInstanceState If the fragment is being re-initialized, this Bundle contains the most recent data.
+     *                           Otherwise, it is null.
+     * @return The fragment's view.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_create_event, container, false);
@@ -122,10 +141,13 @@ public class AdminEventDetailsFragment extends Fragment {
         return view;
     }
 
-    /**
-     * Retrieve poster from firebase storage and load with aspect ratio in mind
-     */
 
+    /**
+     * Loads the event poster image from Firebase storage and adjusts its aspect ratio
+     * to fit the ImageView while maintaining the image's aspect ratio.
+     *
+     * @param url The URL of the poster image stored in Firebase storage.
+     */
     public void loadPoster(String url) {
         posterView.post(() -> {
             Glide.with(this).asBitmap().load(url).into(new CustomTarget<Bitmap>() {
@@ -142,20 +164,33 @@ public class AdminEventDetailsFragment extends Fragment {
                     posterView.setLayoutParams(params);
                     posterView.setImageBitmap(resource);
                 }
-
+                /**
+                 * Called when Glide clears the resource (image) from the ImageView.
+                 * This can occur when the image load operation is canceled or when the view is no longer in use.
+                 *
+                 * @param placeholder A placeholder Drawable that can be used while the image is being loaded.
+                 *                   It is nullable and may be null if no placeholder is provided.
+                 */
                 @Override
                 public void onLoadCleared(@Nullable Drawable placeholder) {}
             });
         });
     }
-
+    /**
+     * Makes a TextView non-editable by disabling focus, cursor visibility, and key listeners.
+     *
+     * @param textView The TextView to make non-editable.
+     */
     public void setNoEdit(TextView textView){
         textView.setFocusable(false);
         textView.setCursorVisible(false);
         textView.setKeyListener(null);
         textView.setTextIsSelectable(true);
     }
-
+    /**
+     * Configures the UI elements based on the event's state and role (admin or user).
+     * This method hides certain buttons and disables their actions based on the event's context.
+     */
     public void setUI() {
         setNoEdit(nameField);
         setNoEdit(locationField);
@@ -167,7 +202,10 @@ public class AdminEventDetailsFragment extends Fragment {
 
         createButton.setText(getString(R.string.lbl_delete_hashdata));
     }
-
+    /**
+     * Interface for handling item clicks related to deleting event hash data.
+     * Implement this interface in the parent activity or fragment to handle the event.
+     */
     // Define an interface for item click listener
     public interface OnItemClickListener {
         void onDeleteHashDataClick(Event event );

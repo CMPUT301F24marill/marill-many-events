@@ -1,7 +1,10 @@
 package com.example.marill_many_events.fragments;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -117,6 +121,8 @@ public class JoinedEventsFragment extends Fragment implements EventyArrayAdapter
         waitlistList.setAdapter(eventAdapter);
 
         eventViewModel.getUserEventlist();
+        checkNotifications();
+
 
         eventViewModel.getUserEventList().observe(getViewLifecycleOwner(), updatedList -> {
             eventItemList.clear(); // Clear the old list
@@ -167,4 +173,59 @@ public class JoinedEventsFragment extends Fragment implements EventyArrayAdapter
             Log.d("Firestore", "Error getting user: ", e);
         });
     }
+
+
+    private void checkNotifications(){
+        userReference.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                // Retrieve the field
+                ArrayList<String> notificationStack = (ArrayList<String>) documentSnapshot.get("notifications"); // Replace 'fieldName' with your field key
+                StringBuilder notificationString = new StringBuilder();
+                if (notificationStack != null) {
+                    for(String notification : notificationStack){
+                        notificationString.append(notification);
+                        notificationString.append('\n');
+                    }
+                    sendNotification("Update", notificationString.toString());
+                    notificationStack.clear();
+
+                    userReference.update("notifications", notificationStack)
+                            .addOnSuccessListener(aVoid -> Log.d("Firestore", "Notifications cleared successfully"))
+                            .addOnFailureListener(e -> Log.e("Firestore", "Failed to clear notifications", e));
+                } else {
+                    System.out.println("Field does not exist in the document.");
+                }
+            } else {
+                System.out.println("Document does not exist.");
+            }
+        }).addOnFailureListener(e -> {
+            System.err.println("Error fetching document: " + e.getMessage());
+        });
+    }
+
+
+    private void sendNotification(String title, String message) {
+        NotificationManager notificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        String channelId = "entrant_updates";
+
+        // Create a notification channel (for Android 8.0 and above)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    channelId,
+                    "Entrant Updates",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        // Build and send the notification
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(requireContext(), channelId)
+                .setSmallIcon(R.drawable.ic_marill) // Replace with your icon
+                .setContentTitle(title)
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+        notificationManager.notify(1, builder.build());
+    }
+
 }
