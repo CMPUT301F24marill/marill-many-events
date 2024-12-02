@@ -38,7 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Displays all events as a list, events can either be user's waitlist or organizer's created events
+ * A fragment that displays a list of events created by the organizer.
+ * Organizers can view event details, create new events, and delete events.
  */
 public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener, FacilityCallback {
 
@@ -65,11 +66,18 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
     CollectionReference facility;
     private List<String> facilityEvents;
 
-
+    /**
+     * Default constructor for OrgEventsFragment.
+     * Required to ensure proper fragment instantiation.
+     */
     public OrgEventsFragment() {
         // Required empty public constructor
     }
-
+    /**
+     * Attaches the fragment to the activity and checks if the activity implements the Identity interface.
+     *
+     * @param context The context to attach the fragment to.
+     */
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -81,7 +89,9 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
             throw new ClassCastException(context.toString() + " must implement Identity Interface");
         }
     }
-
+    /**
+     * Called when the fragment is resumed. Fetches the organizer's events.
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -93,7 +103,14 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
         //addToItemList( new Event("https://firebasestorage.googleapis.com/v0/b/marill-many-events.appspot.com/o/event_posters%2Feventposters%2Fimage_1730935799965_05ae8f93-85df-4308-aa48-cdd23874342a.jpg.jpg?alt=media&token=81e266fb-bc73-4489-9f10-8f893e3260ae"
         //       , "Event9001", null, null, null, 1, false, null));
     }
-
+    /**
+     * Inflates the layout for this fragment, initializes UI components, and sets up the event list.
+     *
+     * @param inflater The LayoutInflater used to inflate the fragment's view.
+     * @param container The parent view that the fragment's UI will be attached to.
+     * @param savedInstanceState The saved state of the fragment.
+     * @return The view for the fragment.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {// Inflate the layout for this fragment
         eventViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
@@ -108,7 +125,6 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
         eventViewModel.setFirebaseStorage(identity.getStorage());
         eventViewModel.setFirebaseReference(firestore);
         getUser();
-
 
 
         //firebaseFacilityRegistration.getFacility(deviceId);
@@ -145,8 +161,9 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
 
         return view;
     }
-
-
+    /**
+     * Fetches the user's events from Firestore.
+     */
     public void getUserEvents() {
 
     }
@@ -161,7 +178,9 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
 //        }
 //        eventAdapter.notifyDataSetChanged();
 //    }
-
+    /**
+     * Navigates to the CreateEventFragment to create a new event.
+     */
     public void createEvent(){
         CreateEventFragment createEventFragment = new CreateEventFragment();
 
@@ -171,7 +190,9 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
                 .commit();
     }
 
-
+    /**
+     * Navigates to the EventDetailsFragment to display event details.
+     */
     public void showEventDetails(){
         EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
 
@@ -189,7 +210,11 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
 //        Log.d("FragmentLifecycle", "Opening details.");
 //        showEventDetails();
 //    }
-
+    /**
+     * Handles item click events to view event details.
+     *
+     * @param event The clicked event.
+     */
     @Override
     public void onItemClick(Event event) {
         eventViewModel.setSelectedEvent(event);
@@ -198,28 +223,42 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
     }
 
 
-
+    /**
+     * Deletes an event from Firestore.
+     *
+     * @param event The event to delete.
+     */
     public void onDeleteClick(Event event){
         if(event != null)
             eventViewModel.deleteEvent(event);
     }
 
-
+    /**
+     * Handles the callback when a facility is loaded.
+     *
+     * @param facility The loaded facility.
+     */
     @Override
     public void onFacilityLoaded(Facility facility) {
     }
 
-
+    /**
+     * Handles the callback when a facility is registered.
+     */
     @Override
     public void onFacilityRegistered() {
 
     }
-
+    /**
+     * Handles the callback when a facility is updated.
+     */
     @Override
     public void onFacilityUpdated() {
 
     }
-
+    /**
+     * Fetches the current user's data from Firestore and updates the ViewModel.
+     */
     public void getUser(){
         userReference.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
