@@ -40,7 +40,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Shows the details of any selected event object, invoked from either user's waitlist or organizers event list
+ * A fragment that displays a map with GeoPoint markers.
+ * This fragment is invoked from either the user's waitlist or the organizer's event list to show event locations.
  */
 public class MapFragment extends Fragment {
 
@@ -50,11 +51,22 @@ public class MapFragment extends Fragment {
     ArrayList<ImageView> drawnViews;
     private ArrayList<GeoPoint> geoPointList;
 
-
+    /**
+     * Constructor for MapFragment.
+     *
+     * @param geoPointList The list of GeoPoint objects representing event locations.
+     */
     public MapFragment(ArrayList<GeoPoint> geoPointList) {
         this.geoPointList = geoPointList;
     }
-
+    /**
+     * Inflates the layout for this fragment and initializes the map and GeoPoint markers.
+     *
+     * @param inflater The LayoutInflater to inflate the layout.
+     * @param container The parent view that the fragment's UI will be attached to.
+     * @param savedInstanceState The saved state of the fragment.
+     * @return The view for the fragment.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
@@ -129,6 +141,9 @@ public class MapFragment extends Fragment {
         drawnViews.add(imageView);
         return view;
     }
+    /**
+     * Cleans up the map and markers when the fragment view is destroyed.
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();
