@@ -25,7 +25,6 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.marill_many_events.EventsCallback;
 import com.example.marill_many_events.R;
-import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Event;
 import com.example.marill_many_events.models.EventViewModel;
 import com.example.marill_many_events.models.FirebaseEvents;
@@ -81,7 +80,7 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         viewParticipantsButton = view.findViewById(R.id.view_participants_button);
         photoPicker = new PhotoPicker(this, this);
         firebaseStorage = eventViewModel.getFirebaseStorage();
-        firebaseEvents = new FirebaseEvents(eventViewModel.getFirebaseReference(), firebaseStorage.getReference(), eventViewModel.getUserReference().getId(), this);
+        firebaseEvents = new FirebaseEvents(eventViewModel.getFirebaseReference(), firebaseStorage.getReference("event_posters"), eventViewModel.getUserReference().getId(), this);
 
 
         createButton = view.findViewById(R.id.create);
@@ -219,7 +218,7 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
     private void eventFound(){
         createButton.setText("Leave Event");
         createButton.setOnClickListener(v-> {
-            eventViewModel.leaveEvent(event);
+            eventViewModel.leaveWaitlist(event);
         });
 
     }
