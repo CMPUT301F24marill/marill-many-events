@@ -17,7 +17,7 @@ import androidx.lifecycle.ViewModel;
 import com.example.marill_many_events.EventsCallback;
 import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.activities.MainActivity;
-import com.google.android.gms.location.FusedLocationProviderClient;
+
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.appcheck.internal.util.Logger;
@@ -36,7 +36,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
-
+/**
+ * ViewModel class for managing event-related data and operations.
+ * Provides LiveData for observing user-related event lists and handles event interactions such as registration, deletion, and status updates.
+ */
 public class EventViewModel extends ViewModel implements EventsCallback {
 
     private final MutableLiveData<Event> selectedEvent = new MutableLiveData<>();
@@ -173,7 +176,14 @@ public class EventViewModel extends ViewModel implements EventsCallback {
             userOwnedList.setValue(currentList); // Trigger observers
         }
     }
-
+    /**
+     * Removes the specified event from the appropriate list based on its current status.
+     * If the event is in the user's pending list, it is rejected.
+     * If the event is in the user's waitlist, the user leaves the waitlist.
+     * If the event is in the user's active events, the user leaves the event.
+     *
+     * @param event The event to be removed from the user's list.
+     */
     public void leaveList(Event event){
         if(getUserPendingList().getValue().contains(event)){
             setSelectedEvent(event);
@@ -188,6 +198,11 @@ public class EventViewModel extends ViewModel implements EventsCallback {
             leaveEvent();
         }
     }
+    /**
+     * Fetches all events that the user is currently registered for and updates the LiveData.
+     * Clears the current list of user events and repopulates it by retrieving references
+     * to the user's events from Firestore.
+     */
 
     public void getUserEventlist() {
         userEventList.setValue(new ArrayList<>()); // Clear the current list
@@ -292,7 +307,12 @@ public class EventViewModel extends ViewModel implements EventsCallback {
                 });
     }
 
-
+    /**
+     * Fetches all events owned by the user and updates the LiveData.
+     * Retrieves the facility document using the user's ID and extracts the list of event IDs
+     * from the "events" field. For each event ID, it fetches the event details and populates
+     * the user's owned events list.
+     */
     public void getUserOwnedEvents() {
         userOwnedList.setValue(new ArrayList<>()); // Clear the current list
 
@@ -327,7 +347,13 @@ public class EventViewModel extends ViewModel implements EventsCallback {
                 });
     }
 
-
+    /**
+     * Fetches the details of a specific event by its ID.
+     * Retrieves the event document from the "events" collection using the provided event ID
+     * and adds it to the user's owned events list.
+     *
+     * @param eventId The ID of the event to fetch.
+     */
     public void fetchEventDetails(String eventId) {
         // Fetch the event document from the "events" collection using the eventId
         firebaseFirestore.collection("events").document(eventId).get()
@@ -491,7 +517,12 @@ public class EventViewModel extends ViewModel implements EventsCallback {
                     //Toast.makeText(getContext(), "Error adding item to the list", Toast.LENGTH_SHORT).show();
                 });
     }
-
+    /**
+     * Adds the current user as an entrant to the selected event.
+     * Removes the event from the user's "pending" list and adds it to their "events" list.
+     * Simultaneously updates the event's "pending" list and adds the user to its "entrants" list.
+     * This operation is performed atomically using a Firestore batch operation.
+     */
     public void enterUser(){ // Add the current user as an entrant to the selected event
         WriteBatch batch = firebaseFirestore.batch();
         DocumentReference eventUsers = firebaseFirestore.collection("events").document(getSelectedEvent().getValue().FirebaseID);
@@ -616,6 +647,11 @@ public class EventViewModel extends ViewModel implements EventsCallback {
                 });
     }
 
+    /**
+     * Deletes the specified event from Firestore and removes its reference from the associated facility.
+     *
+     * @param event The {@link Event} to delete.
+     */
     public void deleteEvent(Event event){
         if(event != null) {
             firebaseFirestore.collection("events") // "events" is the name of your collection
@@ -655,44 +691,81 @@ public class EventViewModel extends ViewModel implements EventsCallback {
                     });
         }
     }
-
+    /**
+     * Event callback method invoked when a new event is created.
+     *
+     * @param documentID The ID of the created event document.
+     */
     // Implemented EventsCallback methods
     public void onEventCreate(String documentID) {
         // Custom logic for event creation
     }
-
+    /**
+     * Event callback method invoked when an event is deleted.
+     */
     public void onEventDelete() {
         // Custom logic for event deletion
     }
-
+    /**
+     * Event callback method for joining an event.
+     */
     public void joinEvent() {
         // Custom logic for joining an event
     }
-
+    /**
+     * Sets the specified event as the currently selected event.
+     *
+     * @param event The {@link Event} to set as selected.
+     */
     public void getEvent(Event event) {
         setSelectedEvent(event);
     }
-
+    /**
+     * Callback method invoked when a poster is successfully uploaded.
+     *
+     * @param url The URL of the uploaded poster.
+     */
     public void onPosterUpload(String url) {
         // Custom logic for handling poster uploads
     }
-
+    /**
+     * Retrieves the FirebaseStorage instance.
+     *
+     * @return The {@link FirebaseStorage} instance used for storage operations.
+     */
     public FirebaseStorage getFirebaseStorage() {
         return firebaseStorage;
     }
-
+    /**
+     * Sets the FirebaseStorage instance.
+     *
+     * @param firebaseStorage The {@link FirebaseStorage} instance to set.
+     */
     public void setFirebaseStorage(FirebaseStorage firebaseStorage) {
         this.firebaseStorage = firebaseStorage;
     }
-
+    /**
+     * Retrieves the DocumentReference for the current user.
+     *
+     * @return The {@link DocumentReference} for the user's Firestore document.
+     */
     public DocumentReference getUserReference() {
         return userReference;
     }
 
+    /**
+     * Sets the DocumentReference for the current user.
+     *
+     * @param userReference The {@link DocumentReference} for the user's Firestore document.
+     */
     public void setUserReference(DocumentReference userReference) {
         this.userReference = userReference;
     }
-
+    /**
+     * Checks whether the current user owns the currently selected event.
+     *
+     * @return {@code true} if the user owns the event; {@code false} otherwise.
+     */
     public boolean userOwnsEvent(){
         // Get the current value of userEventList
         List<Event> currentList = getUserOwnedList().getValue();
@@ -700,7 +773,10 @@ public class EventViewModel extends ViewModel implements EventsCallback {
 
         return currentList != null && getSelectedEvent().getValue() != null && currentList.contains(getSelectedEvent().getValue());
     }
-
+    /**
+     * Performs a random draw to select entrants for the currently selected event.
+     * Removes unselected entrants from the waitlist and sends notifications.
+     */
     public void performDraw() {
         firebaseFirestore = FirebaseFirestore.getInstance();
 
@@ -735,7 +811,11 @@ public class EventViewModel extends ViewModel implements EventsCallback {
                     Log.e("Firestore", "Error retrieving document", e);
                 });
     }
-
+    /**
+     * Retrieves the event's capacity and selects a random set of entrants.
+     *
+     * @param waitListRefs List of entrant references from the waitlist.
+     */
     private void getEventCapacityAndSelectEntrants(List<DocumentReference> waitListRefs) {
         // Fetch the event's capacity from Firestore
 
@@ -749,6 +829,13 @@ public class EventViewModel extends ViewModel implements EventsCallback {
 
     }
 
+    /**
+     * Randomly selects a specified number of entrants from a list.
+     *
+     * @param entrantRefs           List of entrant references.
+     * @param numberOfEntrantsToSelect The number of entrants to select.
+     * @return A list of selected entrant references.
+     */
     private List<DocumentReference> selectRandomEntrants(List<DocumentReference> entrantRefs, int numberOfEntrantsToSelect) {
         if (entrantRefs.isEmpty()) {
             Log.w(TAG, "The entrant references list is empty.");
@@ -764,7 +851,12 @@ public class EventViewModel extends ViewModel implements EventsCallback {
         Collections.shuffle(shuffledEntrantRefs);
         return new ArrayList<DocumentReference>(shuffledEntrantRefs.subList(0, numberOfEntrantsToSelect));
     }
-
+    /**
+     * Updates Firestore with the selected and unselected entrants, updating their statuses and sending notifications.
+     *
+     * @param selectedEntrantRefs List of selected entrant references.
+     * @param allEntrantRefs      List of all entrant references.
+     */
     private void storeSelectedEntrants(List<DocumentReference> selectedEntrantRefs, List<DocumentReference> allEntrantRefs) {
         if (selectedEntrantRefs.isEmpty()) {
             Log.w(TAG, "No entrants to store.");

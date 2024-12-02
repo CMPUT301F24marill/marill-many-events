@@ -20,7 +20,14 @@ public class FirebaseEvents {
     private StorageReference storageReference;
     private String deviceId;
     private EventsCallback eventsCallback;
-
+    /**
+     * Constructs a FirebaseEvents object to manage Firestore and Firebase Storage operations.
+     *
+     * @param firestore       The Firestore database instance.
+     * @param storageReference The Firebase Storage reference.
+     * @param deviceId        The device ID or unique identifier for the user or facility.
+     * @param eventsCallback  The callback interface for event-related operations.
+     */
     public FirebaseEvents(FirebaseFirestore firestore, StorageReference storageReference, String deviceId, EventsCallback eventsCallback) {
         this.firestore = firestore;
         this.storageReference = storageReference;
@@ -62,7 +69,11 @@ public class FirebaseEvents {
                 });
     }
 
-
+    /**
+     * Deletes an event from Firestore.
+     *
+     * @param eventID The Firestore document ID of the event to delete.
+     */
     public void deleteEvent(String eventID) {
         firestore.collection("events") // "events" is the name of your collection
                 .document(eventID)
@@ -191,7 +202,11 @@ public class FirebaseEvents {
     public void deleteUser(){
         firestore.collection("users").document(deviceId).delete();
     }
-
+    /**
+     * Generates a random filename for file uploads.
+     *
+     * @return A unique filename with a timestamp and UUID.
+     */
     public String generateRandomFilename() {    // https://stackoverflow.com/questions/5126559/android-create-unique-string-for-file-name
         long timestamp = System.currentTimeMillis();
         return "image_" + timestamp + "_" + UUID.randomUUID().toString() + ".jpg"; // Add your desired extension

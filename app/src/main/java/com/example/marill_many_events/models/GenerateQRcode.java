@@ -10,8 +10,16 @@ import com.google.zxing.qrcode.QRCodeWriter;
 
 import java.util.Hashtable;
 
-
+/**
+ * Utility class for generating QR codes based on a given document ID.
+ */
 public class GenerateQRcode {
+    /**
+     * Generates a QR code as a Bitmap for the provided document ID.
+     *
+     * @param documentID The unique document ID to encode into the QR code.
+     * @return A Bitmap representation of the QR code, or null if an error occurs.
+     */
     public Bitmap generateQR(String documentID){
 
         if(documentID == null){
