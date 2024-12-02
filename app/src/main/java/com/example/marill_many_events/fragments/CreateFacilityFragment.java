@@ -53,11 +53,16 @@ public class CreateFacilityFragment extends Fragment implements FacilityCallback
     private Facility facility;
 
     FirebaseFacilityRegistration firebaseFacilityRegistration;
-
+    /**
+     * Default constructor for CreateFacilityFragment.
+     */
     public CreateFacilityFragment() {
         // Required empty public constructor
     }
-
+    /**
+     * onAttach() is called when the fragment is attached to its parent activity.
+     * Ensures the parent activity implements the Identity interface for necessary interaction.
+     */
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -69,7 +74,10 @@ public class CreateFacilityFragment extends Fragment implements FacilityCallback
             throw new ClassCastException(context.toString() + " must implement Identity Interface");
         }
     }
-
+    /**
+     * onCreate() initializes the Firebase Firestore instance and gets the device ID.
+     * The FirebaseFacilityRegistration is set up for interacting with Firestore.
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,13 +87,27 @@ public class CreateFacilityFragment extends Fragment implements FacilityCallback
 
         firebaseFacilityRegistration = new FirebaseFacilityRegistration(firestore, facilityId, this);
     }
-
+    /**
+     * onCreateView() inflates the fragment layout when the view is created.
+     * This method returns the fragment's root view.
+     *
+     * @param inflater the LayoutInflater object
+     * @param container the parent ViewGroup
+     * @param savedInstanceState saved state of the fragment
+     * @return the root view for this fragment
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_create_facility, container, false);  // Inflate the layout
     }
-
+    /**
+     * onViewCreated() is called after the view is created and initialized.
+     * It sets up button click listeners and attempts to load existing facility details if available.
+     *
+     * @param view the root view of the fragment
+     * @param savedInstanceState saved state of the fragment
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // Initialize the views
@@ -188,7 +210,9 @@ public class CreateFacilityFragment extends Fragment implements FacilityCallback
 
         return true;
     }
-
+    /**
+     * Deletes the facility and all associated events from Firestore.
+     */
     public void deleteFacility() {
         firestore.collection("facilities").document(facilityId)
                 .get()
