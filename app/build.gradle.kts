@@ -77,6 +77,19 @@ dependencies {
     androidTestImplementation ("androidx.test:runner:1.4.0")
     androidTestImplementation ("androidx.test:rules:1.4.0")
 
+
+    androidTestImplementation ("androidx.test.espresso:espresso-intents:3.4.0")
+
+    implementation ("com.google.android.material:material:1.5.0")
+
+    implementation("androidx.appcompat:appcompat:1.2.0")
+
+    testImplementation ("junit:junit:4.13.2")
+    testImplementation ("org.robolectric:robolectric:4.9")
+    testImplementation ("androidx.test:core:1.4.0")
+    testImplementation ("androidx.test.ext:junit:1.1.3")
+
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
