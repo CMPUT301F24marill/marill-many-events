@@ -145,17 +145,17 @@
             android:id="@+id/create"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="8dp"
             android:text="@string/Create"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/TextView" />
+            app:layout_constraintTop_toBottomOf="@+id/map_button" />
 
         <Button
             android:id="@+id/delete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
+            android:layout_marginTop="8dp"
             android:backgroundTint="@color/delete_red"
             android:text="@string/Delete"
             android:textColor="@color/white"
@@ -169,19 +169,18 @@
             android:id="@+id/map_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
+            android:layout_marginTop="8dp"
             android:text="@string/lbl_View_Map"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/delete" />
+            app:layout_constraintTop_toBottomOf="@+id/TextView" />
 
 
         <Button
             android:id="@+id/draw_entrants_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
             android:text="@string/lbl_draw_entrants"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
@@ -192,7 +191,6 @@
             android:id="@+id/view_participants_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
             android:text="@string/lbl_view_participants"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"

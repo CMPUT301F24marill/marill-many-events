@@ -2,7 +2,10 @@ package com.example.marill_many_events.activities;
 
 import static com.google.firebase.appcheck.internal.util.Logger.TAG;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -17,11 +20,14 @@ import com.example.marill_many_events.fragments.OrgEventsFragment;
 import com.example.marill_many_events.fragments.RegistrationFragment;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.marill_many_events.models.Event;
 import com.example.marill_many_events.models.FirebaseUsers;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.storage.FirebaseStorage;
 
 import androidx.annotation.NonNull;
@@ -30,6 +36,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 
+
+import android.location.Location;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 
 /**
  * HomePageActivity serves as the main activity for the application, managing the
@@ -42,6 +52,9 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
     private FirebaseFirestore firestore; // Firestore instance
     private String deviceId; // Store deviceId here
     private FirebaseUsers firebaseUsers;
+    private FusedLocationProviderClient fusedLocation;
+
+    GeoPoint current_geo;
 
     private boolean isOrgList;
     private String eventDocumentId;
@@ -67,8 +80,6 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
         //firebaseUsers= new FirebaseUsers(firestore, firebaseStorage, deviceId, this);
         //firebaseUsers.loadUserDetails();
 
-
-
         Log.d("HomePageActivity", "Fragment Container Visibility: " + findViewById(R.id.fragment_container).getVisibility());
 
         // Set up NavbarFragment
@@ -82,7 +93,7 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
                 .replace(R.id.fragment_container, joinedEventsFragment) // replace the fragment already in fragment_container
                 .addToBackStack(null) // add to back stack
                 .commit();
-        
+
         fusedLocation = LocationServices.getFusedLocationProviderClient(this);
         checkLocationPerms();
     }
@@ -165,7 +176,7 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
         deviceId = getIntent().getStringExtra("deviceId"); // Retrieve deviceId
 
         WaitlistFragment waitlistFragment = new WaitlistFragment();
-        Log.d(TAG, "onwailistSelected called with deviceId: " + deviceId);
+        Log.d(TAG, "onHomeSelected called with deviceId: " + deviceId);
         isOrgList = false;
 
         getSupportFragmentManager().beginTransaction()
