@@ -98,8 +98,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        //set up notification builder
-
+        //Set up notification: main structure
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "test")
                 .setContentTitle("test title")
                 .setContentText("Example Notification")
@@ -120,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     CharSequence name = "content";
-                    String description = "Example Notification";
+                    String description = "desc";
                     int importance = NotificationManager.IMPORTANCE_DEFAULT;
                     NotificationChannel channel = new NotificationChannel("test", name, importance);
                     channel.setDescription(description);
@@ -130,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        
+
     }
 
     /**

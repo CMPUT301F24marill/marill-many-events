@@ -9,14 +9,16 @@ package com.example.marill_many_events.models;
 public class Notification {
 
     String sentToId;
+    String title;
     String content;
 
     public Notification() {
         // This constructor is needed by Firebase or Gson
     }
 
-    public Notification(String sentToId, String content) {
+    public Notification(String sentToId, String title, String content) {
         this.sentToId = sentToId;
+        this.title = title;
         this.content = content;
     }
 
@@ -26,6 +28,14 @@ public class Notification {
 
     public void setSentToId(String sentToId) {
         this.sentToId = sentToId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getContent() {

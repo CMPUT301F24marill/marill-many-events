@@ -3,6 +3,7 @@ package com.example.marill_many_events.activities;
 import android.util.Log;
 
 import com.example.marill_many_events.models.Entrant;
+import com.example.marill_many_events.models.FirebaseNotifications;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -18,6 +19,7 @@ public class EntrantsDrawActivity {
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final String eventID;
+    FirebaseNotifications firebaseNotifications;
 
     public EntrantsDrawActivity(String eventID) {
         this.eventID = eventID;
@@ -84,6 +86,9 @@ public class EntrantsDrawActivity {
         for (Entrant entrant : selectedEntrants) {
             String entrantId = entrant.getUser().getEmail(); // Assuming email is unique
             batch.set(selectedEntrantsRef.document(entrantId), entrant);
+            //device id is preferable - dont know if i want to change everything
+            // todo: fix the create notification call to fetch event name + fix call itself
+            firebaseNotifications.createNotification(entrantId,"Event Name", "Congratulations! You have been invited to this event, please accept or decline your invitation in-app");
         }
 
         batch.commit().addOnCompleteListener(task -> {
