@@ -69,17 +69,32 @@ public class RegistrationActivity extends AppCompatActivity implements Identity 
 
         }
     }
-
+    /**
+     * Retrieves the device ID for the current user or facility.
+     * This method is part of the {@link Identity} interface.
+     *
+     * @return The device ID as a string.
+     */
     @Override
     public String getdeviceID(){
         return deviceId;
     }
-
+    /**
+     * Retrieves the Firebase Storage instance for managing file uploads and downloads.
+     * This method is part of the {@link Identity} interface.
+     *
+     * @return The Firebase Storage instance.
+     */
     @Override
     public FirebaseStorage getStorage(){
         return firebaseStorage;
     }
-
+    /**
+     * Retrieves the Firebase Firestore instance for interacting with Firestore database.
+     * This method is part of the {@link Identity} interface.
+     *
+     * @return The Firebase Firestore instance.
+     */
     @Override
     public FirebaseFirestore getFirestore(){
         return firestore;
