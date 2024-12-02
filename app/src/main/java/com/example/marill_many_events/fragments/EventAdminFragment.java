@@ -35,9 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * EventAdminFragment displays all events as a list. The events can be either the user's waitlist
- * or the organizer's created events. It allows the admin to interact with the events, such as viewing
- * details, deleting events, or deleting associated hash data.
+ * Displays all events as a list, events can either be user's waitlist or organizer's created events
  */
 public class EventAdminFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener, AdminEventDetailsFragment.OnItemClickListener{
 
@@ -59,14 +57,7 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
         // Required empty public constructor
     }
 
-    /**
-     * Called when the fragment is attached to its context (activity).
-     * This method ensures that the activity hosting the fragment implements the necessary interface
-     * to provide the required functionality.
-     *
-     * @param context The context to which the fragment is attached.
-     * @throws ClassCastException if the context does not implement the required Identity interface.
-     */
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -78,11 +69,7 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
             throw new ClassCastException(context.toString() + " must implement Identity Interface");
         }
     }
-    /**
-     * Called when the fragment is resumed and becomes visible to the user.
-     * This method triggers the loading of events by calling the getEvents method.
-     * It also logs a message indicating that the fragment is now visible.
-     */
+
     @Override
     public void onResume() {
         super.onResume();
@@ -94,16 +81,6 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
         //addToItemList( new Event("https://firebasestorage.googleapis.com/v0/b/marill-many-events.appspot.com/o/event_posters%2Feventposters%2Fimage_1730935799965_05ae8f93-85df-4308-aa48-cdd23874342a.jpg.jpg?alt=media&token=81e266fb-bc73-4489-9f10-8f893e3260ae"
         //       , "Event9001", null, null, null, 1, false, null));
     }
-    /**
-     * Called to create the view for this fragment.
-     * This method inflates the layout and initializes various components,
-     * including setting up the Firestore references, the ViewModel, and handling UI elements.
-     *
-     * @param inflater The LayoutInflater object to inflate the view.
-     * @param container The parent view that the fragment's UI will be attached to.
-     * @param savedInstanceState A Bundle containing saved state information (if any) from a previous instance of the fragment.
-     * @return The root view of the fragment's layout.
-     */
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {// Inflate the layout for this fragment
@@ -146,8 +123,7 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
     }
 
     /**
-     * Retrieves all events from Firestore and populates the event list.
-     * This method fetches event data from Firestore and updates the adapter with the fetched events.
+     * Get all of the events and populate the adapter
      */
     public void getEvents(){
         eventItemList.clear();
@@ -174,9 +150,7 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
     }
 
     /**
-     * Adds an event to the list of events and notifies the adapter to update the UI.
-     *
-     * @param event The event to be added to the list.
+     * Add en event to the list
      */
     public void addToItemList(Event event){
         if (!eventItemList.contains(event)) {
@@ -186,9 +160,7 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
     }
 
     /**
-     * Removes an event from the list and notifies the adapter to update the UI.
-     *
-     * @param event The event to be removed from the list.
+     * Remove an item from the list
      */
     public void removeItemfromList(Event event){
         if (eventItemList.contains(event)) {
@@ -196,17 +168,11 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
         }
         eventAdapter.notifyDataSetChanged();
     }
-    /**
-     * Retrieves the current event.
-     *
-     * @return The current event selected by the user.
-     */
+
     public Event getCurrentEvent(){
         return currentEvent;
     }
-    /**
-     * Shows the details of the selected event by navigating to the event details fragment.
-     */
+
     public void showEventDetails(){
         AdminEventDetailsFragment eventDetailsFragment = new AdminEventDetailsFragment(this);
         // Replace the current fragment with the child fragment
@@ -250,12 +216,7 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
                     Log.e("Firebase", "failed to delete Hashdata: " + e.getMessage());
                 });
     }
-    /**
-     * Handles the event when an item (event) is clicked in the list.
-     * Sets the selected event in the ViewModel and opens the event details screen.
-     *
-     * @param event The event that was clicked.
-     */
+
     @Override
     public void onItemClick(Event event) {
         eventViewModel.setSelectedEvent(event);

@@ -138,6 +138,7 @@ public class ImagesAdminFragment extends Fragment implements ImageyArrayAdapter.
                         public void onSuccess(Uri uri) {
                             String url = uri.toString();
                             addToAvatarItemList(url);
+                            return ;
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -146,6 +147,7 @@ public class ImagesAdminFragment extends Fragment implements ImageyArrayAdapter.
                         }
                     });
                 }
+                return ;
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -164,6 +166,7 @@ public class ImagesAdminFragment extends Fragment implements ImageyArrayAdapter.
                         public void onSuccess(Uri uri) {
                             String url = uri.toString();
                             addToPosterItemList(url);
+                            return;
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -172,6 +175,7 @@ public class ImagesAdminFragment extends Fragment implements ImageyArrayAdapter.
                         }
                     });
                 }
+                return;
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

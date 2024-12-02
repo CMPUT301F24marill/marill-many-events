@@ -200,7 +200,8 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
 
 
     public void onDeleteClick(Event event){
-        eventViewModel.deleteEvent(event);
+        if(event != null)
+            eventViewModel.deleteEvent(event);
     }
 
 
