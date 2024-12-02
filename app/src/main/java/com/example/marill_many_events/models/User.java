@@ -18,7 +18,7 @@ public class User {
     private ArrayList<DocumentReference> pending;
     private boolean isOrganizer;
     public boolean admin;
-
+    public boolean allownotifications;
     public String id;
 
     /**
@@ -36,6 +36,7 @@ public class User {
         this.profilePictureUrl = profilePictureUrl;
         this.pending = pending;
         this.events = events;
+        this.allownotifications = allownotifications;
         this.waitList = waitList;
         this.admin = false;
     }
@@ -186,5 +187,13 @@ public class User {
 
     public void setPending(ArrayList<DocumentReference> pending) {
         this.pending = pending;
+    }
+
+    public boolean Allownotifications() {
+        return allownotifications;
+    }
+
+    public void setAllownotifications(boolean allownotifications) {
+        this.allownotifications = allownotifications;
     }
 }
