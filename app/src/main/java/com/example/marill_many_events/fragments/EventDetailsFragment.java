@@ -114,15 +114,17 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         // Set up the OnClickListener for the drawEntrantsButton
         drawEntrantsButton.setOnClickListener(v -> {
             if (event.getFirebaseID() != null) {
-                // Create a new instance of EntrantsDrawFragment, passing the eventDocumentId
-                EntrantsDrawFragment entrantsDrawFragment = EntrantsDrawFragment.newInstance(event.getFirebaseID());
+//                // Create a new instance of EntrantsDrawFragment, passing the eventDocumentId
+//                EntrantsDrawFragment entrantsDrawFragment = EntrantsDrawFragment.newInstance(event.getFirebaseID());
+//
+//                // Replace the current fragment with EntrantsDrawFragment
+//                FragmentManager fragmentManager = getParentFragmentManager();
+//                fragmentManager.beginTransaction()
+//                        .replace(R.id.fragment_container, entrantsDrawFragment)
+//                        .addToBackStack(null)
+//                        .commit();
 
-                // Replace the current fragment with EntrantsDrawFragment
-                FragmentManager fragmentManager = getParentFragmentManager();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, entrantsDrawFragment)
-                        .addToBackStack(null)
-                        .commit();
+                eventViewModel.performDraw();
             } else {
                 Log.e(TAG, "Event Document ID is null");
                 // Show an error message to the user if needed

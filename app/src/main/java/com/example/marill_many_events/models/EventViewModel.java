@@ -1,5 +1,6 @@
 package com.example.marill_many_events.models;
 
+import static android.content.ContentValues.TAG;
 import static androidx.test.InstrumentationRegistry.getContext;
 
 import android.util.Log;
@@ -18,7 +19,10 @@ import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import org.w3c.dom.Document;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class EventViewModel extends ViewModel implements EventsCallback {
@@ -333,35 +337,7 @@ public class EventViewModel extends ViewModel implements EventsCallback {
     public StorageReference getEventStorageReference() {
         return eventStorageReference;
     }
-
-//    /**
-//     * Updates the status of a specific entrant for the selected event.
-//     *
-//     * @param user   The user whose status needs to be updated.
-//     * @param status The new status to be applied.
-//     */
-//    public void updateEntrantStatus(User user, String status) {
-//        Event event = selectedEvent.getValue();
-//        if (event != null) {
-//            event.setEntrantStatus(user, status);
-//            selectedEvent.setValue(event); // Trigger LiveData observers
-//        }
-//    }
-//
-//    /**
-//     * Adds a new entrant to the currently selected event.
-//     *
-//     * @param user   The user to be added as an entrant.
-//     * @param xCord  The x-coordinate of the user's location.
-//     * @param yCord  The y-coordinate of the user's location.
-//     */
-//    public void addEntrantToEvent(User user, float xCord, float yCord) {
-//        Event event = selectedEvent.getValue();
-//        if (event != null) {
-//            event.addEntrant(user, xCord, yCord);
-//            selectedEvent.setValue(event); // Trigger LiveData observers
-//        }
-//    }
+    
 
     /**
      * Register a user to an event by atomically adding user to event's waitlist and event to user's events
@@ -532,5 +508,96 @@ public class EventViewModel extends ViewModel implements EventsCallback {
         // Check if the list is not null and contains the event
 
         return currentList != null && getSelectedEvent().getValue() != null && currentList.contains(getSelectedEvent().getValue());
+    }
+
+    public void performDraw() {
+        firebaseFirestore = FirebaseFirestore.getInstance();
+
+
+        if (getSelectedEvent().getValue().getFirebaseID() == null || getSelectedEvent().getValue().getFirebaseID().isEmpty()) {
+            Log.e(TAG, "Event Document ID is null or empty.");
+            return;
+        }
+
+        
+        // Reference to the event document
+        DocumentReference eventDocRef = getEventDocumentReference();
+
+        // Fetch the event document from Firestore
+        eventDocRef.get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // Retrieve the array of DocumentReferences
+                        ArrayList<DocumentReference> entrantRefs = (ArrayList<DocumentReference>) documentSnapshot.get("waitList");
+
+                        if (entrantRefs != null) {
+                            Log.d("Firestore", "Entrants: " + entrantRefs);
+                            getEventCapacityAndSelectEntrants(entrantRefs);
+                        } else {
+                            Log.d("Firestore", "No entrants found.");
+                        }
+                    } else {
+                        Log.d("Firestore", "Document does not exist.");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Error retrieving document", e);
+                });
+    }
+
+    private void getEventCapacityAndSelectEntrants(List<DocumentReference> waitListRefs) {
+        // Fetch the event's capacity from Firestore
+
+        int capacity = getSelectedEvent().getValue().capacity != null ? getSelectedEvent().getValue().capacity : 100; // Default capacity if null
+
+        // Select random entrants based on capacity
+        List<DocumentReference> selectedEntrantRefs = selectRandomEntrants(waitListRefs, capacity);
+
+        // Store selected entrants in Firestore
+        storeSelectedEntrants(selectedEntrantRefs);
+
+    }
+
+    private List<DocumentReference> selectRandomEntrants(List<DocumentReference> entrantRefs, int numberOfEntrantsToSelect) {
+        if (entrantRefs.isEmpty()) {
+            Log.w(TAG, "The entrant references list is empty.");
+            return new ArrayList<>();
+        }
+
+        if (numberOfEntrantsToSelect >= entrantRefs.size()) {
+            Log.w(TAG, "Requested number of entrants exceeds or equals the available entrants. Returning all entrants.");
+            return entrantRefs;
+        }
+
+        List<DocumentReference> shuffledEntrantRefs = new ArrayList<>(entrantRefs);
+        Collections.shuffle(shuffledEntrantRefs);
+        return new ArrayList<DocumentReference>(shuffledEntrantRefs.subList(0, numberOfEntrantsToSelect));
+    }
+
+    private void storeSelectedEntrants(List<DocumentReference> selectedEntrantRefs) {
+        if (selectedEntrantRefs.isEmpty()) {
+            Log.w(TAG, "No entrants to store.");
+            return;
+        }
+
+        WriteBatch batch = firebaseFirestore.batch();
+        DocumentReference eventUsers = getEventDocumentReference();
+
+
+        for (DocumentReference entrantRef : selectedEntrantRefs) {
+            batch.update(entrantRef, "events", FieldValue.arrayUnion(eventUsers)); // add to events
+            batch.update(entrantRef, "waitList", FieldValue.arrayRemove(eventUsers)); // remove from waitList
+        }
+
+        batch.update(eventUsers, "entrants", FieldValue.arrayUnion(selectedEntrantRefs.toArray()));
+
+
+
+        batch.commit() // remove event from user and user from event atomically
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("BatchWrite", "Added event to user and user to events");
+
+                });
+
     }
 }
