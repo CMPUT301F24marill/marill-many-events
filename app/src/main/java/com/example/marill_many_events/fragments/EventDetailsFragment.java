@@ -103,9 +103,9 @@ public class EventDetailsFragment extends Fragment {
 
         // Set up the OnClickListener for the drawEntrantsButton
         drawEntrantsButton.setOnClickListener(v -> {
-            if (eventDocumentId != null) {
+            if (event.getFirebaseID() != null) {
                 // Create a new instance of EntrantsDrawFragment, passing the eventDocumentId
-                EntrantsDrawFragment entrantsDrawFragment = EntrantsDrawFragment.newInstance(eventDocumentId);
+                EntrantsDrawFragment entrantsDrawFragment = EntrantsDrawFragment.newInstance(event.getFirebaseID());
 
                 // Replace the current fragment with EntrantsDrawFragment
                 FragmentManager fragmentManager = getParentFragmentManager();
@@ -121,9 +121,9 @@ public class EventDetailsFragment extends Fragment {
 
         // Set up the OnClickListener for the viewParticipantsButton
         viewParticipantsButton.setOnClickListener(v -> {
-            if (eventDocumentId != null) {
+            if (event.getFirebaseID() != null) {
                 // Create a new instance of ViewParticipantsFragment, passing the eventDocumentId
-                ViewParticipantsFragment viewParticipantsFragment = ViewParticipantsFragment.newInstance(eventDocumentId);
+                ViewParticipantsFragment viewParticipantsFragment = ViewParticipantsFragment.newInstance(event.getFirebaseID());
 
                 // Replace the current fragment with ViewParticipantsFragment
                 FragmentManager fragmentManager = getParentFragmentManager();
