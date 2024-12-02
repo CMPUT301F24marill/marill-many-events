@@ -442,7 +442,7 @@ public class EventViewModel extends ViewModel implements EventsCallback {
                                     }
                                 }
                             });
-                    //Toast.makeText(getContext(), "Item added to the list!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Event added to the waiting list!", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
                     //Toast.makeText(getContext(), "Error adding item to the list", Toast.LENGTH_SHORT).show();
@@ -470,7 +470,6 @@ public class EventViewModel extends ViewModel implements EventsCallback {
                                     }
                                 }
                             });
-                    //Toast.makeText(getContext(), "Item added to the list!", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
                     //Toast.makeText(getContext(), "Error adding item to the list", Toast.LENGTH_SHORT).show();
