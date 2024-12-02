@@ -4,7 +4,6 @@ import static android.content.ContentValues.TAG;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,7 +23,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.marill_many_events.R;
-import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Event;
 import com.example.marill_many_events.models.EventViewModel;
 import com.example.marill_many_events.models.GenerateQRcode;
@@ -33,7 +31,6 @@ import com.google.firebase.firestore.DocumentReference;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Shows the details of any selected event object, invoked from either user's waitlist or organizers event list
@@ -104,6 +101,7 @@ public class EventDetailsFragment extends Fragment {
                 datePickerStart.setText(formatter.format(event.getStartDate()));
                 datePickerEnd.setText(formatter.format(event.getDrawDate()));
                 capacityField.setText(String.valueOf(event.getCapacity()));
+
 
                 if (event.getFirebaseID() != null) {
                     QRview.setVisibility(View.VISIBLE);
@@ -181,28 +179,34 @@ public class EventDetailsFragment extends Fragment {
         });
     }
 
-
+    public void setNoEdit(TextView textView){
+        textView.setFocusable(false);
+        textView.setCursorVisible(false);
+        textView.setKeyListener(null);
+        textView.setTextIsSelectable(true);
+    }
 
     public void setUI() {
-        if(user != null){
-            ArrayList<DocumentReference> waitList = user.getwaitList();
-            if (waitList != null){
-                if (waitList.contains(eventViewModel.getEventDocumentReference())) {
-                    eventFound();
-                }
-                else
+        if (eventViewModel.userOwnsEvent()) {
+            isOrganizer();
+        }
+
+        else {
+            setNoEdit(nameField);
+            setNoEdit(locationField);
+            setNoEdit(capacityField);
+
+            if (user != null) {
+                ArrayList<DocumentReference> waitList = user.getwaitList();
+                if (waitList != null) {
+                    if (waitList.contains(eventViewModel.getEventDocumentReference())) {
+                        eventFound();
+                    } else
+                        eventNotFound();
+                } else
                     eventNotFound();
             }
-            else
-                eventNotFound();
         }
-
-
-        if (this.user.isOrganizer()) {
-            deleteButton.setVisibility(View.VISIBLE);
-        }
-
-
     }
 
     private void eventNotFound(){
@@ -216,8 +220,20 @@ public class EventDetailsFragment extends Fragment {
     private void eventFound(){
         createButton.setText("Leave Event");
         createButton.setOnClickListener(v-> {
-            eventViewModel.deleteEvent(event);
+            eventViewModel.leaveEvent(event);
         });
 
+    }
+
+    private void isOrganizer(){
+        deleteButton.setText("Delete Event");
+        deleteButton.setVisibility(View.VISIBLE);
+        createButton.setText("Save");
+        drawEntrantsButton.setVisibility(View.VISIBLE);
+        viewParticipantsButton.setVisibility(View.VISIBLE);
+        deleteButton.setOnClickListener(v -> {
+            eventViewModel.deleteEvent(eventViewModel.getSelectedEvent().getValue());
+            requireActivity().getSupportFragmentManager().popBackStack();
+        });
     }
 }

@@ -18,6 +18,8 @@ public class User {
     private boolean isOrganizer;
     public boolean admin;
 
+    public String id;
+
     /**
      * Default constructor for User.
      */
@@ -126,6 +128,14 @@ public class User {
         this.profilePictureUrl = profilePictureUrl;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+  
     public boolean isOrganizer() {
         return isOrganizer;
     }

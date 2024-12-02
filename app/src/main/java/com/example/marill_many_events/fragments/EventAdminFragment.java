@@ -1,7 +1,6 @@
 package com.example.marill_many_events.fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,17 +18,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.activities.AdminPageActivity;
-import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Event;
 import com.example.marill_many_events.models.FirebaseEvents;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.WriteBatch;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.StorageReference;
-import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
 import java.util.ArrayList;
@@ -54,7 +49,7 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
     private String deviceId;
     private StorageReference storageReference;
     private Identity identity;
-    DocumentReference user;
+    private CollectionReference user;
     //private onLeaveListener listener;
 
     /**
@@ -65,17 +60,6 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
         // Required empty public constructor
     }
 
-    final ActivityResultLauncher<ScanOptions> qrCodeLauncher = registerForActivityResult(
-            new ScanContract(),
-            result -> {
-                if (result.getContents() == null) {
-                    Toast.makeText(getContext(), "Scan canceled", Toast.LENGTH_LONG).show();
-                } else {
-                    String scannedData = result.getContents();
-                    Toast.makeText(getContext(), "Scanned: " + scannedData, Toast.LENGTH_LONG).show();
-                    getEvent(scannedData);
-                }
-            });
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -92,7 +76,7 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
     @Override
     public void onResume() {
         super.onResume();
-        getUserEvents();
+        getEvents();
         Log.d("FragmentLifecycle", "Fragment is now visible.");
 
         //addToItemList( new Event("https://firebasestorage.googleapis.com/v0/b/marill-many-events.appspot.com/o/event_posters%2Feventposters%2Fimage_1730935799965_05ae8f93-85df-4308-aa48-cdd23874342a.jpg.jpg?alt=media&token=81e266fb-bc73-4489-9f10-8f893e3260ae"
@@ -104,9 +88,8 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {// Inflate the layout for this fragment
 
-        deviceId = identity.getdeviceID();
         firestore = identity.getFirestore();
-        user = firestore.collection("users").document(deviceId);
+        user = firestore.collection("events");
 
 
         View view = inflater.inflate(R.layout.fragment_eventlist_admin, container, false);
@@ -139,77 +122,20 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
     }
 
     /**
-     * Get event details from a qr code of its firebase reference
+     * Get all of the events and populate the adapter
      */
-    public void getEvent(String eventID){
-        firestore.collection("events").document(eventID)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            Event event = document.toObject(Event.class);
-                            registerUser(eventID);
-                        }
-                    }
-                });
-    }
-
-    /**
-     * Register a user to an event by atomically adding user to event's waitlist and event to user's events
-     * @param eventID the document reference for the event in firebase
-     */
-    public void registerUser(String eventID){ // Register the current deviceID (user) to the given event by writing to the user and event a reference to each other
-        WriteBatch batch = firestore.batch();
-        DocumentReference eventUsers = firestore.collection("events").document(eventID);
-
-        batch.update(user, "waitList", FieldValue.arrayUnion(eventUsers));
-        batch.update(eventUsers, "waitList", FieldValue.arrayUnion(user));
-
-        batch.commit()
-                .addOnSuccessListener(aVoid -> {
-                    firestore.collection("events").document(eventID).get()
-                            .addOnSuccessListener(documentSnapshot -> {
-                                if (documentSnapshot.exists()) {
-                                    Event newEvent = documentSnapshot.toObject(Event.class);
-                                    if (newEvent != null) {
-                                        addToItemList(newEvent); // Add directly to the list
-                                    }
-                                }
-                            });
-                    Toast.makeText(getContext(), "Item added to the list!", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Error adding item to the list", Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    /**
-     * Get all of the events that a user is registered in and populate the adapter
-     */
-    public void getUserEvents(){
+    public void getEvents(){
         eventItemList.clear();
         user.get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        // Retrieve the array of DocumentReferences
-                        List<DocumentReference> docRefs = (List<DocumentReference>) documentSnapshot.get("waitList");
-
-                        if (docRefs != null) {
-                            // Iterate through the list of DocumentReferences
-                            for (DocumentReference reference : docRefs) {
-                                // Fetch each document using the DocumentReference
-                                reference.get()
-                                        .addOnSuccessListener(innerDoc -> {
-                                            if (innerDoc.exists()) {
-                                                Event eventIter = innerDoc.toObject(Event.class);
-                                                addToItemList(eventIter);
-                                            }
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            // Handle error in fetching the referenced document
-                                            Toast.makeText(getContext(), "Error fetching referenced document", Toast.LENGTH_SHORT).show();
-                                        });
+                .addOnCompleteListener(documentSnapshot -> {
+                    if (documentSnapshot.isSuccessful()) {
+                        QuerySnapshot docRefs = documentSnapshot.getResult();
+                        for (DocumentSnapshot reference : docRefs) {
+                            // Fetch each document using the DocumentReference
+                            Event eventIter = reference.toObject(Event.class);
+                            if(eventIter != null){
+                                eventIter.setID(reference.getId());
+                                addToItemList(eventIter);
                             }
                         }
                     } else {
@@ -240,6 +166,7 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
         if (eventItemList.contains(event)) {
             eventItemList.remove(event);
         }
+        eventAdapter.notifyDataSetChanged();
     }
 
     public Event getCurrentEvent(){
@@ -257,41 +184,29 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
     }
 
     /**
-     * Leave an event as a user
+     * Delete an event as admin
+     * @param event: event to be deleted
      */
-    public void onDeleteClick(Event event){
-            // Register the current deviceID (user) to the given event by writing to the user and event a reference to each other
-            WriteBatch batch = firestore.batch();
-            DocumentReference eventUsers = firestore.collection("events").document(event.getFirebaseID());
-
-            batch.update(user, "waitList", FieldValue.arrayRemove(eventUsers));
-            batch.update(eventUsers, "waitList", FieldValue.arrayRemove(user));
-
-            batch.commit()
-                    .addOnSuccessListener(aVoid -> {
-                        firestore.collection("events").document(event.getFirebaseID()).get()
-                                .addOnSuccessListener(documentSnapshot -> {
-                                    if (documentSnapshot.exists()) {
-                                        Event newEvent = documentSnapshot.toObject(Event.class);
-                                        if (newEvent != null) {
-                                            removeItemfromList(newEvent); // Remove from list
-                                            getUserEvents();
-                                        }
-                                    }
-                                });
-                        Toast.makeText(getContext(), "Left the event!", Toast.LENGTH_SHORT).show();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(getContext(), "Error leaving the event", Toast.LENGTH_SHORT).show();
-                    });
+    public void onDeleteClick(Event event ) {
+        DocumentReference eventDoc = user.document(event.getID());
+        Log.d("S", "event id: "+event.getID());
+        eventDoc.delete()
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firebase", "attempting Event delete");
+                    //remove from local list
+                    removeItemfromList(event);
+                    Log.d("Firebase", "Event deleted successfully");
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "failed to delete event: " + e.getMessage());
+                });
     }
-
 
     @Override
     public void onItemClick(Event event) {
-        HomePageActivity parentActivity = (HomePageActivity) getActivity();
+        /*HomePageActivity parentActivity = (HomePageActivity) getActivity();
         parentActivity.setCurrentEvent(event);
         Log.d("FragmentLifecycle", "Opening details.");
-        showEventDetails();
+        showEventDetails();*/
     }
 }

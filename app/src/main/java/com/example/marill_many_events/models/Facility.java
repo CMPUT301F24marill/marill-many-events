@@ -9,6 +9,8 @@ public class Facility{
     String facilityName;
     String Location;
 
+    String id;
+
     // No-argument constructor (needed by Firestore)
     public Facility() {
         // Firebase needs a no-argument constructor
@@ -37,5 +39,13 @@ public class Facility{
     }
 
     public String getFacilityName(){ return facilityName; }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
     
 }

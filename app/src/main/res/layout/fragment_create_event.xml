@@ -2,6 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/background_gradient"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -165,32 +166,36 @@
 
 
         <Button
-            android:id="@+id/view_participants_button"
+            android:id="@+id/draw_entrants_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
+                
             android:backgroundTint="@color/delete_red"
             android:text="View Participants"
             android:textColor="@color/white"
             android:visibility="visible"
+      
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.036"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/delete" />
 
         <Button
-            android:id="@+id/draw_entrants_button"
+            android:id="@+id/view_participants_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
+
             android:backgroundTint="@color/delete_red"
             android:text="Draw Entrants"
             android:textColor="@color/white"
             android:visibility="visible"
+      
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.915"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/delete" />
+            app:layout_constraintTop_toBottomOf="@+id/draw_entrants_button" />
 
         <ImageView
             android:id="@+id/QRcode"
@@ -200,7 +205,7 @@
             android:src="@drawable/default_profile"
             android:background="@android:color/transparent"
             android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@+id/create" />
+            app:layout_constraintTop_toBottomOf="@+id/view_participants_button" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

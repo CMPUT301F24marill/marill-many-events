@@ -1,5 +1,6 @@
 package com.example.marill_many_events.fragments;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +46,8 @@ public class ImageyArrayAdapter extends RecyclerView.Adapter<ImageyArrayAdapter.
     public void onBindViewHolder(ImageViewHolder holder, int position) {
         String currentItem = imageList.get(position);
         leaveButton = holder.itemView.findViewById(R.id.leave);
+
+        Log.d("s", "current image URL:"+currentItem);
 
         // Load the image into the ImageView using Glide
         Glide.with(holder.itemView.getContext())  // 'getContext()' is used to specify the context
