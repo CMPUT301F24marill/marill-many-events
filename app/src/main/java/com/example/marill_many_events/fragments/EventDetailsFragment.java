@@ -2,10 +2,12 @@ package com.example.marill_many_events.fragments;
 
 import static android.content.ContentValues.TAG;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +18,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -26,6 +27,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.marill_many_events.EventsCallback;
+import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Event;
@@ -34,12 +36,16 @@ import com.example.marill_many_events.models.FirebaseEvents;
 import com.example.marill_many_events.models.GenerateQRcode;
 import com.example.marill_many_events.models.PhotoPicker;
 import com.example.marill_many_events.models.User;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.storage.FirebaseStorage;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Shows the details of any selected event object, invoked from either user's waitlist or organizers event list
@@ -62,12 +68,30 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
     private FirebaseEvents firebaseEvents;
     private FirebaseStorage firebaseStorage;
     private SwitchCompat switchCompat;
-    private MaterialAlertDialogBuilder builder;
-    private boolean isCheckGeo;
-    private boolean dialogAccepted;
+    boolean geo;
+    boolean button_pressed = false;
+    List<Object> current_geoPoints;
+    ArrayList<GeoPoint> geoPointList;
+    HomePageActivity parentActivity;
+    private Identity identity;
+
+    private Handler handler = new Handler();
+    private Runnable runnable;
 
     public EventDetailsFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        // Make sure the activity implements the required interface
+        if (context instanceof Identity) {
+            identity = (Identity) context;
+        } else {
+            throw new ClassCastException(context.toString() + " must implement Identity Interface");
+        }
     }
 
 
@@ -76,7 +100,8 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         View view = inflater.inflate(R.layout.fragment_create_event, container, false);
         eventViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
         generateQRcode = new GenerateQRcode();
-        dialogAccepted = false;
+        parentActivity = (HomePageActivity) getActivity();
+
         nameField = view.findViewById(R.id.NameField);
         datePickerStart = view.findViewById(R.id.Startdatefield);
         datePickerEnd = view.findViewById(R.id.DrawdateField);
@@ -97,17 +122,10 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         firebaseEvents = new FirebaseEvents(eventViewModel.getFirebaseReference(), firebaseStorage.getReference("event_posters"), eventViewModel.getUserReference().getId(), this);
         switchCompat = view.findViewById(R.id.GeoSwitch);
 
-
         createButton = view.findViewById(R.id.create);
         deleteButton = view.findViewById(R.id.delete);
 
-
-
         SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
-
-
-
-
 
         eventViewModel.getSelectedEvent().observe(getViewLifecycleOwner(), event -> {
             this.event = event;
@@ -119,21 +137,31 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
                 datePickerEnd.setText(formatter.format(event.getDrawDate()));
                 capacityField.setText(String.valueOf(event.getCapacity()));
                 switchCompat.setChecked(event.isCheckGeo());
-                isCheckGeo = event.isCheckGeo();
+                geo = event.isCheckGeo();
+
+                setUI(); // Change UI elements based on context
 
                 if (event.getFirebaseID() != null) {
+                    eventDocumentId = event.getFirebaseID();
                     QRview.setVisibility(View.VISIBLE);
                     QRview.setImageBitmap(generateQRcode.generateQR(event.getQRcode()));
                 }
             }
         });
 
-        setUI(); // Change UI elements based on context
-
 
         // Set up the OnClickListener for the drawEntrantsButton
         drawEntrantsButton.setOnClickListener(v -> {
             if (event.getFirebaseID() != null) {
+//                // Create a new instance of EntrantsDrawFragment, passing the eventDocumentId
+//                EntrantsDrawFragment entrantsDrawFragment = EntrantsDrawFragment.newInstance(event.getFirebaseID());
+//
+//                // Replace the current fragment with EntrantsDrawFragment
+//                FragmentManager fragmentManager = getParentFragmentManager();
+//                fragmentManager.beginTransaction()
+//                        .replace(R.id.fragment_container, entrantsDrawFragment)
+//                        .addToBackStack(null)
+//                        .commit();
 
                 eventViewModel.performDraw();
             } else {
@@ -160,7 +188,66 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
             }
         });
 
+        // Set up the OnClickListener for the viewMapButton
+        geoPointList = new ArrayList<>();
+        viewMapButton.setOnClickListener(v -> {
+                FirebaseFirestore db = identity.getFirestore();
+                db.collection("events").document(eventDocumentId).get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            // Get the GeoPoints array from the document
+                            current_geoPoints = (List<Object>) document.get("entrantGeoPoints");
+
+                            // Convert the array into a list of GeoPoint objects
+                            if(current_geoPoints != null) {
+                                for (Object obj : current_geoPoints) {
+                                    if (obj instanceof GeoPoint) {
+                                        geoPointList.add((GeoPoint) obj);
+                                    }
+                                }
+                            }
+
+                            MapFragment mapFragment = new MapFragment(geoPointList);
+
+                            // Replace the current fragment with ViewParticipantsFragment
+                            FragmentManager fragmentManager = getParentFragmentManager();
+                            fragmentManager.beginTransaction()
+                                    .replace(R.id.fragment_container, mapFragment)
+                                    .addToBackStack(null)
+                                    .commit();
+                        }
+                        else{
+                            Log.d("Firebase", "Failed to get document");
+                        }
+                    }
+                    else{
+                        Log.d("Firebase", "Failed to get document");
+                    }
+                }).addOnFailureListener(task -> {
+                    Log.d("Firebase", "Failed to get document");}
+                );
+
+        });
+
+        //code that runs every frame
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                update();
+                handler.postDelayed(this, 20);
+            }
+        };
+        handler.post(runnable);
+
         return view;
+    }
+
+    /**
+     * code that runs every frame
+     */
+    private void update() {
+        if(!button_pressed) setUI(); // Change UI elements based on context
     }
 
     /**
@@ -201,7 +288,6 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         if (eventViewModel.userOwnsEvent()) {
             isOrganizer();
         }
-
         else {
             setNoEdit(nameField);
             setNoEdit(locationField);
@@ -237,27 +323,42 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
     }
 
     private void eventNotFound(){
-            createButton.setText("Join Event");
-
-
-
-            createButton.setOnClickListener(v-> {
-                if(event.isCheckGeo())
-                    showGeoDialog();
-
-            });
+            createButton.setText(getString(R.string.lbl_join_event));
+            if(geo){
+                parentActivity.checkLocationPerms();
+                //get perms
+                boolean permission_check = parentActivity.getLocationPerms();
+                if(!permission_check){
+                    createButton.setVisibility(View.INVISIBLE);
+                    createButton.setEnabled(false);
+                }
+                else{
+                    createButton.setVisibility(View.VISIBLE);
+                    createButton.setEnabled(true);
+                }
+                createButton.setOnClickListener(v-> {
+                    parentActivity.getLocation();
+                    GeoPoint current_geo = parentActivity.getCurrent_geo();
+                    eventViewModel.registerUserGeo(current_geo);
+                    requireActivity().getSupportFragmentManager().popBackStack();
+                    button_pressed = true;
+                });
+            }
+            else{
+                createButton.setOnClickListener(v-> {
+                    eventViewModel.registerUser();
+                    requireActivity().getSupportFragmentManager().popBackStack();
+                    button_pressed = true;
+                });
+            }
     }
 
 
     private void eventFound(){
-        createButton.setText("Leave Event");
+        createButton.setText(getString(R.string.lbl_leave_event));
         createButton.setOnClickListener(v-> {
+<<<<<<< Updated upstream
             eventViewModel.leaveEvent();
-            HomePageActivity parentActivity = (HomePageActivity) getActivity();
-
-            if (parentActivity != null) {
-                parentActivity.onwaitlistSelected();
-            }
         });
     }
 
@@ -266,11 +367,6 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         createButton.setText("Leave Waitlist");
         createButton.setOnClickListener(v-> {
             eventViewModel.leaveWaitlist();
-            HomePageActivity parentActivity = (HomePageActivity) getActivity();
-
-            if (parentActivity != null) {
-                parentActivity.onwaitlistSelected();
-            }
         });
     }
 
@@ -281,21 +377,22 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
 
         deleteButton.setOnClickListener(v->{
             eventViewModel.rejectEvent();
-            HomePageActivity parentActivity = (HomePageActivity) getActivity();
-
-            if (parentActivity != null) {
-                parentActivity.onwaitlistSelected();
-            }
         });
 
 
         createButton.setOnClickListener(v-> {
             eventViewModel.enterUser();
         });
+=======
+            eventViewModel.leaveWaitlist(event);
+            requireActivity().getSupportFragmentManager().popBackStack();
+            button_pressed = true;
+        });
+>>>>>>> Stashed changes
     }
 
     private void isOrganizer(){
-        deleteButton.setText("Delete Event");
+        deleteButton.setText(getString(R.string.lbl_delete_event));
         deleteButton.setVisibility(View.VISIBLE);
         createButton.setVisibility(View.GONE);
         drawEntrantsButton.setVisibility(View.VISIBLE);
@@ -303,9 +400,9 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         pencil1.setAlpha((float) 1.0);
         pencil2.setAlpha((float) 1.0);
 
-        /*if(event.isCheckGeo() == true){
+        if(geo){
             viewMapButton.setVisibility(View.VISIBLE);
-        }*/
+        }
 
         posterView.setOnClickListener(v-> {
             photoPicker.showPhotoOptions(null);
@@ -314,6 +411,7 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         deleteButton.setOnClickListener(v -> {
             eventViewModel.deleteEvent(eventViewModel.getSelectedEvent().getValue());
             requireActivity().getSupportFragmentManager().popBackStack();
+            button_pressed = true;
         });
     }
 
@@ -354,23 +452,6 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         if(posterUri != null) firebaseEvents.uploadPoster(posterUri);
     }
 
-
-    private void showGeoDialog(){
-
-        builder = new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Geolocation Warning")
-                .setMessage("This event will record your location and will make it available to the organizer")
-                .setCancelable(false) // Prevent dismissal by tapping outside
-                .setPositiveButton("Okay", (dialog, which) -> {
-                    eventViewModel.registerUser();
-                    Log.d("Dialog", "Positive button clicked");
-                })
-                .setNegativeButton("Cancel", (dialog, which) -> {
-                    Log.d("Dialog", "Negative button clicked");
-
-                });
-        builder.show();
-    }
 
     public void onPosterUpload(String posterUrl){
         event.setImageURL(posterUrl);

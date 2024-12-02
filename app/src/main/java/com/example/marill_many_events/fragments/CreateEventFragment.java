@@ -343,7 +343,7 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         }
 
         // Create and return the Event object
-        event = new Event(posterUrl, eventName, location, startDate, endDate, capacity, geolocation, null, deviceId);
+        event = new Event(posterUrl, eventName, location, startDate, endDate, capacity, geolocation, null, null);
         return event;
     }
 }
