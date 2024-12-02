@@ -186,8 +186,7 @@ public class WaitlistFragment extends Fragment implements EventyArrayAdapter.OnI
                             Event event = document.toObject(Event.class);
                             eventViewModel.setSelectedEvent(event);
                             Log.d("FragmentLifecycle", "Opening details.");
-                            showEventDetails();
-                        }
+                            showEventDetails();                        }
                     }
                 });
     }
