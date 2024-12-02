@@ -29,10 +29,15 @@ import androidx.fragment.app.Fragment;
 
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.fragments.RegistrationFragment;
+import com.example.marill_many_events.models.FirebaseNotifications;
+import com.example.marill_many_events.models.Notification;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.CollectionReference;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * MainActivity checks for an existing user registration based on the device ID
@@ -45,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseFirestore firestore;
     private CollectionReference usersRef;
     public String deviceId;
+    private FirebaseNotifications firebaseNotifications;
 
     Fragment registrationFragment = new RegistrationFragment();
     Bundle args = new Bundle();
@@ -98,21 +104,25 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        //Set up notification: main structure
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "test")
-                .setContentTitle("test title")
-                .setContentText("Example Notification")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setSmallIcon(R.drawable.ic_marill);
 
-
-        NotificationManager notificationManager = getSystemService(NotificationManager.class);
 
 
         // Set up the login button to navigate to the actual login page
         logInButton.setOnClickListener(v -> {
             checkDeviceId(deviceId);
 
+            //todo: broken code
+//            List<Notification> notifications = new ArrayList<>();
+//            notifications = firebaseNotifications.getUsersNotifications(deviceId);
+            //Set up notification: main structure
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "test")
+                    .setContentTitle("test title")
+                    .setContentText("Example Notification")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setSmallIcon(R.drawable.ic_marill);
+
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
             //After logging in, get notifications
            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 activityResultLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);

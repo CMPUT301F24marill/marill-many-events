@@ -102,12 +102,12 @@ public class FirebaseNotifications {
      * Query notification for specific user
      * @param sentTo The ID of the user the notification is being sent to
      */
-    public void getUsersNotifications(String sentTo){
+    public List<Notification> getUsersNotifications(String sentTo){
+        List<Notification> notifications = new ArrayList<>();
         firestore.collection("notifications").whereEqualTo("sentToId", sentTo)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        List<Notification> notifications = new ArrayList<>();
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             Notification notification = document.toObject(Notification.class);
                             notifications.add(notification);
@@ -117,6 +117,8 @@ public class FirebaseNotifications {
                         notificationCallback.onError(task.getException());
                     }
                 });
+
+        return notifications;
     }
 }
 
