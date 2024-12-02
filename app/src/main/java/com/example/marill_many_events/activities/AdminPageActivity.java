@@ -31,9 +31,8 @@ import com.google.firebase.storage.FirebaseStorage;
 
 
 /**
- * HomePageActivity serves as the main activity for the application, managing the
- * display of the navigation bar and handling user profile interactions.
- * It implements the {@link NavbarListener} interface to respond to navigation events.
+ * AdminPageActivity represents the main activity for an admin user.
+ * It handles navigation, interaction with Firebase, and displays various fragments based on user selection.
  */
 public class AdminPageActivity extends AppCompatActivity implements NavbarListener, Identity{
 
@@ -182,36 +181,71 @@ public class AdminPageActivity extends AppCompatActivity implements NavbarListen
                 .addToBackStack(null) // add to back stack
                 .commit();
     }
-
+    /**
+     * Returns the unique device ID associated with the device.
+     *
+     * @return the device ID
+     */
     @Override
     public String getdeviceID(){
         return deviceId;
     }
-
+    /**
+     * Returns the instance of FirebaseStorage used for interacting with Firebase Cloud Storage.
+     *
+     * @return the FirebaseStorage instance
+     */
     @Override
     public FirebaseStorage getStorage(){
         return firebaseStorage;
     }
-
+    /**
+     * Returns the instance of FirebaseFirestore used for interacting with Firebase Firestore database.
+     *
+     * @return the FirebaseFirestore instance
+     */
     @Override
     public FirebaseFirestore getFirestore(){
         return firestore;
     }
-
+    /**
+     * Returns the current event object.
+     *
+     * @return the current Event instance
+     */
     public Event getCurrentEvent(){
         return currentEvent;
     }
-
+    /**
+     * Sets the current event to the provided event.
+     *
+     * @param event the event to be set as the current event
+     */
     public void setCurrentEvent(Event event){
         currentEvent = event;
     }
-
+    /**
+     * Handles the action when the profile is selected.
+     * This method can be overridden to define behavior when the profile option is selected.
+     */
     @Override
     public void onProfileSelected() {}
+    /**
+     * Handles the action when the home is selected.
+     * This method can be overridden to define behavior when the home option is selected.
+     */
     @Override
     public void onHomeSelected() {}
+    /**
+     * Handles the action when the menu is selected.
+     * This method can be overridden to define behavior when the menu option is selected.
+     */
     @Override
     public void onMenuSelected() {}
+    /**
+     * Handles the action when the waitlist is selected.
+     * This method can be overridden to define behavior when the waitlist option is selected.
+     */
     @Override
     public void onwaitlistSelected() {}
 }
