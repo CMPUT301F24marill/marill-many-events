@@ -153,7 +153,10 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
                 .addToBackStack(null) // add to back stack
                 .commit();
     }
-
+    /**
+     * Called when the waitlist navigation item is selected. Replaces the current fragment with
+     * the {@link WaitlistFragment}.
+     */
     public void onwaitlistSelected(){
         // Open the eventfragment when profile is selected
         deviceId = getIntent().getStringExtra("deviceId"); // Retrieve deviceId
@@ -196,42 +199,61 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
                 .commit();
 
     }
-
+    /**
+     * Returns the device ID associated with the user or facility.
+     */
     @Override
     public String getdeviceID(){
         return deviceId;
     }
-
+    /**
+     * Returns the Firebase Storage instance for managing files.
+     */
     @Override
     public FirebaseStorage getStorage(){
         return firebaseStorage;
     }
-
+    /**
+     * Returns the Firestore instance for database interactions.
+     */
     @Override
     public FirebaseFirestore getFirestore(){
         return firestore;
     }
-
+    /**
+     * Gets the current event.
+     */
     public Event getCurrentEvent(){
         return currentEvent;
     }
-
+    /**
+     * Sets the current event.
+     */
     public void setCurrentEvent(Event event){
         currentEvent = event;
     }
-
+    /**
+     * Sets the flag to indicate whether the user is viewing organization events.
+     */
     public void setOrgList(boolean orgList){
         isOrgList = orgList;
     }
-
+    /**
+     * Gets the flag indicating whether the user is viewing organization events.
+     */
     public boolean getOrgList(){
         return isOrgList;
     }
 
-
+    /**
+     * Sets the event document ID.
+     */
     public void setEventDocumentId(String eventDocumentId) {
         this.eventDocumentId = eventDocumentId;
     }
+    /**
+     * Gets the event document ID.
+     */
     public String getEventDocumentId() {
         return eventDocumentId;
     }
