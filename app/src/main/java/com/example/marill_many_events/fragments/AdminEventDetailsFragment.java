@@ -41,7 +41,7 @@ import java.util.ArrayList;
 public class AdminEventDetailsFragment extends Fragment {
 
     private TextView nameField, locationField ,capacityField, datePickerStart, datePickerEnd;
-    private ImageView QRview, posterView;
+    private ImageView QRview, posterView, pencil1, pencil2;
     private GenerateQRcode generateQRcode;
     private EventViewModel eventViewModel;
     private Button createButton, deleteButton;
@@ -68,6 +68,10 @@ public class AdminEventDetailsFragment extends Fragment {
         datePickerEnd = view.findViewById(R.id.DrawdateField);
         capacityField = view.findViewById(R.id.Capacityfield);
         locationField = view.findViewById(R.id.LocationField);
+        pencil1 = view.findViewById(R.id.pencil1);
+        pencil2 = view.findViewById(R.id.pencil2);
+        pencil1.setAlpha((float) 0.0);
+        pencil2.setAlpha((float) 0.0);
         QRview = view.findViewById(R.id.QRcode);
         posterView = view.findViewById(R.id.poster);
         drawEntrantsButton = view.findViewById(R.id.draw_entrants_button);
@@ -86,8 +90,6 @@ public class AdminEventDetailsFragment extends Fragment {
             Log.e(TAG, "Event object is null");
             // Handle the error appropriately
         }
-
-
 
         setUI(); // Change UI elements based on context
 
