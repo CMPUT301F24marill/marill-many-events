@@ -1,7 +1,5 @@
 package com.example.marill_many_events.models;
 
-import android.util.Log;
-
 import com.example.marill_many_events.NotificationCallback;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -9,16 +7,15 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 
-public class FirebaseNotifs {
+public class FirebaseNotifications {
     private FirebaseFirestore firestore;
     private StorageReference storageReference;
     private String deviceId;
     private NotificationCallback notificationCallback;
 
-    public FirebaseNotifs(FirebaseFirestore firestore, StorageReference storageReference, String deviceId, NotificationCallback notificationCallback) {
+    public FirebaseNotifications(FirebaseFirestore firestore, StorageReference storageReference, String deviceId, NotificationCallback notificationCallback) {
         this.firestore = firestore;
         this.storageReference = storageReference;
         this.deviceId = deviceId;
@@ -71,7 +68,9 @@ public class FirebaseNotifs {
                         List<Notification> notifications = new ArrayList<>();
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             Notification notification = document.toObject(Notification.class);
-                            notifications.add(notification); } notificationCallback.notificationsRecieved(notifications);
+                            notifications.add(notification);
+                        }
+                        notificationCallback.notificationsRecieved(notifications);
                     } else {
                         notificationCallback.onError(task.getException());
                     }

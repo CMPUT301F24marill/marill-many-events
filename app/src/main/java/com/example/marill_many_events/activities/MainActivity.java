@@ -1,20 +1,26 @@
 package com.example.marill_many_events.activities;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.provider.Settings;
 
+import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.activity.result.ActivityResultLauncher;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -23,6 +29,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.fragments.RegistrationFragment;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.CollectionReference;
@@ -44,6 +51,21 @@ public class MainActivity extends AppCompatActivity {
 
 
     private ActivityResultLauncher<Intent> registrationActivityLauncher;
+
+    /**
+     * For notification perms
+     */
+    private final ActivityResultLauncher<String> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
+        @Override
+        public void onActivityResult(Boolean o) {
+            if (o) {
+                Toast.makeText(MainActivity.this, "Post notification permission granted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(MainActivity.this, "Post notification permission not granted", Toast.LENGTH_SHORT).show();
+            }
+        }
+    });
+
 
     /**
      * Called when the app is starting. Initializes the UI components, sets up the
@@ -76,49 +98,39 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
+        //set up notification builder
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "test")
+                .setContentTitle("test title")
+                .setContentText("Example Notification")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setSmallIcon(R.drawable.ic_marill);
+
+
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+
 
         // Set up the login button to navigate to the actual login page
         logInButton.setOnClickListener(v -> {
             checkDeviceId(deviceId);
+
+            //After logging in, get notifications
+           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                activityResultLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            } else {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    CharSequence name = "content";
+                    String description = "Example Notification";
+                    int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                    NotificationChannel channel = new NotificationChannel("test", name, importance);
+                    channel.setDescription(description);
+                    notificationManager.createNotificationChannel(channel);
+
+                    notificationManager.notify(10, builder.build());
+                }
+            }
         });
-        createNotificationChannel();
-
-
-        //notification set up
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "CHANNEL_ID")
-                .setContentTitle("textTitle")
-                .setContentText("textContent")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-        NotificationManagerCompat managerCompat = NotificationManagerCompat.from(MainActivity.this);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        managerCompat.notify(1, builder.build());
-
-    }
-
-    private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is not in the Support Library.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            CharSequence name = getString(R.string.channel_name);
-//            String description = getString(R.string.channel_description);
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel("CHANNEL_ID", "name", importance);
-//            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this.
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
+        
     }
 
     /**
