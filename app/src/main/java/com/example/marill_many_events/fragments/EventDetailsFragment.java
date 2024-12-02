@@ -2,6 +2,8 @@ package com.example.marill_many_events.fragments;
 
 import static android.content.ContentValues.TAG;
 
+import android.app.AlertDialog;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -26,6 +28,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.marill_many_events.EventsCallback;
+import com.example.marill_many_events.Identity;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Event;
@@ -34,8 +37,10 @@ import com.example.marill_many_events.models.FirebaseEvents;
 import com.example.marill_many_events.models.GenerateQRcode;
 import com.example.marill_many_events.models.PhotoPicker;
 import com.example.marill_many_events.models.User;
+import com.google.firebase.appcheck.internal.util.Logger;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
 import java.text.SimpleDateFormat;
@@ -61,7 +66,9 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
     private String eventDocumentId;
     private FirebaseEvents firebaseEvents;
     private FirebaseStorage firebaseStorage;
+    private FirebaseFirestore firestore;
     private SwitchCompat switchCompat;
+    private Identity identity;
     private MaterialAlertDialogBuilder builder;
     private boolean isCheckGeo;
     private boolean dialogAccepted;
@@ -70,6 +77,23 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         // Required empty public constructor
     }
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        // Make sure the activity implements the required interface
+        if (context instanceof Identity) {
+            identity = (Identity) context;
+        } else {
+            throw new ClassCastException(context.toString() + " must implement Identity Interface");
+        }
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        firestore = identity.getFirestore();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -237,15 +261,37 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
     }
 
     private void eventNotFound(){
-            createButton.setText("Join Event");
+        createButton.setText("Join Event");
+        createButton.setOnClickListener(v -> {
+            firestore.collection("events").document(eventViewModel.getSelectedEvent().getValue().getFirebaseID())
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            ArrayList<?> waitList = (ArrayList<?>) documentSnapshot.get("waitList");
+                            int currentCapacity = waitList != null ? waitList.size() : 0;
+                            int maxCapacity = documentSnapshot.getLong("capacity").intValue();
 
-
-
-            createButton.setOnClickListener(v-> {
-                if(event.isCheckGeo())
-                    showGeoDialog();
-
-            });
+                            if (currentCapacity >= maxCapacity) {
+                                // Show a popup message indicating that the event is full
+                                new AlertDialog.Builder(requireContext())
+                                        .setTitle("Capacity Reached")
+                                        .setMessage("Can't join the waitlist as the event is full.")
+                                        .setPositiveButton("OK", null)
+                                        .show();
+                            } else {
+                                // Register the user if the capacity is not reached
+                                if (event.isCheckGeo()) {
+                                    showGeoDialog();
+                                } else {
+                                    eventViewModel.registerUser();
+                                }
+                            }
+                        } else {
+                            Log.e(Logger.TAG, "Event document not found.");
+                        }
+                    })
+                    .addOnFailureListener(e -> Log.e(Logger.TAG, "Error fetching event details", e));
+        });
     }
 
 
