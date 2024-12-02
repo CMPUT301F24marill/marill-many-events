@@ -2,6 +2,7 @@ package com.example.marill_many_events.fragments;
 
 import static com.google.firebase.appcheck.internal.util.Logger.TAG;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -35,10 +37,12 @@ import java.util.ArrayList;
  */
 public class CreateFacilityFragment extends Fragment implements FacilityCallback {
 
+    private TextView title;
     private EditText editTextName;
     private EditText editTextLocation;
     private Button buttonCreate;
     private Button buttonDelete;
+    private Button buttonBack;
 
     private Identity identity;
     public FirebaseFirestore firestore;
@@ -85,22 +89,28 @@ public class CreateFacilityFragment extends Fragment implements FacilityCallback
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // Initialize the views
+        title = view.findViewById(R.id.showFacilityTitle);
         editTextName = view.findViewById(R.id.editTextFacilityName);
         editTextLocation = view.findViewById(R.id.editTextFacilityLocation);
         buttonCreate = view.findViewById(R.id.buttonCreateFacility);
+        buttonBack = view.findViewById(R.id.buttonBack);
 
         buttonDelete = view.findViewById(R.id.buttonDeleteFacility);
         // show if facility registered, hide if not
         firestore.collection("facilities").document(facilityId).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @SuppressLint("SetTextI18n")
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful() && task.getResult().exists()) {
                             Log.d(TAG, "Device ID exists in facilities. Showing facility deletion button.");
+                            title.setText("Manage Your Facility Profile");
                             buttonDelete.setVisibility(View.VISIBLE);
+                            buttonBack.setVisibility(View.VISIBLE);
                         } else {
                             Log.d(TAG, "Device ID does not exist in facilities. Hiding facility deletion button.");
                             buttonDelete.setVisibility(View.GONE);
+                            buttonBack.setVisibility(View.GONE);
                         }
                     }
                 });
@@ -138,6 +148,17 @@ public class CreateFacilityFragment extends Fragment implements FacilityCallback
                         .setPositiveButton("Yes", (dialog, which) -> deleteFacility())
                         .setNegativeButton("No", null)
                         .show();
+            }
+        });
+
+        buttonBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                HomePageActivity parentActivity = (HomePageActivity) getActivity();
+
+                if (parentActivity != null) {
+                    parentActivity.onProfileSelected();
+                }
             }
         });
     }
