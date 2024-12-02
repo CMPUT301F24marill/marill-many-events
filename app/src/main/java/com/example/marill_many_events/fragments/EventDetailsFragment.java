@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -37,6 +38,7 @@ import com.example.marill_many_events.models.GenerateQRcode;
 import com.example.marill_many_events.models.PhotoPicker;
 import com.example.marill_many_events.models.User;
 import com.google.firebase.appcheck.internal.util.Logger;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -67,6 +69,9 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
     private FirebaseFirestore firestore;
     private SwitchCompat switchCompat;
     private Identity identity;
+    private MaterialAlertDialogBuilder builder;
+    private boolean isCheckGeo;
+    private boolean dialogAccepted;
 
     public EventDetailsFragment() {
         // Required empty public constructor
@@ -95,7 +100,7 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         View view = inflater.inflate(R.layout.fragment_create_event, container, false);
         eventViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
         generateQRcode = new GenerateQRcode();
-
+        dialogAccepted = false;
         nameField = view.findViewById(R.id.NameField);
         datePickerStart = view.findViewById(R.id.Startdatefield);
         datePickerEnd = view.findViewById(R.id.DrawdateField);
@@ -121,9 +126,11 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         deleteButton = view.findViewById(R.id.delete);
 
 
-        setUI(); // Change UI elements based on context
 
         SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
+
+
+
 
 
         eventViewModel.getSelectedEvent().observe(getViewLifecycleOwner(), event -> {
@@ -136,6 +143,7 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
                 datePickerEnd.setText(formatter.format(event.getDrawDate()));
                 capacityField.setText(String.valueOf(event.getCapacity()));
                 switchCompat.setChecked(event.isCheckGeo());
+                isCheckGeo = event.isCheckGeo();
 
                 if (event.getFirebaseID() != null) {
                     QRview.setVisibility(View.VISIBLE);
@@ -144,19 +152,12 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
             }
         });
 
+        setUI(); // Change UI elements based on context
+
 
         // Set up the OnClickListener for the drawEntrantsButton
         drawEntrantsButton.setOnClickListener(v -> {
             if (event.getFirebaseID() != null) {
-//                // Create a new instance of EntrantsDrawFragment, passing the eventDocumentId
-//                EntrantsDrawFragment entrantsDrawFragment = EntrantsDrawFragment.newInstance(event.getFirebaseID());
-//
-//                // Replace the current fragment with EntrantsDrawFragment
-//                FragmentManager fragmentManager = getParentFragmentManager();
-//                fragmentManager.beginTransaction()
-//                        .replace(R.id.fragment_container, entrantsDrawFragment)
-//                        .addToBackStack(null)
-//                        .commit();
 
                 eventViewModel.performDraw();
             } else {
@@ -279,7 +280,11 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
                                         .show();
                             } else {
                                 // Register the user if the capacity is not reached
-                                eventViewModel.registerUser();
+                                if (event.isCheckGeo()) {
+                                    showGeoDialog();
+                                } else {
+                                    eventViewModel.registerUser();
+                                }
                             }
                         } else {
                             Log.e(Logger.TAG, "Event document not found.");
@@ -395,6 +400,23 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         if(posterUri != null) firebaseEvents.uploadPoster(posterUri);
     }
 
+
+    private void showGeoDialog(){
+
+        builder = new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Geolocation Warning")
+                .setMessage("This event will record your location and will make it available to the organizer")
+                .setCancelable(false) // Prevent dismissal by tapping outside
+                .setPositiveButton("Okay", (dialog, which) -> {
+                    eventViewModel.registerUser();
+                    Log.d("Dialog", "Positive button clicked");
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    Log.d("Dialog", "Negative button clicked");
+
+                });
+        builder.show();
+    }
 
     public void onPosterUpload(String posterUrl){
         event.setImageURL(posterUrl);

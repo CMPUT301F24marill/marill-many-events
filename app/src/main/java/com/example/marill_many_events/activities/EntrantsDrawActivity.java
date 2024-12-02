@@ -11,18 +11,31 @@ import com.google.firebase.firestore.WriteBatch;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
+/**
+ * This class handles the logic for selecting random entrants from a waitlist and storing
+ * the selected entrants in Firestore for a specific event.
+ */
 public class EntrantsDrawActivity {
 
     private static final String TAG = "Firestore";
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final String eventID;
-
+    /**
+     * Constructor to initialize EntrantsDrawActivity with the event ID.
+     *
+     * @param eventID The ID of the event for which the entrants are drawn.
+     */
     public EntrantsDrawActivity(String eventID) {
         this.eventID = eventID;
     }
 
+    /**
+     * Fetches entrants from the waitlist of an event, selects a random number of entrants,
+     * and stores the selected entrants in Firestore.
+     *
+     * @param numberOfEntrantsToSelect The number of entrants to select from the waitlist.
+     */
     public void fetchAndSelectEntrants(int numberOfEntrantsToSelect) {
         if (eventID == null || eventID.isEmpty()) {
             Log.e(TAG, "Event ID is not initialized.");
@@ -54,7 +67,13 @@ public class EntrantsDrawActivity {
             }
         });
     }
-
+    /**
+     * Randomly selects a specified number of entrants from the given list.
+     *
+     * @param entrantList The list of entrants to select from.
+     * @param numberOfEntrantsToSelect The number of entrants to randomly select.
+     * @return A list of selected entrants.
+     */
     private List<Entrant> selectRandomEntrants(List<Entrant> entrantList, int numberOfEntrantsToSelect) {
         if (entrantList.isEmpty()) {
             Log.w(TAG, "The entrant list is empty.");
@@ -69,7 +88,11 @@ public class EntrantsDrawActivity {
         Collections.shuffle(entrantList);
         return new ArrayList<>(entrantList.subList(0, numberOfEntrantsToSelect));
     }
-
+    /**
+     * Stores the selected entrants in the Firestore database.
+     *
+     * @param selectedEntrants The list of selected entrants to be stored.
+     */
     private void storeSelectedEntrants(List<Entrant> selectedEntrants) {
         if (selectedEntrants.isEmpty()) {
             Log.w(TAG, "No entrants to store.");
