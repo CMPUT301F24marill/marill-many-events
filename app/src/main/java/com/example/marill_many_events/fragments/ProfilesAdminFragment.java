@@ -38,7 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Displays all events as a list, events can either be user's waitlist or organizer's created events
+ * A fragment that displays a list of user profiles for the admin.
+ * Admins can view user details, delete users (except themselves), and manage profiles.
  */
 public class ProfilesAdminFragment extends Fragment implements ProfileyArrayAdapter.OnItemClickListener{
 
@@ -59,7 +60,11 @@ public class ProfilesAdminFragment extends Fragment implements ProfileyArrayAdap
     public ProfilesAdminFragment() {
         // Required empty public constructor
     }
-
+    /**
+     * Attaches the fragment to the activity and checks if the activity implements the Identity interface.
+     *
+     * @param context The context to attach the fragment to.
+     */
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -71,14 +76,23 @@ public class ProfilesAdminFragment extends Fragment implements ProfileyArrayAdap
             throw new ClassCastException(context.toString() + " must implement Identity Interface");
         }
     }
-
+    /**
+     * Called when the fragment is resumed. Fetches the list of user profiles.
+     */
     @Override
     public void onResume() {
         super.onResume();
         getUsers();
         Log.d("FragmentLifecycle", "Profiles Fragment is now visible.");
     }
-
+    /**
+     * Inflates the layout for this fragment, initializes UI components, and sets up the user list.
+     *
+     * @param inflater The LayoutInflater used to inflate the fragment's view.
+     * @param container The parent view that the fragment's UI will be attached to.
+     * @param savedInstanceState The saved state of the fragment.
+     * @return The view for the fragment.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {// Inflate the layout for this fragment
 
@@ -144,8 +158,9 @@ public class ProfilesAdminFragment extends Fragment implements ProfileyArrayAdap
     }
 
     /**
-     * Add a user to the list
-     * @param user: user to add
+     * Adds a user profile to the list and updates the adapter.
+     *
+     * @param user The user profile to add.
      */
     public void addToItemList(User user){
         if (!userItemList.contains(user)) {
@@ -164,15 +179,21 @@ public class ProfilesAdminFragment extends Fragment implements ProfileyArrayAdap
         }
         userAdapter.notifyDataSetChanged();
     }
-
+    /**
+     * Handles item click events. (Currently a placeholder.)
+     *
+     * @param user The clicked user profile.
+     */
     @Override
     public void onItemClick(User user) {
 
     }
 
     /**
-     * remove user from database
-     * @param userObject: user to remove
+     * Deletes a user profile from Firestore and removes it from the local list.
+     * The admin cannot delete their own profile.
+     *
+     * @param userObject The user profile to delete.
      */
     @Override
     public void onDeleteClick(User userObject) {
