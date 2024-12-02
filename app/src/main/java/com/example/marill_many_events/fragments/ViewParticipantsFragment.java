@@ -28,7 +28,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+/**
+ * Fragment that displays the participants of an event.
+ * Participants are categorized into statuses such as "Accepted," "Invited," "Waitlisted," and "Cancelled."
+ */
 public class ViewParticipantsFragment extends Fragment implements EntrantyArrayAdapter.OnItemClickListener {
 
     private RecyclerView entrantList;
@@ -46,11 +49,18 @@ public class ViewParticipantsFragment extends Fragment implements EntrantyArrayA
 
     private EntrantsAdapter entrantsAdapter;
     private RecyclerView recyclerView;
-
+    /**
+     * Default constructor for ViewParticipantsFragment.
+     * Required for proper fragment instantiation.
+     */
     public ViewParticipantsFragment() {
         // Required empty public constructor
     }
-
+    /**
+     * Attaches the fragment to the parent context and ensures the context implements the Identity interface.
+     *
+     * @param context The context to attach the fragment to.
+     */
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -62,7 +72,12 @@ public class ViewParticipantsFragment extends Fragment implements EntrantyArrayA
             throw new ClassCastException(context.toString() + " must implement Identity Interface");
         }
     }
-
+    /**
+     * Creates a new instance of the fragment with the event document ID.
+     *
+     * @param eventDocumentId The ID of the event document.
+     * @return A new instance of ViewParticipantsFragment.
+     */
     public static ViewParticipantsFragment newInstance(String eventDocumentId) {
         ViewParticipantsFragment fragment = new ViewParticipantsFragment();
         Bundle args = new Bundle();
@@ -70,14 +85,24 @@ public class ViewParticipantsFragment extends Fragment implements EntrantyArrayA
         fragment.setArguments(args);
         return fragment;
     }
-
+    /**
+     * Called when the fragment is resumed.
+     * Fetches the entrants for the event.
+     */
     @Override
     public void onResume() {
         super.onResume();
         getEntrants();
         Log.d("FragmentLifecycle", "Profiles Fragment is now visible.");
     }
-
+    /**
+     * Inflates the fragment's layout, initializes UI components, and sets up the entrant list.
+     *
+     * @param inflater The LayoutInflater used to inflate the layout.
+     * @param container The parent container for the fragment's UI.
+     * @param savedInstanceState The saved state of the fragment.
+     * @return The view for the fragment.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_eventlist, container, false);
