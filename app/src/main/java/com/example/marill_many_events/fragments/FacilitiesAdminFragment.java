@@ -38,7 +38,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Displays all events as a list, events can either be user's waitlist or organizer's created events
+ * A fragment that displays all facilities in a list. It can show the user's waitlist
+ * or the facilities created by the organizer. This fragment allows for the deletion
+ * of facilities and their associated events.
  */
 public class FacilitiesAdminFragment extends Fragment implements FacilityArrayAdapter.OnItemClickListener{
 
@@ -59,6 +61,11 @@ public class FacilitiesAdminFragment extends Fragment implements FacilityArrayAd
         // Required empty public constructor
     }
 
+    /**
+     * Attaches the fragment to the activity and checks if the activity implements the Identity interface.
+     *
+     * @param context The context to attach the fragment to.
+     */
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -71,14 +78,24 @@ public class FacilitiesAdminFragment extends Fragment implements FacilityArrayAd
             throw new ClassCastException(context.toString() + " must implement Identity Interface");
         }
     }
-
+    /**
+     * Called when the fragment is resumed. It retrieves the facilities from the Firestore database.
+     */
     @Override
     public void onResume() {
         super.onResume();
         getFacilities();
         Log.d("FragmentLifecycle", "Facility Fragment is now visible.");
     }
-
+    /**
+     * Inflates the layout for this fragment and sets up the RecyclerView for displaying facilities.
+     * Initializes the FirebaseFirestore instance and sets up the adapter for the RecyclerView.
+     *
+     * @param inflater The LayoutInflater used to inflate the fragment's view.
+     * @param container The parent view that the fragment's UI will be attached to.
+     * @param savedInstanceState The saved state of the fragment.
+     * @return The view for the fragment.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {// Inflate the layout for this fragment
 
@@ -143,7 +160,9 @@ public class FacilitiesAdminFragment extends Fragment implements FacilityArrayAd
     }
 
     /**
-     * Add en event to the list
+     * Adds a facility to the item list and notifies the adapter.
+     *
+     * @param facility The facility to add to the list.
      */
     public void addToItemList(Facility facility){
         if (!facilityItemList.contains(facility)) {
@@ -153,7 +172,9 @@ public class FacilitiesAdminFragment extends Fragment implements FacilityArrayAd
     }
 
     /**
-     * Remove an item from the list
+     * Removes a facility from the item list and notifies the adapter.
+     *
+     * @param facility The facility to remove from the list.
      */
     public void removeItemfromList(Facility facility){
         if (facilityItemList.contains(facility)) {
@@ -161,7 +182,9 @@ public class FacilitiesAdminFragment extends Fragment implements FacilityArrayAd
         }
         facilityAdapter.notifyDataSetChanged();
     }
-
+    /**
+     * Displays the details of an event by navigating to the EventDetailsFragment.
+     */
     public void showEventDetails(){
         EventDetailsFragment eventDetailsFragment = new EventDetailsFragment();
 
@@ -171,7 +194,11 @@ public class FacilitiesAdminFragment extends Fragment implements FacilityArrayAd
                 .addToBackStack(null)
                 .commit();
     }
-  
+    /**
+     * Handles item clicks on the facilities list.
+     *
+     * @param facility The clicked facility.
+     */
     @Override
     public void onItemClick(Facility facility) {
 
