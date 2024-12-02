@@ -589,7 +589,11 @@ public class EventViewModel extends ViewModel implements EventsCallback {
             batch.update(entrantRef, "waitList", FieldValue.arrayRemove(eventUsers)); // remove from waitList
         }
 
-        batch.update(eventUsers, "entrants", FieldValue.arrayUnion(selectedEntrantRefs.toArray()));
+        batch.update(eventUsers, "entrants", FieldValue.arrayUnion(selectedEntrantRefs.toArray())); // add to entrants
+
+        for (DocumentReference ref : selectedEntrantRefs) {
+            batch.update(eventUsers, "waitList", FieldValue.arrayRemove(ref)); // remove from waitlist
+        }
 
 
 
