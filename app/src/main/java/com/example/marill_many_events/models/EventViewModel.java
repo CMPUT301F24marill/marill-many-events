@@ -17,7 +17,7 @@ import androidx.lifecycle.ViewModel;
 import com.example.marill_many_events.EventsCallback;
 import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.activities.MainActivity;
-import com.google.android.gms.location.FusedLocationProviderClient;
+
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.appcheck.internal.util.Logger;
