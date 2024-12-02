@@ -31,7 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Displays all events as a list, events can either be user's waitlist or organizer's created events
+ * A fragment that displays all images (avatars and posters) in separate lists.
+ * The images can be managed by an admin, including viewing, deleting, or performing other operations.
  */
 public class ImagesAdminFragment extends Fragment implements ImageyArrayAdapter.OnItemClickListener{
 
@@ -58,7 +59,12 @@ public class ImagesAdminFragment extends Fragment implements ImageyArrayAdapter.
     public ImagesAdminFragment() {
         // Required empty public constructor
     }
-
+    /**
+     * Attaches the fragment to the activity and checks if the activity implements the Identity interface.
+     *
+     * @param context The context to attach the fragment to.
+     * @throws ClassCastException if the context does not implement Identity.
+     */
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -70,7 +76,9 @@ public class ImagesAdminFragment extends Fragment implements ImageyArrayAdapter.
             throw new ClassCastException(context.toString() + " must implement Identity Interface");
         }
     }
-
+    /**
+     * Called when the fragment is resumed. Fetches the images (avatars and posters) from Firebase Storage.
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -78,7 +86,15 @@ public class ImagesAdminFragment extends Fragment implements ImageyArrayAdapter.
         Log.d("FragmentLifecycle", "Fragment ImagesAdminFragment is now visible.");
 
     }
-
+    /**
+     * Inflates the fragment layout, sets up the RecyclerView for avatars and posters,
+     * and initializes the Firebase Storage references.
+     *
+     * @param inflater The LayoutInflater used to inflate the fragment's view.
+     * @param container The parent view that the fragment's UI will be attached to.
+     * @param savedInstanceState The saved state of the fragment.
+     * @return The view for the fragment.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {// Inflate the layout for this fragment
 
@@ -187,7 +203,9 @@ public class ImagesAdminFragment extends Fragment implements ImageyArrayAdapter.
     }
 
     /**
-     * Add an avatar to the list
+     * Adds an avatar image URL to the avatar list and notifies the adapter.
+     *
+     * @param url The URL of the avatar image to add.
      */
     public void addToAvatarItemList(String url){
         if (!avatarItemList.contains(url)) {
@@ -197,7 +215,9 @@ public class ImagesAdminFragment extends Fragment implements ImageyArrayAdapter.
     }
 
     /**
-     * Add a poster to the list
+     * Adds a poster image URL to the poster list and notifies the adapter.
+     *
+     * @param url The URL of the poster image to add.
      */
     public void addToPosterItemList(String url){
         if (!posterItemList.contains(url)) {
@@ -207,7 +227,9 @@ public class ImagesAdminFragment extends Fragment implements ImageyArrayAdapter.
     }
 
     /**
-     * Remove an item from the list
+     * Removes an image URL from both the avatar and poster lists and updates the adapters.
+     *
+     * @param url The URL of the image to remove.
      */
     public void removeItemfromList(String url){
         if (avatarItemList.contains(url)) {
@@ -217,14 +239,19 @@ public class ImagesAdminFragment extends Fragment implements ImageyArrayAdapter.
             posterItemList.remove(url);
         }
     }
-
+    /**
+     * Handles item click events on an image.
+     *
+     * @param url The URL of the clicked image.
+     */
     @Override
     public void onItemClick(String url) {
     }
 
     /**
-     * Delete a file from Firebase Storage by url
-     * @param url: url of image
+     * Deletes an image from Firebase Storage and removes it from the local list.
+     *
+     * @param url The URL of the image to delete.
      */
     @Override
     public void onDeleteClick(String url) {
