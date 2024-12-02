@@ -15,6 +15,7 @@ public class User {
     private String profilePictureUrl;
     private ArrayList<DocumentReference> events;
     private ArrayList<DocumentReference> waitList;
+    private ArrayList<DocumentReference> pending;
     private boolean isOrganizer;
     public boolean admin;
 
@@ -33,6 +34,7 @@ public class User {
         this.email = email;
         this.phone = phone;
         this.profilePictureUrl = profilePictureUrl;
+        this.pending = pending;
         this.events = events;
         this.waitList = waitList;
         this.admin = false;
@@ -167,5 +169,13 @@ public class User {
 
     public void setEvents(ArrayList<DocumentReference> events) {
         this.events = events;
+    }
+
+    public ArrayList<DocumentReference> getPending() {
+        return pending;
+    }
+
+    public void setPending(ArrayList<DocumentReference> pending) {
+        this.pending = pending;
     }
 }

@@ -198,10 +198,23 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
 
             if (user != null) {
                 ArrayList<DocumentReference> waitList = user.getwaitList();
+                ArrayList<DocumentReference> pending = user.getPending();
+                ArrayList<DocumentReference> events = user.getEvents();
+
+
+
                 if (waitList != null) {
-                    if (waitList.contains(eventViewModel.getEventDocumentReference())) {
+                    if (waitList.contains(eventViewModel.getEventDocumentReference())) { // if the event is in the waitlist
+                        eventInWaitlist();
+                    }
+
+                    else if (pending.contains(eventViewModel.getEventDocumentReference())) // if the event is in the pending list
+                        invitePending();
+
+                    else if (events.contains(eventViewModel.getEventDocumentReference())) // if the event is in the events list
                         eventFound();
-                    } else
+
+                    else
                         eventNotFound();
                 } else
                     eventNotFound();
@@ -220,9 +233,31 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
     private void eventFound(){
         createButton.setText("Leave Event");
         createButton.setOnClickListener(v-> {
-            eventViewModel.leaveWaitlist(event);
+            eventViewModel.leaveEvent();
+        });
+    }
+
+
+    private void eventInWaitlist(){
+        createButton.setText("Leave Waitlist");
+        createButton.setOnClickListener(v-> {
+            eventViewModel.leaveWaitlist();
+        });
+    }
+
+    private void invitePending(){
+        createButton.setText("Accept Invite");
+        deleteButton.setText("Reject Invite");
+        deleteButton.setVisibility(View.VISIBLE);
+
+        deleteButton.setOnClickListener(v->{
+            eventViewModel.rejectEvent();
         });
 
+
+        createButton.setOnClickListener(v-> {
+            eventViewModel.enterUser();
+        });
     }
 
     private void isOrganizer(){
