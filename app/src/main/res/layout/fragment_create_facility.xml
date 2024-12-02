@@ -1,47 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
 
+
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:gravity="center_horizontal">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <!-- Title -->
         <TextView
+            android:id="@+id/showFacilityTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/lbl_create_facility_top_label"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="@color/white"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="24dp"
+            android:text="@string/lbl_create_facility_top_label"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
         <!-- Name Field -->
         <EditText
             android:id="@+id/editTextFacilityName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/white"
             android:hint="@string/lbl_enter_facility_name"
-            android:textColorHint="@color/white"
-            android:textColor="@color/white"
             android:padding="12dp"
-            android:backgroundTint="@color/white" />
+            android:textColor="@color/white"
+            android:textColorHint="@color/white" />
 
         <!-- Location Input -->
         <EditText
             android:id="@+id/editTextFacilityLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/white"
             android:hint="@string/lbl_enter_facility_location"
-            android:textColorHint="@color/white"
-            android:textColor="@color/white"
             android:padding="12dp"
-            android:backgroundTint="@color/white" />
+            android:textColor="@color/white"
+            android:textColorHint="@color/white" />
 
         <!-- Create Account Button -->
         <Button
@@ -61,8 +70,19 @@
             android:layout_marginTop="16dp"
             android:backgroundTint="@color/delete_red"
             android:text="@string/lbl_delete_facility"
-            android:visibility="gone"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:visibility="gone" />
 
     </LinearLayout>
-</ScrollView>
+
+    <Button
+        android:id="@+id/buttonBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Manage my user profile"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+</androidx.constraintlayout.widget.ConstraintLayout>
