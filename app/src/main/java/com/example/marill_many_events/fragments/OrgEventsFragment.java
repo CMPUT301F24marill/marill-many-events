@@ -200,25 +200,7 @@ public class OrgEventsFragment extends Fragment implements EventyArrayAdapter.On
 
 
     public void onDeleteClick(Event event){
-        if(event != null) {
-            firestore.collection("events") // "events" is the name of your collection
-                    .document(event.getFirebaseID())
-                    .delete()
-                    .addOnSuccessListener(documentReference -> {
-                        removeItemfromList(event);
-                        Log.d("Firestore", "Event deleted");
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.w("Firestore", "Error adding event", e);
-                    });
-        }
-    }
-
-    public void removeItemfromList(Event event){
-        if (eventItemList.contains(event)) {
-            eventItemList.remove(event);
-        }
-        eventAdapter.notifyDataSetChanged();
+        eventViewModel.deleteEvent(event);
     }
 
 

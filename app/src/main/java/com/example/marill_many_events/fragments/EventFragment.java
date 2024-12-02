@@ -26,9 +26,7 @@ import com.example.marill_many_events.models.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.StorageReference;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
@@ -165,7 +163,7 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
 
     public void onDeleteClick(Event event){
         Log.d("FragmentLifecycle", "Deleting Event.");
-        eventViewModel.deleteEvent(event);
+        eventViewModel.leaveEvent(event);
     }
 
 

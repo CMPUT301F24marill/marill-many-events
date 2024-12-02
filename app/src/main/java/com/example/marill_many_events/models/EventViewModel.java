@@ -95,14 +95,6 @@ public class EventViewModel extends ViewModel implements EventsCallback {
         }
     }
 
-    /**
-     * Sets the currently selected event.
-     *
-     * @param event The event to be set as selected.
-     */
-    public void setSelectedEvent(Event event) {
-        selectedEvent.setValue(event);
-    }
 
     /**
      * Fetch all events the user is registered in and update LiveData.
@@ -197,7 +189,14 @@ public class EventViewModel extends ViewModel implements EventsCallback {
                 });
     }
 
-
+    /**
+     * Sets the currently selected event.
+     *
+     * @param event The event to be set as selected.
+     */
+    public void setSelectedEvent(Event event) {
+        selectedEvent.setValue(event);
+    }
 
     /**
      * Retrieves the currently selected event as a LiveData object.
@@ -323,7 +322,7 @@ public class EventViewModel extends ViewModel implements EventsCallback {
     /**
      * Leave an event as a user
      */
-    public void deleteEvent(Event event){
+    public void leaveEvent(Event event){
         // Leave an event as a user
         WriteBatch batch = firebaseFirestore.batch();
         DocumentReference eventUsers = firebaseFirestore.collection("events").document(event.getFirebaseID());
@@ -347,6 +346,21 @@ public class EventViewModel extends ViewModel implements EventsCallback {
                 .addOnFailureListener(e -> {
                     //Toast.makeText(getContext(), "Error leaving the event", Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    public void deleteEvent(Event event){
+        if(event != null) {
+            firebaseFirestore.collection("events") // "events" is the name of your collection
+                    .document(event.getFirebaseID())
+                    .delete()
+                    .addOnSuccessListener(documentReference -> {
+                        removeFromOwnedList(event);
+                        Log.d("Firestore", "Event deleted");
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.w("Firestore", "Error adding event", e);
+                    });
+        }
     }
 
     // Implemented EventsCallback methods
@@ -384,5 +398,13 @@ public class EventViewModel extends ViewModel implements EventsCallback {
 
     public void setUserReference(DocumentReference userReference) {
         this.userReference = userReference;
+    }
+
+    public boolean userOwnsEvent(){
+        // Get the current value of userEventList
+        List<Event> currentList = getUserOwnedList().getValue();
+        // Check if the list is not null and contains the event
+
+        return currentList != null && getSelectedEvent().getValue() != null && currentList.contains(getSelectedEvent().getValue());
     }
 }
