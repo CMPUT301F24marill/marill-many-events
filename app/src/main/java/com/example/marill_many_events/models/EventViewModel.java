@@ -1,20 +1,30 @@
 package com.example.marill_many_events.models;
 
+import static android.app.PendingIntent.getActivity;
 import static android.content.ContentValues.TAG;
 import static androidx.test.InstrumentationRegistry.getContext;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.marill_many_events.EventsCallback;
+import com.example.marill_many_events.activities.HomePageActivity;
+import com.example.marill_many_events.activities.MainActivity;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -24,6 +34,7 @@ import org.w3c.dom.Document;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 public class EventViewModel extends ViewModel implements EventsCallback {
 
@@ -38,11 +49,14 @@ public class EventViewModel extends ViewModel implements EventsCallback {
     private final MutableLiveData<List<Event>> userEventList = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<List<Event>> userPendingList = new MutableLiveData<>(new ArrayList<>());
 
+<<<<<<< Updated upstream
 
     public LiveData<List<Event>> getUserPendingList() {
         return userPendingList;
     }
 
+=======
+>>>>>>> Stashed changes
     public LiveData<List<Event>> getUserEventList() {
         return userEventList;
     }
@@ -385,8 +399,8 @@ public class EventViewModel extends ViewModel implements EventsCallback {
     }
 
     /**
-     * Sets the DocumentReference for the selected event.
-     *
+     * Gets the DocumentReference for the selected event.
+     * @returns FirebaseFirestore
      */
     public FirebaseFirestore getFirebaseReference() {
         return firebaseFirestore;
@@ -424,12 +438,41 @@ public class EventViewModel extends ViewModel implements EventsCallback {
     /**
      * Register a user to an event by atomically adding user to event's waitlist and event to user's events
      */
-    public void registerUser(){ // Register the current deviceID (user) to the given event by writing to the user and event a reference to each other
+    public void registerUser() { // Register the current deviceID (user) to the given event by writing to the user and event a reference to each other
         WriteBatch batch = firebaseFirestore.batch();
         DocumentReference eventUsers = firebaseFirestore.collection("events").document(getSelectedEvent().getValue().FirebaseID);
 
         batch.update(userReference, "waitList", FieldValue.arrayUnion(eventUsers));
         batch.update(eventUsers, "waitList", FieldValue.arrayUnion(userReference));
+
+        batch.commit()
+                .addOnSuccessListener(aVoid -> {
+                    firebaseFirestore.collection("events").document(getSelectedEvent().getValue().FirebaseID).get()
+                            .addOnSuccessListener(documentSnapshot -> {
+                                if (documentSnapshot.exists()) {
+                                    Event newEvent = documentSnapshot.toObject(Event.class);
+                                    if (newEvent != null) {
+                                        addToWaitList(newEvent); // Add directly to the list
+                                    }
+                                }
+                            });
+                    //Toast.makeText(getContext(), "Item added to the list!", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    //Toast.makeText(getContext(), "Error adding item to the list", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    /**
+     * Register a user to an event by atomically adding user to event's waitlist and event to user's events, accounting for their geolocation
+     */
+    public void registerUserGeo(GeoPoint geoPoint) { // Register the current deviceID (user) to the given event by writing to the user and event a reference to each other
+        WriteBatch batch = firebaseFirestore.batch();
+        DocumentReference eventUsers = firebaseFirestore.collection("events").document(getSelectedEvent().getValue().FirebaseID);
+
+        batch.update(userReference, "waitList", FieldValue.arrayUnion(eventUsers));
+        batch.update(eventUsers, "waitList", FieldValue.arrayUnion(userReference));
+        batch.update(eventUsers, "entrantGeoPoints", FieldValue.arrayUnion(geoPoint));
 
         batch.commit()
                 .addOnSuccessListener(aVoid -> {
@@ -714,13 +757,10 @@ public class EventViewModel extends ViewModel implements EventsCallback {
             batch.update(eventUsers, "waitList", FieldValue.arrayRemove(ref)); // remove from event's waitlist
         }
 
-
-
         batch.commit() // remove event from user and user from event atomically
                 .addOnSuccessListener(aVoid -> {
                     Log.d("BatchWrite", "Added event to user and user to events");
 
                 });
-
     }
 }
