@@ -169,9 +169,18 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
             photoPicker.showPhotoOptions(null);
         });
 
-        createButton.setOnClickListener(v-> {
-                if(posterUri != null) firebaseEvents.uploadPoster(posterUri);
-                else firebaseEvents.createEvent(createEvent());
+        createButton.setOnClickListener(v -> {
+            Event event = createEvent(); // Attempt to create the event
+            if (event == null) {// Stop further execution if validation fails
+                return;
+            }
+
+            // Proceed with uploading the poster or creating the event
+            if (posterUri != null) {
+                firebaseEvents.uploadPoster(posterUri);
+            } else {
+                firebaseEvents.createEvent(event);
+            }
         });
 
         switchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -284,26 +293,56 @@ public class CreateEventFragment extends Fragment implements EventsCallback, Pho
         firebaseEvents.createEvent(event);
     }
 
-    /**
-     * Create an event object.
-     */
-    public Event createEvent(){
-        String capacityInput = capacityField.getText().toString().trim();
 
+    /**
+     * Create an event object with mandatory field validations.
+     */
+    public Event createEvent() {
+        // Validate event name
+        eventName = NameField.getText().toString().trim();
+        if (eventName.isEmpty()) {
+            Toast.makeText(getContext(), "Event name is required.", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        // Validate location
+        location = locationField.getText().toString().trim();
+        if (location.isEmpty()) {
+            Toast.makeText(getContext(), "Location is required.", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        // Validate start and end dates
+        if (startDate == null) {
+            Toast.makeText(getContext(), "Start date is required.", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        if (endDate == null) {
+            Toast.makeText(getContext(), "End date is required.", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        // Ensure the end date is not earlier than the start date
+        if (endDate.before(startDate)) {
+            Toast.makeText(getContext(), "End date cannot be earlier than the start date.", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        // Validate capacity
+        String capacityInput = capacityField.getText().toString().trim();
         if (capacityInput.isEmpty()) {
-            // If empty, set the default value to 1000
-            capacity = 10000;
+            capacity = 10000; // Default value
         } else {
-            // If not empty, try to parse it as an integer
             try {
                 capacity = Integer.parseInt(capacityInput);
             } catch (NumberFormatException e) {
-                // In case of invalid number format, set capacity to default value (1000)
-                capacity = 10000;
+                Toast.makeText(getContext(), "Invalid capacity value. Please enter a number.", Toast.LENGTH_SHORT).show();
+                return null;
             }
         }
-        eventName = NameField.getText().toString().trim();
-        location = locationField.getText().toString().trim();
+
+        // Create and return the Event object
         event = new Event(posterUrl, eventName, location, startDate, endDate, capacity, geolocation, null, null);
         return event;
     }
