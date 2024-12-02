@@ -84,7 +84,13 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
      * Default constructor for RegistrationFragment.
      */
     public RegistrationFragment() {}
-
+    /**
+     * Attaches the fragment to its parent context and verifies that the context implements the required `Identity` interface.
+     * This method ensures that the fragment has access to necessary dependencies provided by the parent activity.
+     *
+     * @param context The context to attach the fragment to, typically the parent activity.
+     * @throws ClassCastException if the context does not implement the `Identity` interface.
+     */
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -97,7 +103,12 @@ public class RegistrationFragment extends Fragment implements PhotoPicker.OnPhot
         }
     }
 
-
+    /**
+     * Initializes the fragment's ViewModel, Firebase instances, and utility classes.
+     * This method is called when the fragment is created.
+     *
+     * @param savedInstanceState The saved state of the fragment, if available.
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
