@@ -7,10 +7,9 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.example.marill_many_events.Identity;
-import com.example.marill_many_events.UserCallback;
 import com.example.marill_many_events.fragments.CreateFacilityFragment;
-import com.example.marill_many_events.fragments.EventFragment;
-import com.example.marill_many_events.fragments.CreateEventFragment;
+import com.example.marill_many_events.fragments.JoinedEventsFragment;
+import com.example.marill_many_events.fragments.WaitlistFragment;
 import com.example.marill_many_events.fragments.NavbarFragment;
 import com.example.marill_many_events.NavbarListener;
 import com.example.marill_many_events.R;
@@ -21,14 +20,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.marill_many_events.models.Event;
-import com.example.marill_many_events.models.EventViewModel;
 import com.example.marill_many_events.models.FirebaseUsers;
-import com.example.marill_many_events.models.User;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -81,9 +77,9 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
                 .replace(R.id.navbar_container, navbarFragment)
                 .commit();
 
-        EventFragment eventFragment = new EventFragment();
+        JoinedEventsFragment joinedEventsFragment = new JoinedEventsFragment();
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, eventFragment) // replace the fragment already in fragment_container
+                .replace(R.id.fragment_container, joinedEventsFragment) // replace the fragment already in fragment_container
                 .addToBackStack(null) // add to back stack
                 .commit();
     }
@@ -142,18 +138,32 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
 
     /**
      * Called when the home navigation item is selected. Replaces the current fragment with
-     * {@link EventFragment} and passes the device ID as an argument.
+     * {@link WaitlistFragment} and passes the device ID as an argument.
      */
     public void onHomeSelected(){
         // Open the eventfragment when profile is selected
         deviceId = getIntent().getStringExtra("deviceId"); // Retrieve deviceId
 
-        EventFragment eventFragment = new EventFragment();
+        JoinedEventsFragment joinedEventsFragment = new JoinedEventsFragment();
         Log.d(TAG, "onHomeSelected called with deviceId: " + deviceId);
         isOrgList = false;
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, eventFragment, "user events") // replace the fragment already in fragment_container
+                .replace(R.id.fragment_container, joinedEventsFragment, "user events") // replace the fragment already in fragment_container
+                .addToBackStack(null) // add to back stack
+                .commit();
+    }
+
+    public void onwaitlistSelected(){
+        // Open the eventfragment when profile is selected
+        deviceId = getIntent().getStringExtra("deviceId"); // Retrieve deviceId
+
+        WaitlistFragment waitlistFragment = new WaitlistFragment();
+        Log.d(TAG, "onHomeSelected called with deviceId: " + deviceId);
+        isOrgList = false;
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, waitlistFragment, "user events") // replace the fragment already in fragment_container
                 .addToBackStack(null) // add to back stack
                 .commit();
     }
@@ -218,20 +228,6 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
         return isOrgList;
     }
 
-//    @Override
-//    public void onUserloaded(User user) {
-//        this.user = user;
-//    }
-//
-//    @Override
-//    public void onUserUpdated() {
-//        firebaseUsers.loadUserDetails();
-//    }
-//
-//    @Override
-//    public void onRegistered() {
-//        firebaseUsers.loadUserDetails();
-//    }
 
     public void setEventDocumentId(String eventDocumentId) {
         this.eventDocumentId = eventDocumentId;

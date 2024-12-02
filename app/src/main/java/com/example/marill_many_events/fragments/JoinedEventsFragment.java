@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -37,7 +38,7 @@ import java.util.List;
 /**
  * Displays all events as a list, events can either be user's waitlist or organizer's created events
  */
-public class EventFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener{
+public class JoinedEventsFragment extends Fragment implements EventyArrayAdapter.OnItemClickListener{
 
     private Event currentEvent;
     private RecyclerView waitlistList;
@@ -58,25 +59,12 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
     //private onLeaveListener listener;
 
     /**
-     * Default constructor for EventFragment.
+     * Default constructor for WaitlistFragment.
      * Required to ensure proper fragment instantiation.
      */
-    public EventFragment() {
+    public JoinedEventsFragment() {
         // Required empty public constructor
     }
-
-    final ActivityResultLauncher<ScanOptions> qrCodeLauncher = registerForActivityResult(
-            new ScanContract(),
-            result -> {
-                if (result.getContents() == null) {
-                    Toast.makeText(getContext(), "Scan canceled", Toast.LENGTH_LONG).show();
-                } else {
-                    String scannedData = result.getContents();
-                    Toast.makeText(getContext(), "Scanned: " + scannedData, Toast.LENGTH_LONG).show();
-                    getEvent(scannedData);
-                }
-            });
-
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -111,14 +99,11 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
 
         getUser();
 
-
+        TextView title = view.findViewById(R.id.waitlist_label);
+        title.setText("My Joined Events");
         FloatingActionButton scanButton = view.findViewById(R.id.scan);
 
-        scanButton.setOnClickListener(v -> {
-            // Launch the QR scanner using the ActivityResultLauncher
-            Intent intent = new Intent(getActivity(), com.journeyapps.barcodescanner.CaptureActivity.class);
-            qrCodeLauncher.launch(options);
-        });
+        scanButton.setVisibility(View.GONE);
 
         // Initialize RecyclerView and CardAdapter
         waitlistList = view.findViewById(R.id.waitlist_list);
@@ -131,7 +116,7 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
         eventAdapter = new EventyArrayAdapter(eventItemList, this, true);
         waitlistList.setAdapter(eventAdapter);
 
-        eventViewModel.getUserEvents();
+        eventViewModel.getUserEventlist();
 
         eventViewModel.getUserEventList().observe(getViewLifecycleOwner(), updatedList -> {
             eventItemList.clear(); // Clear the old list
@@ -140,24 +125,6 @@ public class EventFragment extends Fragment implements EventyArrayAdapter.OnItem
         });
 
         return view;
-    }
-
-    /**
-     * Get event details from a qr code of its firebase reference
-     */
-    public void getEvent(String eventID){
-        firestore.collection("events").document(eventID)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            Event event = document.toObject(Event.class);
-                            eventViewModel.setSelectedEvent(event);
-                            Log.d("FragmentLifecycle", "Opening details.");
-                            showEventDetails();                        }
-                    }
-                });
     }
 
 

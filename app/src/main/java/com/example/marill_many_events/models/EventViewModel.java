@@ -29,13 +29,18 @@ public class EventViewModel extends ViewModel implements EventsCallback {
     private StorageReference eventStorageReference;
     private FirebaseStorage firebaseStorage;
     private DocumentReference userReference;
-    private final MutableLiveData<List<Event>> userEventList = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<List<Event>> userWaitList = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<List<Event>> userOwnedList = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<List<Event>> userEventList = new MutableLiveData<>(new ArrayList<>());
 
 
 
     public LiveData<List<Event>> getUserEventList() {
         return userEventList;
+    }
+
+    public LiveData<List<Event>> getUserWaitList() {
+        return userWaitList;
     }
     public LiveData<List<Event>> getUserOwnedList() {
         return userOwnedList;
@@ -73,6 +78,33 @@ public class EventViewModel extends ViewModel implements EventsCallback {
      *
      * @param event The event to add.
      */
+    private void addToWaitList(Event event) {
+        List<Event> currentList = userWaitList.getValue();
+        if (currentList == null) {
+            currentList = new ArrayList<>();
+        }
+        currentList.add(event);
+        userWaitList.setValue(currentList); // Trigger observers
+    }
+
+    /**
+     * Remove an event from the current event list and updates the LiveData.
+     *
+     * @param event The event to remove.
+     */
+    private void removeFromWaitList(Event event) {
+        List<Event> currentList = userWaitList.getValue();
+        if (currentList != null && currentList.contains(event)) {
+            currentList.remove(event);
+            userWaitList.setValue(currentList); // Trigger observers
+        }
+    }
+
+    /**
+     * Adds a new event to the current event list and updates the LiveData.
+     *
+     * @param event The event to add.
+     */
     private void addToOwnedList(Event event) {
         List<Event> currentList = userOwnedList.getValue();
         if (currentList == null) {
@@ -95,12 +127,44 @@ public class EventViewModel extends ViewModel implements EventsCallback {
         }
     }
 
+    public void getUserEventlist() {
+        userEventList.setValue(new ArrayList<>()); // Clear the current list
+        userReference.get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        List<DocumentReference> docRefs = (List<DocumentReference>) documentSnapshot.get("events");
+
+                        if (docRefs != null) {
+                            for (DocumentReference reference : docRefs) {
+                                reference.get()
+                                        .addOnSuccessListener(innerDoc -> {
+                                            if (innerDoc.exists()) {
+                                                Event event = innerDoc.toObject(Event.class);
+                                                addToEventList(event);
+                                            }
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            // Handle error fetching the event document
+                                            Toast.makeText(getContext(), "Error fetching referenced document", Toast.LENGTH_SHORT).show();
+                                        });
+                            }
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "Document not found", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Handle error retrieving the user document
+                    Toast.makeText(getContext(), "Error getting document", Toast.LENGTH_SHORT).show();
+                });
+    }
+
 
     /**
      * Fetch all events the user is registered in and update LiveData.
      */
-    public void getUserEvents() {
-        userEventList.setValue(new ArrayList<>()); // Clear the current list
+    public void getUserWaitlist() {
+        userWaitList.setValue(new ArrayList<>()); // Clear the current list
         userReference.get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
@@ -112,7 +176,7 @@ public class EventViewModel extends ViewModel implements EventsCallback {
                                         .addOnSuccessListener(innerDoc -> {
                                             if (innerDoc.exists()) {
                                                 Event event = innerDoc.toObject(Event.class);
-                                                addToEventList(event);
+                                                addToWaitList(event);
                                             }
                                         })
                                         .addOnFailureListener(e -> {
@@ -270,34 +334,34 @@ public class EventViewModel extends ViewModel implements EventsCallback {
         return eventStorageReference;
     }
 
-    /**
-     * Updates the status of a specific entrant for the selected event.
-     *
-     * @param user   The user whose status needs to be updated.
-     * @param status The new status to be applied.
-     */
-    public void updateEntrantStatus(User user, String status) {
-        Event event = selectedEvent.getValue();
-        if (event != null) {
-            event.setEntrantStatus(user, status);
-            selectedEvent.setValue(event); // Trigger LiveData observers
-        }
-    }
-
-    /**
-     * Adds a new entrant to the currently selected event.
-     *
-     * @param user   The user to be added as an entrant.
-     * @param xCord  The x-coordinate of the user's location.
-     * @param yCord  The y-coordinate of the user's location.
-     */
-    public void addEntrantToEvent(User user, float xCord, float yCord) {
-        Event event = selectedEvent.getValue();
-        if (event != null) {
-            event.addEntrant(user, xCord, yCord);
-            selectedEvent.setValue(event); // Trigger LiveData observers
-        }
-    }
+//    /**
+//     * Updates the status of a specific entrant for the selected event.
+//     *
+//     * @param user   The user whose status needs to be updated.
+//     * @param status The new status to be applied.
+//     */
+//    public void updateEntrantStatus(User user, String status) {
+//        Event event = selectedEvent.getValue();
+//        if (event != null) {
+//            event.setEntrantStatus(user, status);
+//            selectedEvent.setValue(event); // Trigger LiveData observers
+//        }
+//    }
+//
+//    /**
+//     * Adds a new entrant to the currently selected event.
+//     *
+//     * @param user   The user to be added as an entrant.
+//     * @param xCord  The x-coordinate of the user's location.
+//     * @param yCord  The y-coordinate of the user's location.
+//     */
+//    public void addEntrantToEvent(User user, float xCord, float yCord) {
+//        Event event = selectedEvent.getValue();
+//        if (event != null) {
+//            event.addEntrant(user, xCord, yCord);
+//            selectedEvent.setValue(event); // Trigger LiveData observers
+//        }
+//    }
 
     /**
      * Register a user to an event by atomically adding user to event's waitlist and event to user's events
@@ -308,6 +372,31 @@ public class EventViewModel extends ViewModel implements EventsCallback {
 
         batch.update(userReference, "waitList", FieldValue.arrayUnion(eventUsers));
         batch.update(eventUsers, "waitList", FieldValue.arrayUnion(userReference));
+
+        batch.commit()
+                .addOnSuccessListener(aVoid -> {
+                    firebaseFirestore.collection("events").document(getSelectedEvent().getValue().FirebaseID).get()
+                            .addOnSuccessListener(documentSnapshot -> {
+                                if (documentSnapshot.exists()) {
+                                    Event newEvent = documentSnapshot.toObject(Event.class);
+                                    if (newEvent != null) {
+                                        addToWaitList(newEvent); // Add directly to the list
+                                    }
+                                }
+                            });
+                    //Toast.makeText(getContext(), "Item added to the list!", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    //Toast.makeText(getContext(), "Error adding item to the list", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    public void enterUser(){ // Add the current user as an entrant to the selected event
+        WriteBatch batch = firebaseFirestore.batch();
+        DocumentReference eventUsers = firebaseFirestore.collection("events").document(getSelectedEvent().getValue().FirebaseID);
+
+        batch.update(userReference, "events", FieldValue.arrayUnion(eventUsers));
+        batch.update(eventUsers, "entrants", FieldValue.arrayUnion(userReference));
 
         batch.commit()
                 .addOnSuccessListener(aVoid -> {
@@ -327,11 +416,39 @@ public class EventViewModel extends ViewModel implements EventsCallback {
                 });
     }
 
-
     /**
      * Leave an event as a user
      */
     public void leaveEvent(Event event){
+        // Leave an event as a user
+        WriteBatch batch = firebaseFirestore.batch();
+        DocumentReference eventUsers = firebaseFirestore.collection("events").document(event.getFirebaseID());
+
+        batch.update(userReference, "events", FieldValue.arrayRemove(eventUsers));
+        batch.update(eventUsers, "entrants", FieldValue.arrayRemove(userReference));
+
+        batch.commit() // remove event from user and user from event atomically
+                .addOnSuccessListener(aVoid -> {
+                    firebaseFirestore.collection("events").document(event.getFirebaseID()).get() // get the present event's firebase id from its local copy
+                            .addOnSuccessListener(documentSnapshot -> {
+                                if (documentSnapshot.exists()) {
+                                    Event newEvent = documentSnapshot.toObject(Event.class);
+                                    if (newEvent != null) {
+                                        removeFromWaitList(event); // Remove from list
+                                    }
+                                }
+                            });
+                    //Toast.makeText(getContext(), "Left the event!", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    //Toast.makeText(getContext(), "Error leaving the event", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    /**
+     * Leave an event as a user
+     */
+    public void leaveWaitlist(Event event){
         // Leave an event as a user
         WriteBatch batch = firebaseFirestore.batch();
         DocumentReference eventUsers = firebaseFirestore.collection("events").document(event.getFirebaseID());
@@ -346,7 +463,7 @@ public class EventViewModel extends ViewModel implements EventsCallback {
                                 if (documentSnapshot.exists()) {
                                     Event newEvent = documentSnapshot.toObject(Event.class);
                                     if (newEvent != null) {
-                                        removeFromEventList(event); // Remove from list
+                                        removeFromWaitList(event); // Remove from list
                                     }
                                 }
                             });

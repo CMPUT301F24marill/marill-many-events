@@ -16,10 +16,9 @@ import com.example.marill_many_events.R;
 import com.example.marill_many_events.fragments.AdminNavbarFragment;
 import com.example.marill_many_events.fragments.CreateFacilityFragment;
 import com.example.marill_many_events.fragments.EventAdminFragment;
-import com.example.marill_many_events.fragments.EventFragment;
+import com.example.marill_many_events.fragments.WaitlistFragment;
 import com.example.marill_many_events.fragments.FacilitiesAdminFragment;
 import com.example.marill_many_events.fragments.ImagesAdminFragment;
-import com.example.marill_many_events.fragments.NavbarFragment;
 import com.example.marill_many_events.fragments.OrgEventsFragment;
 import com.example.marill_many_events.fragments.ProfilesAdminFragment;
 import com.example.marill_many_events.fragments.RegistrationFragment;
@@ -120,7 +119,7 @@ public class AdminPageActivity extends AppCompatActivity implements NavbarListen
 
     /**
      * Called when the home navigation item is selected. Replaces the current fragment with
-     * {@link EventFragment} and passes the device ID as an argument.
+     * {@link WaitlistFragment} and passes the device ID as an argument.
      */
     public void onFacilitiesSelected(){
         // Open the RegistrationFragment when profile is selected
@@ -213,4 +212,6 @@ public class AdminPageActivity extends AppCompatActivity implements NavbarListen
     public void onHomeSelected() {}
     @Override
     public void onMenuSelected() {}
+    @Override
+    public void onwaitlistSelected() {}
 }

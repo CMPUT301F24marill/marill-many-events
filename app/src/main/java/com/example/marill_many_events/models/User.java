@@ -13,7 +13,7 @@ public class User {
     private String email;
     private String phone;
     private String profilePictureUrl;
-    private ArrayList<String> events;
+    private ArrayList<DocumentReference> events;
     private ArrayList<DocumentReference> waitList;
     private boolean isOrganizer;
     public boolean admin;
@@ -145,11 +145,11 @@ public class User {
     }
 
 
-    public ArrayList<String> getEvents() {
+    public ArrayList<DocumentReference> getEvents() {
         return events;
     }
 
-    public void addEvent(String event) {
+    public void addEvent(DocumentReference event) {
         this.events.add(event);
     }
 

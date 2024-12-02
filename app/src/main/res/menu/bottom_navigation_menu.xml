@@ -1,8 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/nav_home"
-        android:icon="@drawable/home"
+        android:icon="@drawable/home_focused"
         android:title="@string/lbl_Events" />
+
+    <item
+        android:id="@+id/nav_waitlist"
+        android:icon="@drawable/hourglass_empty"
+        android:title="Waitlist" />
+
     <item
         android:id="@+id/nav_menu"
         android:icon="@drawable/menu"
@@ -11,4 +17,6 @@
         android:id="@+id/nav_profile"
         android:icon="@drawable/default_profile"
         android:title="@string/lbl_Profile" />
+
+
 </menu>

@@ -52,7 +52,7 @@ public class FacilitiesAdminFragment extends Fragment implements FacilityArrayAd
     private CollectionReference user;
 
     /**
-     * Default constructor for EventFragment.
+     * Default constructor for WaitlistFragment.
      * Required to ensure proper fragment instantiation.
      */
     public FacilitiesAdminFragment() {

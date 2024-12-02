@@ -56,7 +56,7 @@ public class ProfilesAdminFragment extends Fragment implements ProfileyArrayAdap
     private CollectionReference user;
 
     /**
-     * Default constructor for EventFragment.
+     * Default constructor for WaitlistFragment.
      * Required to ensure proper fragment instantiation.
      */
     public ProfilesAdminFragment() {

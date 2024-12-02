@@ -52,7 +52,7 @@ public class ImagesAdminFragment extends Fragment implements ImageyArrayAdapter.
     StorageReference user_posters;
 
     /**
-     * Default constructor for EventFragment.
+     * Default constructor for WaitlistFragment.
      * Required to ensure proper fragment instantiation.
      */
     public ImagesAdminFragment() {

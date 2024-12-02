@@ -50,7 +50,7 @@ public class EventAdminFragment extends Fragment implements EventyArrayAdapter.O
     private EventViewModel eventViewModel;
 
     /**
-     * Default constructor for EventFragment.
+     * Default constructor for WaitlistFragment.
      * Required to ensure proper fragment instantiation.
      */
     public EventAdminFragment() {
