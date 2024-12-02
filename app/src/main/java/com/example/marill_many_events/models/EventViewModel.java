@@ -235,6 +235,15 @@ public class EventViewModel extends ViewModel implements EventsCallback {
     }
 
     /**
+     * Sets the DocumentReference for the selected event.
+     *
+     */
+    public FirebaseFirestore getFirebaseReference() {
+        return firebaseFirestore;
+    }
+
+
+    /**
      * Retrieves the DocumentReference for the selected event.
      *
      * @return The DocumentReference for the event.

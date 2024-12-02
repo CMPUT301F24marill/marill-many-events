@@ -150,6 +150,7 @@ public class FirebaseEvents {
 //    }
 
 
+
     /**
      * Upload poster picture to firebase storage and get the download url.
      */
