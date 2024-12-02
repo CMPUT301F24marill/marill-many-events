@@ -7,13 +7,21 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
 import java.util.Map;
-
+/**
+ * Handles Firebase Firestore operations related to facility registration and management.
+ */
 public class FirebaseFacilityRegistration {
 
     private FirebaseFirestore firestore;
     private String facilityId;
     private FacilityCallback callback;
-
+    /**
+     * Constructor for FirebaseFacilityRegistration.
+     *
+     * @param firestore  The Firestore instance to use for database operations.
+     * @param facilityId The unique ID of the facility being managed.
+     * @param callback   The callback interface for facility-related operations.
+     */
     public FirebaseFacilityRegistration(FirebaseFirestore firestore,  String facilityId, FacilityCallback callback) {
         this.firestore = firestore;
         this.facilityId = facilityId;
@@ -21,7 +29,10 @@ public class FirebaseFacilityRegistration {
     }
 
     /**
-     * Register a new facility.
+     * Registers a new facility in Firestore.
+     *
+     * @param Name     The name of the facility.
+     * @param location The location of the facility.
      */
     public void registerFacility(String Name, String location) {
         Facility facility = new Facility(Name, location);
@@ -30,7 +41,12 @@ public class FirebaseFacilityRegistration {
                     callback.onFacilityRegistered();
                 });
     }
-
+    /**
+     * Updates the facility's details in Firestore.
+     *
+     * @param name     The new name of the facility.
+     * @param location The new location of the facility.
+     */
     public void updateFacility(String name, String location) {
         Map<String, Object> userUpdates = new HashMap<>();
         userUpdates.put("facilityName", name);
@@ -43,7 +59,11 @@ public class FirebaseFacilityRegistration {
                     //Toast.makeText(getActivity(), "facility details updated successfully!", Toast.LENGTH_SHORT).show();
                 });
     }
-
+    /**
+     * Loads the details of a facility from Firestore.
+     * If the facility exists, its details are passed to the callback.
+     * If the facility does not exist, the callback receives a null value.
+     */
     public void loadFacilityDetails() {
         firestore.collection("facilities")
                 .document(facilityId)
