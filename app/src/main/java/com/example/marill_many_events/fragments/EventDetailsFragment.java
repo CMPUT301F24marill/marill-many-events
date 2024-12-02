@@ -4,6 +4,7 @@ import static android.content.ContentValues.TAG;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,13 +23,17 @@ import androidx.lifecycle.ViewModelProvider;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.example.marill_many_events.EventsCallback;
 import com.example.marill_many_events.R;
 import com.example.marill_many_events.activities.HomePageActivity;
 import com.example.marill_many_events.models.Event;
 import com.example.marill_many_events.models.EventViewModel;
+import com.example.marill_many_events.models.FirebaseEvents;
 import com.example.marill_many_events.models.GenerateQRcode;
+import com.example.marill_many_events.models.PhotoPicker;
 import com.example.marill_many_events.models.User;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,7 +41,7 @@ import java.util.ArrayList;
 /**
  * Shows the details of any selected event object, invoked from either user's waitlist or organizers event list
  */
-public class EventDetailsFragment extends Fragment {
+public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhotoSelectedListener, EventsCallback {
 
     private TextView nameField, locationField ,capacityField, datePickerStart, datePickerEnd;
     private ImageView QRview, posterView;
@@ -44,10 +49,14 @@ public class EventDetailsFragment extends Fragment {
     private EventViewModel eventViewModel;
     private Button createButton, deleteButton;
     private Event event;
+    private PhotoPicker photoPicker;
     private User user;
+    private Uri posterUri;
     private Button drawEntrantsButton;
     private Button viewParticipantsButton;
     private String eventDocumentId;
+    private FirebaseEvents firebaseEvents;
+    private FirebaseStorage firebaseStorage;
 
     public EventDetailsFragment() {
         // Required empty public constructor
@@ -70,22 +79,13 @@ public class EventDetailsFragment extends Fragment {
         user = eventViewModel.getCurrentUser();
         drawEntrantsButton = view.findViewById(R.id.draw_entrants_button);
         viewParticipantsButton = view.findViewById(R.id.view_participants_button);
+        photoPicker = new PhotoPicker(this, this);
+        firebaseStorage = eventViewModel.getFirebaseStorage();
+        firebaseEvents = new FirebaseEvents(eventViewModel.getFirebaseReference(), firebaseStorage.getReference(), eventViewModel.getUserReference().getId(), this);
 
 
         createButton = view.findViewById(R.id.create);
         deleteButton = view.findViewById(R.id.delete);
-
-        // Fetch current event
-        HomePageActivity parentActivity = (HomePageActivity) getActivity();
-        event = parentActivity.getCurrentEvent(); // Fallback to fetching directly from activity if ViewModel is delayed
-
-        if (event != null) {
-            eventDocumentId = event.getFirebaseID(); // Assign eventDocumentId from QRcode
-        } else {
-            Log.e(TAG, "Event object is null");
-            // Handle the error appropriately
-        }
-
 
 
         setUI(); // Change UI elements based on context
@@ -112,13 +112,11 @@ public class EventDetailsFragment extends Fragment {
         });
 
 
-
-
         // Set up the OnClickListener for the drawEntrantsButton
         drawEntrantsButton.setOnClickListener(v -> {
-            if (eventDocumentId != null) {
+            if (event.getFirebaseID() != null) {
                 // Create a new instance of EntrantsDrawFragment, passing the eventDocumentId
-                EntrantsDrawFragment entrantsDrawFragment = EntrantsDrawFragment.newInstance(eventDocumentId);
+                EntrantsDrawFragment entrantsDrawFragment = EntrantsDrawFragment.newInstance(event.getFirebaseID());
 
                 // Replace the current fragment with EntrantsDrawFragment
                 FragmentManager fragmentManager = getParentFragmentManager();
@@ -134,9 +132,9 @@ public class EventDetailsFragment extends Fragment {
 
         // Set up the OnClickListener for the viewParticipantsButton
         viewParticipantsButton.setOnClickListener(v -> {
-            if (eventDocumentId != null) {
+            if (event.getFirebaseID() != null) {
                 // Create a new instance of ViewParticipantsFragment, passing the eventDocumentId
-                ViewParticipantsFragment viewParticipantsFragment = ViewParticipantsFragment.newInstance(eventDocumentId);
+                ViewParticipantsFragment viewParticipantsFragment = ViewParticipantsFragment.newInstance(event.getFirebaseID());
 
                 // Replace the current fragment with ViewParticipantsFragment
                 FragmentManager fragmentManager = getParentFragmentManager();
@@ -229,12 +227,64 @@ public class EventDetailsFragment extends Fragment {
     private void isOrganizer(){
         deleteButton.setText("Delete Event");
         deleteButton.setVisibility(View.VISIBLE);
-        createButton.setText("Save");
+        createButton.setVisibility(View.GONE);
         drawEntrantsButton.setVisibility(View.VISIBLE);
         viewParticipantsButton.setVisibility(View.VISIBLE);
+
+        posterView.setOnClickListener(v-> {
+            photoPicker.showPhotoOptions(null);
+        });
+
         deleteButton.setOnClickListener(v -> {
             eventViewModel.deleteEvent(eventViewModel.getSelectedEvent().getValue());
             requireActivity().getSupportFragmentManager().popBackStack();
         });
     }
+
+    /**
+     * Sets the poster imageview once an image is selected.
+     *
+     * @param uri The image resource id.
+     */
+    public void onPhotoSelected(Uri uri){ // when the upload photo button is pressed and a photo is uploaded
+        posterUri = uri;
+        Glide.with(this).asBitmap().load(uri)
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition transition) {
+                        float imageAspectRatio = (float) resource.getWidth() / (float) resource.getHeight(); // Get the aspect ratio of the image
+
+                        int viewwidth = posterView.getWidth(); // Get the width of the ImageView
+
+
+                        int height;
+                        if (imageAspectRatio >= 1)  // Landscape or square image (16:9 or wider)
+                            height = (int) (viewwidth / imageAspectRatio);
+                        else // Portrait image (9:16 or taller), limit the height to 1/4 of the fragment height
+                            height = getView().getHeight()/4;
+
+
+                        // Set the height of the ImageView
+                        ViewGroup.LayoutParams params = posterView.getLayoutParams();
+                        params.height = height;
+                        posterView.setLayoutParams(params);
+
+                        posterView.setImageBitmap(resource); // Add the image in the view
+                    }
+
+                    public void onLoadCleared(Drawable draw){}
+                });
+
+        if(posterUri != null) firebaseEvents.uploadPoster(posterUri);
+    }
+
+
+    public void onPosterUpload(String posterUrl){
+        event.setImageURL(posterUrl);
+        eventViewModel.getFirebaseReference().collection("events").document(event.getFirebaseID()).update("imageURL", posterUrl);
+    }
+
+    public void getEvent (Event event){}
+    public void onEventCreate(String string){}
+    public void onPhotoDeleted(){}
 }
