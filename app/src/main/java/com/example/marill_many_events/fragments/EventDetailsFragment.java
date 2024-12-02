@@ -18,7 +18,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
+
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -47,7 +47,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 /**
- * Shows the details of any selected event object, invoked from either user's waitlist or organizers event list
+ * Fragment that displays the details of a selected event. It allows users to join or leave the event, view participants,
+ * delete the event (if the user is an organizer), and manage event poster.
+ * The event's details are displayed and updated based on the user's role (Organizer, Participant, Waitlisted, etc.).
  */
 public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhotoSelectedListener, EventsCallback {
 
@@ -76,7 +78,11 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
     public EventDetailsFragment() {
         // Required empty public constructor
     }
-
+    /**
+     * Attaches the fragment to the parent context and ensures that the context implements the Identity interface.
+     *
+     * @param context The context to attach to.
+     */
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -88,13 +94,24 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
             throw new ClassCastException(context.toString() + " must implement Identity Interface");
         }
     }
-
+    /**
+     * Initializes necessary components such as Firestore and ViewModel.
+     *
+     * @param savedInstanceState The saved instance state for the fragment.
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         firestore = identity.getFirestore();
     }
-
+    /**
+     * Inflates the event details layout and sets up observers and UI components based on the event details.
+     *
+     * @param inflater The LayoutInflater to inflate the layout.
+     * @param container The ViewGroup to contain the fragment's view.
+     * @param savedInstanceState The saved instance state.
+     * @return The fragment's view.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_create_event, container, false);
@@ -186,11 +203,11 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
 
         return view;
     }
-
     /**
-     * Retrieve poster from firebase storage and load with aspect ratio in mind
+     * Loads the event poster from Firebase and adjusts the image view's aspect ratio.
+     *
+     * @param url The URL of the event poster.
      */
-
     public void loadPoster(String url) {
         posterView.post(() -> {
             Glide.with(this).asBitmap().load(url).into(new CustomTarget<Bitmap>() {
@@ -213,6 +230,11 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
             });
         });
     }
+    /**
+     * Makes the specified TextView non-editable by disabling focus, cursor visibility, and key listener.
+     *
+     * @param textView The TextView to be set as non-editable.
+     */
 
     public void setNoEdit(TextView textView){
         textView.setFocusable(false);
@@ -220,7 +242,9 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         textView.setKeyListener(null);
         textView.setTextIsSelectable(true);
     }
-
+    /**
+     * Adjusts the UI based on whether the user is the organizer or a participant.
+     */
     public void setUI() {
         if (eventViewModel.userOwnsEvent()) {
             isOrganizer();
@@ -259,7 +283,9 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
             }
         }
     }
-
+    /**
+     * Sets up the UI for when the event is not found in the user's list.
+     */
     private void eventNotFound(){
         createButton.setText("Join Event");
         createButton.setOnClickListener(v -> {
@@ -293,8 +319,9 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
                     .addOnFailureListener(e -> Log.e(Logger.TAG, "Error fetching event details", e));
         });
     }
-
-
+    /**
+     * Sets up the UI for when the user is already part of the event (participant).
+     */
     private void eventFound(){
         createButton.setText("Leave Event");
         createButton.setOnClickListener(v-> {
@@ -306,8 +333,9 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
             }
         });
     }
-
-
+    /**
+     * Sets up the UI for when the user is on the waitlist for the event.
+     */
     private void eventInWaitlist(){
         createButton.setText("Leave Waitlist");
         createButton.setOnClickListener(v-> {
@@ -319,7 +347,9 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
             }
         });
     }
-
+    /**
+     * Sets up the UI for when the user is invited but hasn't joined the event yet.
+     */
     private void invitePending(){
         createButton.setText("Accept Invite");
         deleteButton.setText("Reject Invite");
@@ -339,7 +369,9 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
             eventViewModel.enterUser();
         });
     }
-
+    /**
+     * Sets up the UI for event organizers.
+     */
     private void isOrganizer(){
         deleteButton.setText("Delete Event");
         deleteButton.setVisibility(View.VISIBLE);
@@ -399,8 +431,12 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
 
         if(posterUri != null) firebaseEvents.uploadPoster(posterUri);
     }
-
-
+    /**
+     * Displays a dialog warning the user that their geolocation will be recorded and shared with the event organizer.
+     * The user is given the option to either accept or cancel the action.
+     * If the user accepts, the user's registration will be processed.
+     * If the user cancels, no action will be taken.
+     */
     private void showGeoDialog(){
 
         builder = new MaterialAlertDialogBuilder(requireContext())
@@ -417,13 +453,32 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
                 });
         builder.show();
     }
-
+    /**
+     * Updates the event's poster URL in the event object and saves it to the Firestore database.
+     *
+     * @param posterUrl The URL of the uploaded poster.
+     */
     public void onPosterUpload(String posterUrl){
         event.setImageURL(posterUrl);
         eventViewModel.getFirebaseReference().collection("events").document(event.getFirebaseID()).update("imageURL", posterUrl);
     }
-
+    /**
+     * This method is a placeholder for handling the event data. It may be used for future functionality
+     * or may be implemented for fetching or processing event-related information.
+     *
+     * @param event The event object to be processed.
+     */
     public void getEvent (Event event){}
+    /**
+     * This method is a placeholder for handling the event creation process.
+     * It may be used for future functionality, such as responding to event creation status.
+     *
+     * @param string A string message or identifier related to the event creation process.
+     */
     public void onEventCreate(String string){}
+    /**
+     * This method is a placeholder for handling the photo deletion process.
+     * It may be used for future functionality, such as responding to a photo deletion event.
+     */
     public void onPhotoDeleted(){}
 }
