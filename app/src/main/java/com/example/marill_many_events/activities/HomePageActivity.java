@@ -95,6 +95,7 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
                 .commit();
 
         fusedLocation = LocationServices.getFusedLocationProviderClient(this);
+        checkLocationPerms();
     }
 
     /**
@@ -313,6 +314,7 @@ public class HomePageActivity extends AppCompatActivity implements NavbarListene
                     double latitude = location.getLatitude();
                     double longitude = location.getLongitude();
                     current_geo = new GeoPoint(latitude, longitude);
+                    Log.d("Location", "location retrieval succeeded");
                 }
             }
         });

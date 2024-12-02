@@ -348,6 +348,10 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
 
     private void eventNotFound(){
         createButton.setText(getString(R.string.lbl_join_event));
+
+        if (event.isCheckGeo()) {
+            parentActivity.checkLocationPerms();
+        }
         createButton.setOnClickListener(v -> {
             firestore.collection("events").document(eventViewModel.getSelectedEvent().getValue().getFirebaseID())
                     .get()
@@ -481,4 +485,32 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
     public void getEvent (Event event){}
     public void onEventCreate(String string){}
     public void onPhotoDeleted(){}
+
+    /**
+     * Displays a dialog warning the user that their geolocation will be recorded and shared with the event organizer.
+     * The user is given the option to either accept or cancel the action.
+     * If the user accepts, the user's registration will be processed.
+     * If the user cancels, no action will be taken.
+     */
+    private void showGeoDialog(){
+
+        builder = new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Geolocation Warning")
+                .setMessage("This event will record your location and will make it available to the organizer")
+                .setCancelable(false) // Prevent dismissal by tapping outside
+                .setPositiveButton("Okay", (dialog, which) -> {
+                    Log.d("Dialog", "Positive button clicked");
+                    parentActivity.getLocation();
+                    GeoPoint current_geo = parentActivity.getCurrent_geo();
+                    Log.d("S", "currentgeo:" + current_geo);
+                    eventViewModel.registerUserGeo(current_geo);
+                    requireActivity().getSupportFragmentManager().popBackStack();
+                    button_pressed = true;
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    Log.d("Dialog", "Negative button clicked");
+
+                });
+        builder.show();
+    }
 }
