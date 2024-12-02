@@ -61,6 +61,9 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
     private FirebaseEvents firebaseEvents;
     private FirebaseStorage firebaseStorage;
     private SwitchCompat switchCompat;
+    private MaterialAlertDialogBuilder builder;
+    private boolean isCheckGeo;
+    private boolean dialogAccepted;
 
     public EventDetailsFragment() {
         // Required empty public constructor
@@ -72,7 +75,7 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         View view = inflater.inflate(R.layout.fragment_create_event, container, false);
         eventViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
         generateQRcode = new GenerateQRcode();
-
+        dialogAccepted = false;
         nameField = view.findViewById(R.id.NameField);
         datePickerStart = view.findViewById(R.id.Startdatefield);
         datePickerEnd = view.findViewById(R.id.DrawdateField);
@@ -98,9 +101,11 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         deleteButton = view.findViewById(R.id.delete);
 
 
-        setUI(); // Change UI elements based on context
 
         SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
+
+
+
 
 
         eventViewModel.getSelectedEvent().observe(getViewLifecycleOwner(), event -> {
@@ -113,6 +118,7 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
                 datePickerEnd.setText(formatter.format(event.getDrawDate()));
                 capacityField.setText(String.valueOf(event.getCapacity()));
                 switchCompat.setChecked(event.isCheckGeo());
+                isCheckGeo = event.isCheckGeo();
 
                 if (event.getFirebaseID() != null) {
                     QRview.setVisibility(View.VISIBLE);
@@ -121,19 +127,12 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
             }
         });
 
+        setUI(); // Change UI elements based on context
+
 
         // Set up the OnClickListener for the drawEntrantsButton
         drawEntrantsButton.setOnClickListener(v -> {
             if (event.getFirebaseID() != null) {
-//                // Create a new instance of EntrantsDrawFragment, passing the eventDocumentId
-//                EntrantsDrawFragment entrantsDrawFragment = EntrantsDrawFragment.newInstance(event.getFirebaseID());
-//
-//                // Replace the current fragment with EntrantsDrawFragment
-//                FragmentManager fragmentManager = getParentFragmentManager();
-//                fragmentManager.beginTransaction()
-//                        .replace(R.id.fragment_container, entrantsDrawFragment)
-//                        .addToBackStack(null)
-//                        .commit();
 
                 eventViewModel.performDraw();
             } else {
@@ -239,18 +238,12 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
     private void eventNotFound(){
             createButton.setText("Join Event");
 
-            if(switchCompat.isChecked()){
-                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("Geolocation Warning")
-                        .setMessage("This event will record your location and will make it available to the organizer")
-                        .setCancelable(false); // Prevent dismissal by tapping outside
-
-                AlertDialog dialog = builder.show();
-            }
 
 
             createButton.setOnClickListener(v-> {
-                eventViewModel.registerUser();
+                if(event.isCheckGeo())
+                    showGeoDialog();
+
             });
     }
 
@@ -345,6 +338,23 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         if(posterUri != null) firebaseEvents.uploadPoster(posterUri);
     }
 
+
+    private void showGeoDialog(){
+
+        builder = new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Geolocation Warning")
+                .setMessage("This event will record your location and will make it available to the organizer")
+                .setCancelable(false) // Prevent dismissal by tapping outside
+                .setPositiveButton("Okay", (dialog, which) -> {
+                    eventViewModel.registerUser();
+                    Log.d("Dialog", "Positive button clicked");
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    Log.d("Dialog", "Negative button clicked");
+
+                });
+        builder.show();
+    }
 
     public void onPosterUpload(String posterUrl){
         event.setImageURL(posterUrl);
