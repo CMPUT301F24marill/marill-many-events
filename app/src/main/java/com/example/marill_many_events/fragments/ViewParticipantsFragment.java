@@ -129,7 +129,7 @@ public class ViewParticipantsFragment extends Fragment implements EntrantyArrayA
                 Log.d(TAG, "Event document fetched successfully: " + eventSnapshot.getId());
 
                 // Get the accepted Entrants field from the event document
-                Object selectedEntrantRefsObj = eventSnapshot.get("acceptedEntrants");
+                Object selectedEntrantRefsObj = eventSnapshot.get("entrants");
                 Log.d(TAG, "acceptedEntrantRefsObj: " + selectedEntrantRefsObj);
 
                 List<?> selectedEntrantRefs = null;
@@ -148,7 +148,7 @@ public class ViewParticipantsFragment extends Fragment implements EntrantyArrayA
                 }
 
                 // Get the selectedEntrants field from the event document
-                selectedEntrantRefsObj = eventSnapshot.get("selectedEntrants");
+                selectedEntrantRefsObj = eventSnapshot.get("pending");
                 Log.d(TAG, "selectedEntrantRefsObj: " + selectedEntrantRefsObj);
 
                 selectedEntrantRefs = null;
@@ -329,9 +329,9 @@ public class ViewParticipantsFragment extends Fragment implements EntrantyArrayA
         String database_list_name;
 
         if (status.equals(getString(R.string.lbl_invited))) {
-            database_list_name = "selectedEntrants";
+            database_list_name = "pending";
         } else if (status.equals(getString(R.string.lbl_accepted))) {
-            database_list_name = "acceptedEntrants";
+            database_list_name = "entrants";
         } else if (status.equals(getString(R.string.lbl_waitlisted))) {
             database_list_name = "waitList";
         } else{
@@ -430,9 +430,9 @@ public class ViewParticipantsFragment extends Fragment implements EntrantyArrayA
         String database_list_name;
 
         if (status.equals(getString(R.string.lbl_invited))) {
-            database_list_name = "selectedEntrants";
+            database_list_name = "pending";
         } else if (status.equals(getString(R.string.lbl_accepted))) {
-            database_list_name = "acceptedEntrants";
+            database_list_name = "entrants";
         } else if (status.equals(getString(R.string.lbl_waitlisted))) {
             database_list_name = "waitList";
         } else{

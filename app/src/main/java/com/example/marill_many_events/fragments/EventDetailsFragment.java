@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
@@ -43,7 +44,7 @@ import java.util.ArrayList;
 public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhotoSelectedListener, EventsCallback {
 
     private TextView nameField, locationField ,capacityField, datePickerStart, datePickerEnd;
-    private ImageView QRview, posterView;
+    private ImageView QRview, posterView, pencil1, pencil2;
     private GenerateQRcode generateQRcode;
     private EventViewModel eventViewModel;
     private Button createButton, deleteButton;
@@ -53,9 +54,11 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
     private Uri posterUri;
     private Button drawEntrantsButton;
     private Button viewParticipantsButton;
+    private Button viewMapButton;
     private String eventDocumentId;
     private FirebaseEvents firebaseEvents;
     private FirebaseStorage firebaseStorage;
+    private SwitchCompat switchCompat;
 
     public EventDetailsFragment() {
         // Required empty public constructor
@@ -73,14 +76,20 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         datePickerEnd = view.findViewById(R.id.DrawdateField);
         capacityField = view.findViewById(R.id.Capacityfield);
         locationField = view.findViewById(R.id.LocationField);
+        pencil1 = view.findViewById(R.id.pencil1);
+        pencil2 = view.findViewById(R.id.pencil2);
+        pencil1.setAlpha((float) 0.0);
+        pencil2.setAlpha((float) 0.0);
         QRview = view.findViewById(R.id.QRcode);
         posterView = view.findViewById(R.id.poster);
         user = eventViewModel.getCurrentUser();
         drawEntrantsButton = view.findViewById(R.id.draw_entrants_button);
         viewParticipantsButton = view.findViewById(R.id.view_participants_button);
+        viewMapButton = view.findViewById(R.id.map_button);
         photoPicker = new PhotoPicker(this, this);
         firebaseStorage = eventViewModel.getFirebaseStorage();
         firebaseEvents = new FirebaseEvents(eventViewModel.getFirebaseReference(), firebaseStorage.getReference("event_posters"), eventViewModel.getUserReference().getId(), this);
+        switchCompat = view.findViewById(R.id.GeoSwitch);
 
 
         createButton = view.findViewById(R.id.create);
@@ -101,7 +110,7 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
                 datePickerStart.setText(formatter.format(event.getStartDate()));
                 datePickerEnd.setText(formatter.format(event.getDrawDate()));
                 capacityField.setText(String.valueOf(event.getCapacity()));
-
+                switchCompat.setChecked(event.isCheckGeo());
 
                 if (event.getFirebaseID() != null) {
                     QRview.setVisibility(View.VISIBLE);
@@ -195,6 +204,9 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
             setNoEdit(nameField);
             setNoEdit(locationField);
             setNoEdit(capacityField);
+            setNoEdit(datePickerStart);
+            setNoEdit(datePickerEnd);
+            switchCompat.setEnabled(false);
 
             if (user != null) {
                 ArrayList<DocumentReference> waitList = user.getwaitList();
@@ -231,6 +243,12 @@ public class EventDetailsFragment extends Fragment implements PhotoPicker.OnPhot
         createButton.setVisibility(View.GONE);
         drawEntrantsButton.setVisibility(View.VISIBLE);
         viewParticipantsButton.setVisibility(View.VISIBLE);
+        pencil1.setAlpha((float) 1.0);
+        pencil2.setAlpha((float) 1.0);
+
+        /*if(event.isCheckGeo() == true){
+            viewMapButton.setVisibility(View.VISIBLE);
+        }*/
 
         posterView.setOnClickListener(v-> {
             photoPicker.showPhotoOptions(null);
